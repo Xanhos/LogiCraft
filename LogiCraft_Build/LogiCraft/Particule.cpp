@@ -153,7 +153,8 @@ namespace lc
 	{
 		m_name = "Particules System";
 		m_typeName = "Particules System";
-		m_type = TYPE::PARTICULES_SYSTEM;
+		m_type = TYPE::PARTICULES;
+
 		m_particulesType = ParticulesSystemType::NORMAL;
 
 		m_rendererView = sf::View(sf::Vector2f(1920.f / 2.f, 1080.f / 2.f), sf::Vector2f(1920.f, 1080.f));
@@ -200,7 +201,7 @@ namespace lc
 	{
 		m_name = "Particules System";
 		m_typeName = "Particules System";
-		m_type = TYPE::PARTICULES_SYSTEM;
+		m_type = TYPE::PARTICULES;
 		m_particulesType = _type;
 
 		m_rendererView = sf::View(sf::Vector2f(1920.f / 2.f, 1080.f / 2.f), sf::Vector2f(1920.f, 1080.f));
