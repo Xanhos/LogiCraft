@@ -1,0 +1,265 @@
+#include "AI.h"
+#include "GameObject.h"
+
+lc::AI::AI() : m_root(PatronNode::getNodeType("SEQUENCE"))
+{
+    m_type = TYPE::IA;
+    m_typeName = "IA";
+    m_name = "AI";
+}
+
+lc::AI::~AI()
+{
+}
+
+void lc::AI::Save(std::ofstream& save, sf::RenderTexture& texture, int _depth)
+{
+    save << static_cast<int>(m_type) << " " << Tools::replaceSpace(m_typeName, true) << std::endl;
+	m_root.Save(save);
+}
+
+void lc::AI::Load(std::ifstream& load)
+{
+    load >> m_typeName;
+    m_root.Load(load);
+}
+
+void lc::AI::UpdateEvent(sf::Event& _window)
+{
+}
+
+void lc::AI::Update(WindowManager& _window)
+{
+    if (m_isEditionBehaviorTree)
+    {
+        if (ImGui::Begin(("Behavior Tree Information##lc" + getParent()->getName()).c_str(), &m_isEditionBehaviorTree, ImGuiWindowFlags_AlwaysHorizontalScrollbar | ImGuiWindowFlags_NoCollapse))
+        {
+            ImGui::SetWindowPos(_window.getSize() / 4 - sf::Vector2i(ImGui::GetWindowSize()) / 4, ImGuiCond_Once);
+            ImGui::SetWindowSize(sf::Vector2f(_window.getSize() / 2), ImGuiCond_Once);
+
+            ImGui::BeginChild("Tree information##lc", ImVec2((ImGui::GetWindowSize().x / 2) - 20, ImGui::GetWindowSize().y - 40), true, ImGuiWindowFlags_AlwaysHorizontalScrollbar);
+            m_root.Display(&m_selectedNode);
+            ImGui::EndChild();
+
+
+
+            ImGui::SameLine();
+            ImGui::BeginChild("Node information##lc", ImVec2((ImGui::GetWindowSize().x / 2) - 20, ImGui::GetWindowSize().y - 40), true);
+            this->UpdateSelectedNode();
+            ImGui::EndChild();
+
+           
+		}
+		ImGui::End();
+	} 
+    if (m_wantToCopyATreeNode)
+    {
+        auto scene = getParent();
+        while (scene->getParent())
+        {
+            scene = scene->getParent();
+        }
+        this->CopyTreeNode(scene);
+    }
+}
+
+
+
+void lc::AI::Draw(WindowManager& _window)
+{
+}
+
+void lc::AI::Draw(sf::RenderTexture& _window)
+{
+}
+
+std::shared_ptr<lc::GameComponent> lc::AI::Clone()
+{
+    return std::make_shared<lc::AI>(*this);
+}
+
+void lc::AI::setHierarchieFunc()
+{
+    m_hierarchieInformation = [&] {
+        if (ImGui::Button("Edit Behavior Tree"))
+        {
+			m_isEditionBehaviorTree = !m_isEditionBehaviorTree;
+            m_wantToCopyATreeNode = false;
+        }
+        if (ImGui::Button("Copy TreeNode"))
+        {
+			m_wantToCopyATreeNode = !m_wantToCopyATreeNode;
+            m_isEditionBehaviorTree = false;
+		}
+
+    };
+}
+
+void lc::AI::UpdateSelectedNode()
+{
+    if (m_selectedNode)
+    {
+        ImGui::Text("Node Type : %s", PatronNode::getNodeName(m_selectedNode->getType()).c_str());
+
+        if (m_selectedNode->getType() < PatronNode::getDecoratorNodeStart() or (m_selectedNode->getType() >= PatronNode::getDecoratorNodeStart() and m_selectedNode->getType() < PatronNode::getActionNodeStart() and m_selectedNode->getChildrens().empty())) //if the node if not a leaf node or the decorator node is empty, we can add a node to it
+        {
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15.f);
+
+            if (ImGui::BeginCombo("Node Type", PatronNode::getNodeName(m_newNodeType).c_str())) //Make a combo with all the node type except the decorator
+            {
+                bool isSelected = false;
+
+                for (int i = 0; i < PatronNode::getNodeContainer().size(); i++)
+                {
+                    if(i < PatronNode::getDecoratorNodeStart() || i >= PatronNode::getActionNodeStart())
+                        if (ImGui::Selectable(PatronNode::getNodeName(i).c_str(), &isSelected, ImGuiSelectableFlags_SelectOnClick))
+                        {
+                            m_newNodeType = i;
+                        }
+                }
+
+
+                ImGui::EndCombo();
+            }
+
+            if (ImGui::Button("Add Node"))
+            {
+                this->AddNode(m_newNodeType);
+            }
+        }
+
+        if (m_selectedNode->getParent()) //If the node has a parent, we can remove it (so we can't remove the root node)
+        {
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15.f);
+            if (ImGui::Button("Delete Node"))
+            {
+                this->RemoveNode();
+            }
+
+
+            ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15.f);
+            m_newDecorateType = MakeCombo(PatronNode::getDecoratorNodeStart(), PatronNode::getActionNodeStart(), m_newDecorateType, "Decorator Type"); // Make a combo with all the decorator node type
+
+            if (ImGui::Button("Add Decorator"))
+            {
+                this->AddDecorateNode(m_newDecorateType);
+            }
+            if (m_selectedNode->getType() >= PatronNode::getDecoratorNodeStart() && m_selectedNode->getType() < PatronNode::getActionNodeStart())
+            {
+                ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15.f);
+                if (ImGui::Button("Remove Decorator"))
+                {
+                    this->RemoveDecorateNode();
+                }
+            } 
+
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15.f);
+            auto t = PatronNode::getNodeUpdateMethod();
+            if (t[PatronNode::getNodeName(m_selectedNode->getType())])//Check if the node need an update method
+            {
+                t[PatronNode::getNodeName(m_selectedNode->getType())](m_selectedNode);//Update the node with the correct method if they need it
+			}
+			
+        }
+	}
+}
+
+void lc::AI::AddNode(int type)
+{
+    if (m_selectedNode)
+    {
+        m_selectedNode->setNewNodeIsAdded(true);
+		m_selectedNode->Add(PatronNode(type));
+	}
+}
+
+void lc::AI::RemoveNode()
+{
+    auto NewNode = m_selectedNode->getParent();
+    NewNode->removeChild(m_selectedNode);
+    m_selectedNode = NewNode;
+}
+
+void lc::AI::AddDecorateNode(int type)
+{
+    auto nodeDecorated = m_selectedNode;
+    auto parentNode = m_selectedNode->getParent();
+    m_selectedNode = parentNode->Add(type);
+    m_selectedNode->setNewNodeIsAdded(true);
+    m_selectedNode->Add(*nodeDecorated);
+    parentNode->removeChild(nodeDecorated);
+}
+
+void lc::AI::RemoveDecorateNode()
+{
+    if (m_selectedNode->getParent())
+    {
+        auto NewNode = m_selectedNode->getParent();
+        auto children = m_selectedNode->getChildrens();
+        for (auto& i : children)
+        {
+            NewNode->Add(i);
+        }
+        NewNode->removeChild(m_selectedNode);
+        m_selectedNode = NewNode;
+    }
+}
+
+void lc::AI::CopyTreeNode(std::shared_ptr<lc::GameObject> _game_object)
+{
+    //Recursive lambda function to check all the children of the gameobject and make a ImGui combo box to select the tree node to copy
+    std::function<void(std::shared_ptr<lc::GameObject>, std::pair<std::weak_ptr<GameObject>,PatronNode*>*)> checkChild = [&](std::shared_ptr<lc::GameObject> object, std::pair<std::weak_ptr<GameObject>, PatronNode*>* nodeToCopy) {
+
+        for (auto& i : object->getObjects())
+        {
+            if (i->hasComponent("AI") and &*i->getComponent<lc::AI>("AI") != this)//Check if the gameobject has a AI component and if it is not the current AI component
+            {           
+                if(ImGui::Selectable(i->getName().c_str()))
+                {
+                    nodeToCopy->second = &i->getComponent<lc::AI>("AI")->m_root;
+                    nodeToCopy->first = i;
+                }
+			}
+            checkChild(i,nodeToCopy);
+		}
+	};
+    ImGui::Begin("Copy TreeNode##lc", &m_wantToCopyATreeNode, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove);
+    ImGui::SetWindowPos(sf::Vector2f(ImGui::GetIO().DisplaySize.x / 2 - ImGui::GetWindowSize().x / 2, ImGui::GetIO().DisplaySize.y / 2 - ImGui::GetWindowSize().y / 2));
+    
+    if(ImGui::BeginCombo("TreeNode to copy", (m_copiedNode.first.lock() ? m_copiedNode.first.lock()->getName().c_str() : "")))
+    {
+        checkChild(_game_object, &m_copiedNode);
+        ImGui::EndCombo();
+    }
+    if (ImGui::Button("Copy"))
+    {
+        if (m_copiedNode.second)//if the copied node is not null we proceed to the copy
+        {
+            m_root = m_copiedNode.second->Clone();
+		}
+        m_copiedNode = {};
+		m_wantToCopyATreeNode = false;
+	}
+    ImGui::End();
+}
+
+int lc::AI::MakeCombo(int start, int end, int DefaultValue, std::string name)
+{
+    int type = DefaultValue;
+    if (ImGui::BeginCombo(name.c_str(), PatronNode::getNodeName(DefaultValue).c_str()))
+    {
+        bool isSelected = false;
+
+        for (int i = start; i < end; i++)
+        {
+            if (ImGui::Selectable(PatronNode::getNodeName(i).c_str(), &isSelected, ImGuiSelectableFlags_SelectOnClick))
+            {
+                type = i;
+            }
+        }
+
+
+        ImGui::EndCombo();
+    }
+    return type;
+}

@@ -1,0 +1,97 @@
+#include "GameComponent.h"
+
+lc::GameComponent::GameComponent()
+	: m_name(""), m_ID(0u), m_needToBeDeleted(false)
+{}
+
+lc::GameComponent::GameComponent(std::string _name)
+	: m_name(_name), m_ID(0u), m_needToBeDeleted(false)
+{}
+
+lc::GameComponent::~GameComponent()
+{
+}
+
+void lc::GameComponent::Hierarchie_Draw(unsigned int _parentID, std::list<std::shared_ptr<lc::GameComponent>>::iterator& _actComp, std::list<std::shared_ptr<lc::GameComponent>>& _compList)
+{
+	if (m_typeName == "Texture")
+	{
+		ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.f, 0.6f, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.8f, 0.f, 0.8f, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(1.f, 0.f, 1.f, 1.f));
+	}
+	else if (m_typeName == "Text")
+	{
+		ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.f, 0.f, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.8f, 0.f, 0.f, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(1.f, 0.f, 0.f, 1.f));
+	}
+	else
+	{
+		ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1215f, 0.22352f, 0.3450f, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, ImVec4(0.21960f, 0.4823f, 0.7960f, 1.f));
+		ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.25882f, 0.5882f, 1.f, 1.f));
+	}
+	if (ImGui::TreeNodeEx(std::string(m_typeName + std::to_string(_parentID) + std::to_string(m_ID)).c_str(),
+		ImGuiTreeNodeFlags_Selected | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth, std::string(m_typeName + "<Name:" + m_name + ">").c_str()))
+	{
+		if (_actComp != std::prev(_compList.end()))
+		{
+			ImGui::SameLine();
+			if (ImGui::ArrowButtonEx(std::string("Down" + std::to_string((*_actComp)->getID())).c_str(), ImGuiDir_Down, sf::Vector2f(15.f, 13.f)))
+			{
+				auto tmp_Object = (*_actComp);
+				(*_actComp) = *std::next(_actComp);
+				*std::next(_actComp) = tmp_Object;
+			}
+		}
+		if (_actComp != _compList.begin())
+		{
+			ImGui::SameLine();
+			if (ImGui::ArrowButtonEx(std::string("Up" + std::to_string((*_actComp)->getID())).c_str(), ImGuiDir_Up, sf::Vector2f(15.f, 13.f)))
+			{
+				auto tmp_Object = (*_actComp);
+				(*_actComp) = *std::prev(_actComp);
+				*std::prev(_actComp) = tmp_Object;
+			}
+		}
+
+		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
+		if (ImGui::ImageButton(std::string("Delete component" + std::to_string(_parentID) + std::to_string(m_ID)).c_str(), GET_MANAGER->getTexture(""), sf::Vector2f(15.f, 15.f)))
+			m_needToBeDeleted = true;
+
+		ImGui::SameLine();
+		ImGui::Text("Delete component");
+
+		if (m_hierarchieInformation)
+			m_hierarchieInformation();
+		else
+			ImGui::Text("No option provided.");
+
+		ImGui::TreePop();
+	}
+	else
+	{
+		if (_actComp != std::prev(_compList.end()))
+		{
+			ImGui::SameLine();
+			if (ImGui::ArrowButtonEx(std::string("Down" + std::to_string((*_actComp)->getID())).c_str(), ImGuiDir_Down, sf::Vector2f(15.f, 13.f)))
+			{
+				auto tmp_Object = (*_actComp);
+				(*_actComp) = *std::next(_actComp);
+				*std::next(_actComp) = tmp_Object;
+			}
+		}
+		if (_actComp != _compList.begin())
+		{
+			ImGui::SameLine();
+			if (ImGui::ArrowButtonEx(std::string("Up" + std::to_string((*_actComp)->getID())).c_str(), ImGuiDir_Up, sf::Vector2f(15.f, 13.f)))
+			{
+				auto tmp_Object = (*_actComp);
+				(*_actComp) = *std::prev(_actComp);
+				*std::prev(_actComp) = tmp_Object;
+			}
+		}
+	}
+	ImGui::PopStyleColor(3);
+}
