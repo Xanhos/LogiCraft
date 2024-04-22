@@ -35,11 +35,28 @@ SOFTWARE.
 #pragma once
 #include "Ressource.h"
 
-class Animation : public lc::Ressource
+namespace lc
 {
-public:
-	Animation();
-	~Animation();
-private:
-};
+	class Animation : public lc::Ressource
+	{
+	public:
+		Animation();
+		~Animation();
 
+		virtual void UpdateEvent(sf::Event& _window) override;
+		virtual void Update(WindowManager& _window) override;
+		virtual void Draw(WindowManager& _window) override;
+		virtual void Draw(sf::RenderTexture& _window) override;
+
+		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) override;
+		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth) override {};
+		virtual void Load(std::ifstream& load) override;
+
+		virtual std::shared_ptr<lc::GameComponent> Clone() override;
+		virtual void setHierarchieFunc() override;
+	private:
+		sf::IntRect m_baseIntRect;
+		sf::Vector2f m_baseMaxFrame;
+		float m_baseFrameTimer;
+	};
+}

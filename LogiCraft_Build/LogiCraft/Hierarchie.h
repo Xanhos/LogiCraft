@@ -39,9 +39,6 @@ SOFTWARE.
 #include "tools_imgui.h"
 #include "GameObject.h"
 #include "Viewport.h"
- 
-typedef std::list<std::weak_ptr<lc::GameObject>> WeakPtrList;
-typedef std::list<std::shared_ptr<lc::GameObject>> SharedPtrList;
 
 class Hierarchie
 {
@@ -51,7 +48,7 @@ public:
 
 	void Update(std::shared_ptr<lc::GameObject> _scene, WindowManager& _window, Viewports& _viewports);
 
-	WeakPtrList& getSelectedGameObject();
+	ObjWeakPtrList& getSelectedGameObject();
 private:
 	/*
 	* @brief This function is here to display all the Object in the world in the hierarchie window.
@@ -71,6 +68,8 @@ private:
 	*/
 	void CopyPaste(std::shared_ptr<lc::GameObject> _scene, Viewports& _viewport);
 
+	void VerifyThePasteObject(std::shared_ptr<lc::GameObject> _scene);
+
 	/*
 	* @brief A function to display arrow to move up or down the object.
 	* @brief To change the diplay order.
@@ -78,7 +77,7 @@ private:
 	* @param _gameObject : Actual Object that will be moved.
 	* @param _gameObjectList : Is the object list of the parent of _gameObject to move _gameObject move up or down in it. 
 	*/
-	void MoveDownUpBehavior(std::shared_ptr<lc::GameObject> _gameObject, std::list<std::shared_ptr<lc::GameObject>>* _gameObjectList);
+	void MoveDownUpBehavior(std::shared_ptr<lc::GameObject> _gameObject, ObjSharedPtrList* _gameObjectList);
 
 	/*
 	* @brief A function to move object in other object by drag it and drop it in the object.
@@ -106,8 +105,8 @@ private:
 	bool IsAChldOfASltObj(std::shared_ptr<lc::GameObject> _gameObject, std::shared_ptr<lc::GameObject> _scene);
 
 private:
-	WeakPtrList m_selectedGameObjects;
-	SharedPtrList m_copyPasteObjects;
+	ObjWeakPtrList m_selectedGameObjects;
+	ObjSharedPtrList m_copyPasteObjects;
 
 	std::weak_ptr<lc::GameObject> m_clickedObject;
 

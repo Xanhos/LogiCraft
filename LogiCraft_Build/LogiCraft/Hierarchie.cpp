@@ -68,9 +68,35 @@ void Hierarchie::Update(std::shared_ptr<lc::GameObject> _scene, WindowManager& _
 	ImGui::End();
 
 	this->CopyPaste(_scene, _viewports);
+
+	std::string tmp_cloneName(m_name);
+	if (tmp_cloneName.find_last_of("copie") != std::string::npos)
+	{
+		int tmp_strOff(tmp_cloneName.find_last_of("copie") + static_cast<size_t>(5));
+
+		if (tmp_cloneName.at(tmp_strOff) == '_')
+		{
+			//if (tmp_cloneName.at(tmp_strOff) == '_')
+			//{
+			//	//DO TO
+			//}
+			//else
+			//	tmp_cloneName.append("_", tmp_cloneName.find("copie"), 1);
+		}
+		else
+		{
+			int tmp_off(1);
+			while (std::next(tmp_cloneName.begin(), tmp_strOff + tmp_off) != tmp_cloneName.end())
+			{
+
+			}
+		}
+	}
+	else
+		tmp_cloneName += "_copie";
 }
 
-WeakPtrList& Hierarchie::getSelectedGameObject()
+ObjWeakPtrList& Hierarchie::getSelectedGameObject()
 {
 	return m_selectedGameObjects;
 }
@@ -284,6 +310,8 @@ void Hierarchie::CopyPaste(std::shared_ptr<lc::GameObject> _scene, Viewports& _v
 		{
 			_scene->addObject(newObject);
 			m_selectedGameObjects.push_back(newObject);
+
+			this->VerifyThePasteObject(_scene);
 		}
 
 		_viewport.getActualSelectedObjectNumber() = 0u;
@@ -292,7 +320,39 @@ void Hierarchie::CopyPaste(std::shared_ptr<lc::GameObject> _scene, Viewports& _v
 	}
 }
 
-void Hierarchie::MoveDownUpBehavior(std::shared_ptr<lc::GameObject> _gameObject, std::list<std::shared_ptr<lc::GameObject>>* _gameObjectList)
+void Hierarchie::VerifyThePasteObject(std::shared_ptr<lc::GameObject> _scene)
+{
+	/*std::string tmp_cloneName(m_name);
+	if (tmp_cloneName.find_last_of("copie") != std::string::npos)
+	{
+		int tmp_strOff(tmp_cloneName.find_last_of("copie") + static_cast<size_t>(5));
+
+		if (tmp_cloneName.at(tmp_strOff) == '_')
+		{
+			//if (tmp_cloneName.at(tmp_strOff) == '_')
+			//{
+			//	//DO TO
+			//}
+			//else
+			//	tmp_cloneName.append("_", tmp_cloneName.find("copie"), 1);
+		}
+		else
+		{
+			int tmp_off(1);
+			while (std::next(tmp_cloneName.begin(), tmp_strOff + tmp_off) != tmp_cloneName.end())
+			{
+
+			}
+		}
+	}
+	else
+		tmp_cloneName += "_copie";*/
+
+	//TO DO
+	//BOUCLE POUR VERIFIÉ LES NOMS QUI SONT PAREIL (COURAGE SAMY) 
+}
+
+void Hierarchie::MoveDownUpBehavior(std::shared_ptr<lc::GameObject> _gameObject, ObjSharedPtrList* _gameObjectList)
 {
 	if (_gameObjectList != nullptr)
 		if (!_gameObjectList->empty())

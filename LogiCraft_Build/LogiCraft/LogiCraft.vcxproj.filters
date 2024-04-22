@@ -147,6 +147,9 @@
     <ClCompile Include="Viewport.cpp">
       <Filter>Fichiers sources\SOFTWARE UI</Filter>
     </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Fichiers sources\RESSOURCES</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IMGUI\imconfig.h">
@@ -247,6 +250,9 @@
     </ClInclude>
     <ClInclude Include="ToolsBar.h">
       <Filter>Fichiers d%27en-tête\SOFTWARE UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Fichiers d%27en-tête\RESSOURCES</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

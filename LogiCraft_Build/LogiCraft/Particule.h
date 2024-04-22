@@ -106,6 +106,7 @@ namespace lc
 		virtual void setHierarchieFunc() override;
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) override;
+		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth) override {};
 		virtual void Load(std::ifstream& load) override;
 	private:
 		/*
