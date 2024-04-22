@@ -1,6 +1,14 @@
 MIT License
 
-Copyright (c) 2024 Yann Grallan
+Copyright (c) [2024] [GRALLAN Yann]
+Copyright (c) [2024] [LESAGE Charles]
+Copyright (c) [2024] [MENA-BOUR Samy]
+
+This software utilizes code from the following GitHub repositories, which are also licensed under the MIT License:
+
+- [SFML](https://github.com/SFML)
+- [ImGUI](https://github.com/ocornut/imgui)
+- [ImNodes](https://github.com/Nelarius/imnodes)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
