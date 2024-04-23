@@ -322,6 +322,8 @@ void Hierarchie::VerifyThePasteObject(std::shared_ptr<lc::GameObject>& _object)
 	}
 }
 
+
+
 void Hierarchie::MoveDownUpBehavior(std::shared_ptr<lc::GameObject> _gameObject, ObjSharedPtrList* _gameObjectList)
 {
 	if (_gameObjectList != nullptr)
@@ -424,6 +426,20 @@ void Hierarchie::SelectionBehavior(std::shared_ptr<lc::GameObject> _gameObject)
 		if (!KEY(LControl))
 			m_selectedGameObjects.clear();
 
+		this->SelectionVerifyBehavior(_gameObject);
+	}
+
+	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+	{
+		m_clickedObject = _gameObject;
+		m_wantToCreateAGameObject = true;
+	}
+}
+
+void Hierarchie::SelectionVerifyBehavior(std::shared_ptr<lc::GameObject> _gameObject)
+{
+	if (KEY(LShift))
+	{
 		if (std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&_gameObject](std::weak_ptr<lc::GameObject> _wptrObject)
 			{
 				if (!_wptrObject.expired())
@@ -433,12 +449,25 @@ void Hierarchie::SelectionBehavior(std::shared_ptr<lc::GameObject> _gameObject)
 				return false;
 			}) == m_selectedGameObjects.end())
 			m_selectedGameObjects.push_back(_gameObject);
-	}
 
-	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+		for (auto& object : _gameObject->getObjects())
+			this->SelectionVerifyBehavior(object);
+	}
+	else
 	{
-		m_clickedObject = _gameObject;
-		m_wantToCreateAGameObject = true;
+		auto tmp_selected = std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&_gameObject](std::weak_ptr<lc::GameObject> _wptrObject)
+			{
+				if (!_wptrObject.expired())
+					if (_gameObject == _wptrObject.lock())
+						return true;
+
+				return false;
+			});
+
+		if (tmp_selected == m_selectedGameObjects.end())
+			m_selectedGameObjects.push_back(_gameObject);
+		else
+			m_selectedGameObjects.erase(tmp_selected);
 	}
 }
 

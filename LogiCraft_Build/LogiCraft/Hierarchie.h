@@ -97,6 +97,8 @@ private:
 	*/
 	void SelectionBehavior(std::shared_ptr<lc::GameObject> _gameObject);
 
+	void SelectionVerifyBehavior(std::shared_ptr<lc::GameObject> _gameObject);
+
 	/*
 	* @brief A function to know if the _gameObject is a child of a selected object.
 	* @brief Its to prevent double copy of an object.
