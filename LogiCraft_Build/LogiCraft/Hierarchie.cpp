@@ -68,32 +68,6 @@ void Hierarchie::Update(std::shared_ptr<lc::GameObject> _scene, WindowManager& _
 	ImGui::End();
 
 	this->CopyPaste(_scene, _viewports);
-
-	std::string tmp_cloneName(m_name);
-	if (tmp_cloneName.find_last_of("copie") != std::string::npos)
-	{
-		int tmp_strOff(tmp_cloneName.find_last_of("copie") + static_cast<size_t>(5));
-
-		if (tmp_cloneName.at(tmp_strOff) == '_')
-		{
-			//if (tmp_cloneName.at(tmp_strOff) == '_')
-			//{
-			//	//DO TO
-			//}
-			//else
-			//	tmp_cloneName.append("_", tmp_cloneName.find("copie"), 1);
-		}
-		else
-		{
-			int tmp_off(1);
-			while (std::next(tmp_cloneName.begin(), tmp_strOff + tmp_off) != tmp_cloneName.end())
-			{
-
-			}
-		}
-	}
-	else
-		tmp_cloneName += "_copie";
 }
 
 ObjWeakPtrList& Hierarchie::getSelectedGameObject()
@@ -308,10 +282,16 @@ void Hierarchie::CopyPaste(std::shared_ptr<lc::GameObject> _scene, Viewports& _v
 		m_selectedGameObjects.clear();
 		for (auto& newObject : m_copyPasteObjects)
 		{
+			for (auto& child : newObject->getObjects())
+			{
+				child->getName() += "_copie_" + std::to_string(lc::GameObject::getGeneralID());
+			}
+			newObject->getName() += "_copie_" + std::to_string(lc::GameObject::getGeneralID());
 			_scene->addObject(newObject);
 			m_selectedGameObjects.push_back(newObject);
 
-			this->VerifyThePasteObject(_scene);
+			newObject = newObject->Clone();
+			this->VerifyThePasteObject(newObject);
 		}
 
 		_viewport.getActualSelectedObjectNumber() = 0u;
@@ -320,36 +300,14 @@ void Hierarchie::CopyPaste(std::shared_ptr<lc::GameObject> _scene, Viewports& _v
 	}
 }
 
-void Hierarchie::VerifyThePasteObject(std::shared_ptr<lc::GameObject> _scene)
+void Hierarchie::VerifyThePasteObject(std::shared_ptr<lc::GameObject>& _object)
 {
-	/*std::string tmp_cloneName(m_name);
-	if (tmp_cloneName.find_last_of("copie") != std::string::npos)
+	_object->getName() = _object->getName().erase(_object->getName().find_last_of('_'));
+	_object->getName() = _object->getName().erase(_object->getName().find_last_of('_'));
+	for (auto& child : _object->getObjects())
 	{
-		int tmp_strOff(tmp_cloneName.find_last_of("copie") + static_cast<size_t>(5));
-
-		if (tmp_cloneName.at(tmp_strOff) == '_')
-		{
-			//if (tmp_cloneName.at(tmp_strOff) == '_')
-			//{
-			//	//DO TO
-			//}
-			//else
-			//	tmp_cloneName.append("_", tmp_cloneName.find("copie"), 1);
-		}
-		else
-		{
-			int tmp_off(1);
-			while (std::next(tmp_cloneName.begin(), tmp_strOff + tmp_off) != tmp_cloneName.end())
-			{
-
-			}
-		}
+		this->VerifyThePasteObject(child);
 	}
-	else
-		tmp_cloneName += "_copie";*/
-
-	//TO DO
-	//BOUCLE POUR VERIFIÉ LES NOMS QUI SONT PAREIL (COURAGE SAMY) 
 }
 
 void Hierarchie::MoveDownUpBehavior(std::shared_ptr<lc::GameObject> _gameObject, ObjSharedPtrList* _gameObjectList)

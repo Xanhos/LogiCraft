@@ -68,7 +68,7 @@ private:
 	*/
 	void CopyPaste(std::shared_ptr<lc::GameObject> _scene, Viewports& _viewport);
 
-	void VerifyThePasteObject(std::shared_ptr<lc::GameObject> _scene);
+	void VerifyThePasteObject(std::shared_ptr<lc::GameObject>& _object);
 
 	/*
 	* @brief A function to display arrow to move up or down the object.
