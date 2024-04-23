@@ -70,7 +70,7 @@ void Hierarchie::Update(std::shared_ptr<lc::GameObject> _scene, WindowManager& _
 	this->CopyPaste(_scene, _viewports);
 }
 
-WeakPtrList& Hierarchie::getSelectedGameObject()
+ObjWeakPtrList& Hierarchie::getSelectedGameObject()
 {
 	return m_selectedGameObjects;
 }
@@ -289,7 +289,10 @@ void Hierarchie::CopyPaste(std::shared_ptr<lc::GameObject> _scene, Viewports& _v
 		for (auto& newObject : m_copyPasteObjects)
 		{
 			_scene->addObject(newObject);
-			m_selectedGameObjects.push_back(newObject);
+			this->AddSelectedObject(newObject);
+
+			newObject = newObject->Clone();
+			this->VerifyThePasteObject(newObject);
 		}
 
 		_viewport.getActualSelectedObjectNumber() = 0u;
@@ -298,7 +301,30 @@ void Hierarchie::CopyPaste(std::shared_ptr<lc::GameObject> _scene, Viewports& _v
 	}
 }
 
-void Hierarchie::MoveDownUpBehavior(std::shared_ptr<lc::GameObject> _gameObject, std::list<std::shared_ptr<lc::GameObject>>* _gameObjectList)
+void Hierarchie::AddSelectedObject(std::shared_ptr<lc::GameObject> _object)
+{
+	_object->getName() += "_copie_" + std::to_string(_object->getID());
+
+	m_selectedGameObjects.push_back(_object);
+	for (auto& object : _object->getObjects())
+	{
+		this->AddSelectedObject(object);
+	}
+}
+
+void Hierarchie::VerifyThePasteObject(std::shared_ptr<lc::GameObject>& _object)
+{
+	_object->getName() = _object->getName().erase(_object->getName().find_last_of('_'));
+	_object->getName() = _object->getName().erase(_object->getName().find_last_of('_'));
+	for (auto& child : _object->getObjects())
+	{
+		this->VerifyThePasteObject(child);
+	}
+}
+
+
+
+void Hierarchie::MoveDownUpBehavior(std::shared_ptr<lc::GameObject> _gameObject, ObjSharedPtrList* _gameObjectList)
 {
 	if (_gameObjectList != nullptr)
 		if (!_gameObjectList->empty())
@@ -400,22 +426,48 @@ void Hierarchie::SelectionBehavior(std::shared_ptr<lc::GameObject> _gameObject)
 		if (!KEY(LControl))
 			m_selectedGameObjects.clear();
 
-		if (!_gameObject->isLock())
-			if (std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&_gameObject](std::weak_ptr<lc::GameObject> _wptrObject)
-				{
-					if (!_wptrObject.expired())
-						if (_gameObject == _wptrObject.lock())
-							return true;
-
-					return false;
-				}) == m_selectedGameObjects.end())
-				m_selectedGameObjects.push_back(_gameObject);
+		this->SelectionVerifyBehavior(_gameObject);
 	}
 
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
 	{
 		m_clickedObject = _gameObject;
 		m_wantToCreateAGameObject = true;
+	}
+}
+
+void Hierarchie::SelectionVerifyBehavior(std::shared_ptr<lc::GameObject> _gameObject)
+{
+	if (KEY(LShift))
+	{
+		if (std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&_gameObject](std::weak_ptr<lc::GameObject> _wptrObject)
+			{
+				if (!_wptrObject.expired())
+					if (_gameObject == _wptrObject.lock())
+						return true;
+
+				return false;
+			}) == m_selectedGameObjects.end())
+			m_selectedGameObjects.push_back(_gameObject);
+
+		for (auto& object : _gameObject->getObjects())
+			this->SelectionVerifyBehavior(object);
+	}
+	else
+	{
+		auto tmp_selected = std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&_gameObject](std::weak_ptr<lc::GameObject> _wptrObject)
+			{
+				if (!_wptrObject.expired())
+					if (_gameObject == _wptrObject.lock())
+						return true;
+
+				return false;
+			});
+
+		if (tmp_selected == m_selectedGameObjects.end())
+			m_selectedGameObjects.push_back(_gameObject);
+		else
+			m_selectedGameObjects.erase(tmp_selected);
 	}
 }
 

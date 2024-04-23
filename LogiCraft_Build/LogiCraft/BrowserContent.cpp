@@ -317,47 +317,8 @@ void BrowserContent::PutRessources(std::shared_ptr<lc::GameObject> _object, Wind
 	}
 	if (m_choosingName)
 	{
-		bool open = true;
-		static std::vector<std::string> names;
-		for (auto& it : _object->getObjects())
-		{
-			while (it->getObjects().size() != 0)
-			{
-				for (auto& i : it->getObjects())
-				{
-					names.push_back(i->getName());
-				}
-			}
-			names.push_back(it->getName());
-		}
-		ImGui::Begin("Choose a name for the object", &open, ImGuiWindowFlags_AlwaysAutoResize);
-		if(ImGui::InputText("Change Name", m_newObjectName, 150, ImGuiInputTextFlags_EnterReturnsTrue))
-		{
-			static int count = 0;
-			for (auto& it : names)
-			{
-				if (Tools::replaceSpace(m_newObjectName) != it || m_slidingRessources->getTypeName() == "Event")
-				{
-					count++;
-				}
-			}
-			if (count == names.size())
-			{
-				m_nameIsReady = true;
-				m_showError = false;
-				count = 0;
-				names.clear();
-			}
-			else
-			{
-				m_showError = true;
-				count = 0;
-				names.clear();
-			}
-		}
-		if (m_showError)
-			ImGui::Text("Name already existing, change it !");
-		ImGui::End();
+		if (m_slidingRessources->getTypeName() != "Event")
+			this->MakeRessourcesName(_object);
 	}
 	if (m_nameIsReady)
 	{
@@ -396,6 +357,36 @@ void BrowserContent::PutRessources(std::shared_ptr<lc::GameObject> _object, Wind
 		m_choosingName = false;
 		m_nameIsReady = false;
 	}
+}
+
+void BrowserContent::MakeRessourcesName(std::shared_ptr<lc::GameObject> _scene)
+{
+	ImGui::Begin("Choose a name for the object", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+	if (ImGui::InputText("Change Name", m_newObjectName, 150, ImGuiInputTextFlags_EnterReturnsTrue))
+	{
+		Tools::ReplaceCharacter(m_newObjectName, ' ', '_');
+		if (!this->CheckObjectName(_scene, m_newObjectName))
+			m_nameIsReady = true;
+		else
+			m_showError = true;
+	}
+	if (m_showError)
+		ImGui::Text("Name already existing, change it !");
+	ImGui::End();
+}
+
+bool BrowserContent::CheckObjectName(std::shared_ptr<lc::GameObject> _obj, std::string _name)
+{
+	if (_obj->getName() == _name)
+		return true;
+
+	for (auto& object : _obj->getObjects())
+	{
+		if (this->CheckObjectName(object, _name))
+			return true;
+	}
+
+	return false;
 }
 
 void BrowserContent::AddComponent(std::shared_ptr<lc::GameObject> _object, WindowManager& _window, Viewport& _viewport)

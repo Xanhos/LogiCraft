@@ -43,8 +43,6 @@ SOFTWARE.
 
 const sf::Vector2f screenSize(3840.f, 2160.f);
 
-typedef std::list<std::weak_ptr<lc::GameObject>> WeakPtrList;
-
 class Viewport
 {
 public:
@@ -142,14 +140,14 @@ public:
 	/*
 	* @brief Just an update.
 	*/
-	void Update(WeakPtrList& _selectedObject, std::shared_ptr<lc::GameObject> _scene, WindowManager& _window);
+	void Update(ObjWeakPtrList& _selectedObject, std::shared_ptr<lc::GameObject> _scene, WindowManager& _window);
 
 	/*
 	* @brief A function to display every viewport.
 	* 
 	* @param _display : You will to put a lambda that contain everything you need to display on the viewport.
 	*/
-	void Draw(WeakPtrList& _object, std::shared_ptr<lc::GameObject> _scene, WindowManager& _window);
+	void Draw(ObjWeakPtrList& _object, std::shared_ptr<lc::GameObject> _scene, WindowManager& _window);
 #pragma endregion
 
 #pragma region GETTER/SETTER
@@ -192,7 +190,7 @@ private:
 	/*
 	* @brief Update of all the viewport.
 	*/
-	void UpdateViewports(WeakPtrList& _selectedObject, std::shared_ptr<lc::GameObject> _scene, WindowManager& _window);
+	void UpdateViewports(ObjWeakPtrList& _selectedObject, std::shared_ptr<lc::GameObject> _scene, WindowManager& _window);
 
 	/*
 	* @brief Update of the option that can be apply to All/Selected viewport.
@@ -227,7 +225,7 @@ private:
 	*/
 	void ResizeSelectionBoxBehavior(
 		sf::Vector2f _mousePositionWithView,
-		WeakPtrList& _selectedObject,
+		ObjWeakPtrList& _selectedObject,
 		std::shared_ptr<lc::GameObject> _scene,
 		std::shared_ptr<Viewport> _viewport,
 		WindowManager& _window);
@@ -237,7 +235,7 @@ private:
 	void ObjectIsSelectedOrMovedBehavior(
 		sf::Vector2f _mousePosition,
 		sf::Vector2f _mousePositionWithView,
-		WeakPtrList& _selectedObject,
+		ObjWeakPtrList& _selectedObject,
 		std::shared_ptr<lc::GameObject> _scene,
 		std::shared_ptr<Viewport> _viewport,
 		WindowManager& _window);
@@ -246,7 +244,7 @@ private:
 	* @brief This recurcive algorithm is made to check the selection of the object and his child and the child of his child...
 	*/
 	bool CheckSelection(
-		WeakPtrList& _object,
+		ObjWeakPtrList& _object,
 		std::shared_ptr<lc::GameObject> _scene,
 		sf::Vector2f _mousePosition,
 		std::shared_ptr<Viewport>& _viewport,
@@ -254,7 +252,7 @@ private:
 	/*
 	* @brief This function resize the selection rect.
 	*/
-	void ResizeRectSelection(WeakPtrList& _object, std::shared_ptr<lc::GameObject> _scene);
+	void ResizeRectSelection(ObjWeakPtrList& _object, std::shared_ptr<lc::GameObject> _scene);
 #pragma endregion
 private:
 	std::list<std::shared_ptr<Viewport>> m_viewports;

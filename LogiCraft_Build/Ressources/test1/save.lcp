@@ -1,0 +1,477 @@
+WORLD 0 0 1 1 0 0 0 0 0 0
+Components
+{
+}
+Objects
+{
+HERB2 154.658 789.637 1 1 217 203 0 0 0 2
+Components
+{
+0 Texture 0 0 217 203 ../ASSETS\AS_ARRPLAN\HERB2.png 0 0
+
+}
+Objects
+{
+TERP 390.156 764.648 1 1 261 208 0 0 0 2
+Components
+{
+0 Texture 0 0 261 208 ../ASSETS\AS_ARRPLAN\TERP.png 0 0
+
+}
+Objects
+{
+}
+
+}
+
+T1_1 3359.17 1810.99 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+T1_1 3175.22 1810.54 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+forme2 3268.33 1049.01 1 1 553 456 0 0 0 1
+Components
+{
+0 Texture 0 0 553 456 ../ASSETS\FORME_NOIR\3.png 0 0
+
+}
+Objects
+{
+}
+
+forme1 18.3696 1065.16 1 1 1054 1074 0 0 0 1
+Components
+{
+0 Texture 0 0 1054 1074 ../ASSETS\FORME_NOIR\1.png 0 0
+
+}
+Objects
+{
+}
+
+forme3 1892.61 1742.77 1 1 1929 402 0 0 0 1
+Components
+{
+0 Texture 0 0 1929 402 ../ASSETS\FORME_NOIR\2.png 0 0
+
+}
+Objects
+{
+}
+
+T1 3639.8 1016.61 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+A1_G 3204.58 1046.4 1 1 122 175 0 0 0 1
+Components
+{
+0 Texture 0 0 122 175 ../ASSETS\TILESET\A1_G.png 0 0
+
+}
+Objects
+{
+}
+
+T1_1 2805.35 1642.99 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_1 2622.4 1642.24 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_1 2439.46 1641.49 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_1 2257.45 1641.96 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_1 2074.82 1642.21 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_1 1894.4 1642.36 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_D 3542.71 1811.21 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1_D.png 0 0
+
+}
+Objects
+{
+}
+
+A1_D 3677.91 1833.18 1 1 122 175 0 0 0 1
+Components
+{
+0 Texture 0 0 122 175 ../ASSETS\TILESET\A1_D.png 0 0
+
+}
+Objects
+{
+}
+
+T1_D 2987.67 1642.94 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1_D.png 0 0
+
+}
+Objects
+{
+}
+
+T1_D 1531.29 2026.89 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1_D.png 0 0
+
+}
+Objects
+{
+}
+
+T1_G 1347.61 2026.6 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1_G.png 0 0
+
+}
+Objects
+{
+}
+
+A1_D 1665.78 2043.64 1 1 122 175 0 0 0 1
+Components
+{
+0 Texture 0 0 122 175 ../ASSETS\TILESET\A1_D.png 0 0
+
+}
+Objects
+{
+}
+
+A1_G 1271.45 2043.02 1 1 122 175 0 0 0 1
+Components
+{
+0 Texture 0 0 122 175 ../ASSETS\TILESET\A1_G.png 0 0
+
+}
+Objects
+{
+}
+
+A1_D 1012.9 989.993 1 1 122 175 0 0 0 1
+Components
+{
+0 Texture 0 0 122 175 ../ASSETS\TILESET\A1_D.png 0 0
+
+}
+Objects
+{
+}
+
+T1_D 885.537 956.362 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1_D.png 0 0
+
+}
+Objects
+{
+}
+
+T1_2 702.853 956.362 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_2 518.531 956.362 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_2 335.185 956.362 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_2 335.185 956.362 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_2 335.185 956.362 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_2 151.234 956.362 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_2 151.234 956.362 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_2 151.234 956.362 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_2 151.234 956.362 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_2 -32.766 956.362 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_2 -32.766 956.362 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+T1_G 3276.77 1017.43 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1_G.png 0 0
+
+}
+Objects
+{
+}
+
+T1 3455.27 1017.12 1 1 184 140 0 0 0 1
+Components
+{
+0 Texture 0 0 184 140 ../ASSETS\TILESET\T1.png 0 0
+
+}
+Objects
+{
+}
+
+}
+
+L1b 3348.34 763.161 1 1 485 1101 0 0 0 6
+Components
+{
+0 Texture 0 0 485 1101 ../ASSETS\BG_L1\L1b.png 0 0
+
+}
+Objects
+{
+L1a 3340.52 1724.86 1 1 440 431 0 0 0 6
+Components
+{
+0 Texture 0 0 440 431 ../ASSETS\BG_L1\L1a.png 0 0
+
+}
+Objects
+{
+}
+
+L1e 49.4065 -2.45566 1 1 994 1738 0 0 0 6
+Components
+{
+0 Texture 0 0 994 1738 ../ASSETS\BG_L1\L1e.png 0 0
+
+}
+Objects
+{
+}
+
+L1d 573.761 1751.39 1 1 998 412 0 0 0 6
+Components
+{
+0 Texture 0 0 998 412 ../ASSETS\BG_L1\L1d.png 0 0
+
+}
+Objects
+{
+}
+
+L1c 2934.68 -4.28589 1 1 912 804 0 0 0 6
+Components
+{
+0 Texture 0 0 912 804 ../ASSETS\BG_L1\L1c.png 0 0
+
+}
+Objects
+{
+}
+
+}
+
+L2b 566.626 -1.35123 1 1 2033 2160 0 0 0 7
+Components
+{
+0 Texture 0 0 2033 2160 ../ASSETS\BG_L2\L2b.png 0 0
+
+}
+Objects
+{
+L2a 3030.64 1343.03 1 1 805 809 0 0 0 7
+Components
+{
+0 Texture 0 0 805 809 ../ASSETS\BG_L2\L2a.png 0 0
+
+}
+Objects
+{
+}
+
+}
+
+L3b 869.873 1270.12 1 1 1930 862 0 0 0 8
+Components
+{
+0 Texture 0 0 1930 862 ../ASSETS\BG_L3\L3b.png 0 0
+
+}
+Objects
+{
+L3c 611.169 -19.4291 1 1 2599 2160 0 0 0 8
+Components
+{
+0 Texture 0 0 2599 2160 ../ASSETS\BG_L3\L3c.png 0 0
+
+}
+Objects
+{
+}
+
+L3a 2.80011 -1.35123 1 1 3840 2160 0 0 0 8
+Components
+{
+0 Texture 0 0 3840 2160 ../ASSETS\BG_L3\L3a.png 0 0
+
+}
+Objects
+{
+}
+
+}
+
+}
