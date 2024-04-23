@@ -125,6 +125,7 @@ private:
 	std::string m_selectedRessources = {};
 	std::string m_RessourceName;
 	std::string m_newFolderName;
+	std::string m_newObjectName;
 
 	sf::IntRect m_newTextureRect;
 

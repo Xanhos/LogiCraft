@@ -135,6 +135,7 @@ void BrowserContent::Update(std::shared_ptr<lc::GameObject> _object, WindowManag
 								if (Tools::Collisions::point_rect(_window.getMousePos<sf::Vector2f>(), { ImGui::GetItemRectMin(),ImGui::GetItemRectSize() }))
 								{
 									m_slidingRessources = &*dir_entry;
+									m_newObjectName = dir_entry->getName();
 									auto t = dir_entry.get();
 									m_isSlidingRessources = true;
 									_viewport.wantToPlaceAnObject() = true;
@@ -331,12 +332,12 @@ void BrowserContent::PutRessources(std::shared_ptr<lc::GameObject> _object, Wind
 			names.push_back(it->getName());
 		}
 		ImGui::Begin("Choose a name for the object", &open, ImGuiWindowFlags_AlwaysAutoResize);
-		if(ImGui::InputText("Change Name", m_slidingRessources->getName(), 150, ImGuiInputTextFlags_EnterReturnsTrue))
+		if(ImGui::InputText("Change Name", m_newObjectName, 150, ImGuiInputTextFlags_EnterReturnsTrue))
 		{
 			static int count = 0;
 			for (auto& it : names)
 			{
-				if (Tools::replaceSpace(m_slidingRessources->getName()) != it || m_slidingRessources->getTypeName() == "Event")
+				if (Tools::replaceSpace(m_newObjectName) != it || m_slidingRessources->getTypeName() == "Event")
 				{
 					count++;
 				}
@@ -379,7 +380,7 @@ void BrowserContent::PutRessources(std::shared_ptr<lc::GameObject> _object, Wind
 
 				if (selectedObject == _object)
 				{
-					auto object = selectedObject->addObject(m_slidingRessources->getName(), ToolsBar::GetActualLayer().first);
+					auto object = selectedObject->addObject(m_newObjectName, ToolsBar::GetActualLayer().first);
 					AddComponent(object, _window, *viewport);
 					object->getTransform().getPosition() = m_putPosition - object->getTransform().getSize() / 2.f;
 					_viewport.wantToPlaceAnObject() = false;
