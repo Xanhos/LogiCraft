@@ -97,6 +97,11 @@ private:
 	*/
 	void SelectionBehavior(std::shared_ptr<lc::GameObject> _gameObject);
 
+	/*
+	* @brief This function is used to know what input the user pressed and use to copy and paste,
+	* @brief So if maj is press it will selected the parent and his child.
+	* @brief And if ctrl is press it can multi select objects.
+	*/
 	void SelectionVerifyBehavior(std::shared_ptr<lc::GameObject> _gameObject);
 
 	/*
