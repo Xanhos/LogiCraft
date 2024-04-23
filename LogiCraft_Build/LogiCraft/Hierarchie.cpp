@@ -124,6 +124,12 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
 			ImGui::Text(std::string("Name : " + tmp_object->getName()).c_str());
 			if (tmp_object != _scene)
 			{
+				if (ImGui::Button(std::string("Delete Object##<ID:" + std::to_string(tmp_object->getID())).c_str()))
+				{
+					auto tmp_parent = tmp_object->getParent();
+					tmp_parent->removeObject(tmp_object->getName(), tmp_object->getID());
+				}
+
 				ImGui::Checkbox(std::string("is Visible##<ID:" + std::to_string(tmp_object->getID())).c_str(), &tmp_object->isVisible());
 				ImGui::Checkbox(std::string("is Lock##<ID:" + std::to_string(tmp_object->getID())).c_str(), &tmp_object->isLock());
 				
