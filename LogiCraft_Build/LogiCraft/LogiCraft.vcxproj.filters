@@ -249,4 +249,7 @@
       <Filter>Fichiers d%27en-tête\SOFTWARE UI</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="LogiCraft.licenseheader" />
+  </ItemGroup>
 </Project>
