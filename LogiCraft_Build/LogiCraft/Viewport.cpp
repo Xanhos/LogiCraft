@@ -33,6 +33,7 @@ SOFTWARE.
 ---------------------------------------------------------------------------------*/
 
 #include "Viewport.h"
+#include "ToolsBar.h"
 
 Viewport::Viewport() :
 	m_name(""), //STRING
@@ -515,7 +516,18 @@ void Viewports::ResizeSelectionBoxBehavior(sf::Vector2f _mousePositionWithView, 
 				for (auto& selectedObject : _selectedObject)
 					if (!selectedObject.expired())
 						if (!selectedObject.lock()->isLock())
-							selectedObject.lock()->getTransform().getPosition() = _mousePositionWithView + selectedObject.lock()->getTransform().getDistance();
+						{
+							if (ToolsBar::GetActualLayer().second == "Player Plan" && selectedObject.lock()->getDepth() == 1)
+							{
+								int x = (int)(_mousePositionWithView.x + selectedObject.lock()->getTransform().getDistance().x) / 120;
+								int y = (int)(_mousePositionWithView.y + selectedObject.lock()->getTransform().getDistance().y) / 120;
+								selectedObject.lock()->getTransform().getPosition() = sf::Vector2f(x * 120, y * 120);
+							}
+							else
+							{
+								selectedObject.lock()->getTransform().getPosition() = _mousePositionWithView + selectedObject.lock()->getTransform().getDistance();
+							}
+						}
 			}
 
 			m_maxSelectedObjectPosition = sf::Vector2f(INFINITY, INFINITY);

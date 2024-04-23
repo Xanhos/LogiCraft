@@ -146,6 +146,20 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
 					ImGui::EndCombo();
 				}
 
+				if (ImGui::Button("Add Button"))
+				{
+					bool isButton = false;
+					for (auto& components : tmp_object->getComponents())
+					{
+						if (components->getTypeName() == "Button")
+						{
+							isButton = true;
+						}
+					}
+					if (!isButton)
+						tmp_object->addComponent<lc::Button>();
+				}
+
 				ImGui::InputText("Change Name", tmp_object->getName(), 150, ImGuiInputTextFlags_EnterReturnsTrue);
 
 				if (ImGui::TreeNodeEx(std::string("Transform##" + std::to_string(tmp_object->getID())).c_str(),
@@ -178,20 +192,6 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
 
 					if (ImGui::Button("Add RigidBody"))
 						tmp_object->addComponent<lc::RigidBody>();
-
-					if (ImGui::Button("Add Button"))
-					{
-						bool isButton = false;
-						for (auto& components : tmp_object->getComponents())
-						{
-							if (components->getTypeName() == "Button")
-							{
-								isButton = true;
-							}
-						}
-						if (!isButton)
-							tmp_object->addComponent<lc::Button>();
-					}
 
 					if (ImGui::Button("Add Particules System"))
 						tmp_object->addComponent<lc::Particules>();
