@@ -255,4 +255,7 @@
       <Filter>Fichiers d%27en-tête\RESSOURCES</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="LogiCraft.licenseheader" />
+  </ItemGroup>
 </Project>
