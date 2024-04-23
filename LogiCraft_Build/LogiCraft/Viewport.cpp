@@ -517,7 +517,7 @@ void Viewports::ResizeSelectionBoxBehavior(sf::Vector2f _mousePositionWithView, 
 					if (!selectedObject.expired())
 						if (!selectedObject.lock()->isLock())
 						{
-							if (ToolsBar::GetActualLayer().second == "Player Plan" && selectedObject.lock()->getDepth() == 1)
+							if (ToolsBar::GetActualLayer().second == "Player Plan" && selectedObject.lock()->getDepth() == 4)
 							{
 								selectedObject.lock()->getTransform().getPosition() = 
 									sf::Vector2f((int)(_mousePositionWithView.x + selectedObject.lock()->getTransform().getDistance().x) / 120 * 120,
