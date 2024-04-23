@@ -30,6 +30,11 @@ public:
 namespace Tools
 {
 
+	namespace Collisions
+	{
+		bool lineRect(sf::FloatRect line, sf::FloatRect rect);
+		bool lineLine(sf::FloatRect line_one, sf::FloatRect line_two);
+	}
 	//Replace all the character that are the same as _characterToReplace to _replaceCharacter.
 	void ReplaceCharacter(std::string& _sentence, unsigned char _characterToReplace, unsigned char _replaceChar);
 

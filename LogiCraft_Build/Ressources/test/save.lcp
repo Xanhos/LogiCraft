@@ -4,22 +4,24 @@ Components
 }
 Objects
 {
-200x200 0.256287 -0.485291 1 1 200 200 0 0 0 0
+200x200D -1.72906 -1.47058 1 1 200 200 0 0 0 0
 Components
 {
 0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
 
-7 RigidBody 0 0 200 200 0 0 0 0 0 RigidBody
+7 RigidBody 0 0 200 200 0 0 0 0 1 RigidBody
 
 }
 Objects
 {
 }
 
-200x200D 359.591 239.926 1 1 200 200 0 0 0 0
+200x200 -4.91135 1228.45 1 1 200 200 0 0 0 0
 Components
 {
 0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+7 RigidBody 0 0 200 200 0 0 0 0 0 RigidBody
 
 }
 Objects

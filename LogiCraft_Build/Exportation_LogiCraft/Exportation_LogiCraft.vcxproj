@@ -138,6 +138,7 @@
     <ClCompile Include="GameComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Ressource.cpp" />
+    <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Tools_LC.cpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Ressource.h" />
+    <ClInclude Include="RigidBody.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Tools_LC.h" />
     <ClInclude Include="Transform.h" />

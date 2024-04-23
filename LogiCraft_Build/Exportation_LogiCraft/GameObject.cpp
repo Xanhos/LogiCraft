@@ -34,6 +34,7 @@ SOFTWARE.
 
 #include "GameObject.h"
 #include "Texture.h"
+#include "RigidBody.h"
 
 lc::GameObject::GameObject()
 	: m_name(""), m_depth(0), m_ID(m_generalID++), m_needToBeRemove(false)
@@ -100,6 +101,9 @@ void lc::GameObject::Load(std::ifstream& load)
 		}
 		else if ((Ressource::TYPE)type == Ressource::TYPE::RIGIDBODY)
 		{
+			auto rigid = std::make_shared<RigidBody>();
+			rigid->Load(load);
+			addComponent(rigid);
 		}
 		else if ((Ressource::TYPE)type == Ressource::TYPE::EVENT)
 		{
@@ -155,7 +159,7 @@ std::shared_ptr<lc::GameObject> lc::GameObject::LoadScene(std::string _SceneToLo
 			sf::Vector2f position(0,0);
 			iss >> posBGx >> posBGy >> garbarge >> garbarge >> depth;
 			position = sf::Vector2f(0 + (screenResolution.x * posBGx), 0 + (screenResolution.y * posBGy));
-			world->addObject("OBJECT",depth)->addComponent(std::make_shared<Texture>(dir_entry.path().filename().string(), dir_entry.path().string()))->setRelativePosition(position);
+			world->addObject("BACKGROUND",depth)->addComponent(std::make_shared<Texture>(dir_entry.path().filename().string(), dir_entry.path().string()))->setRelativePosition(position);
 		}
 	}
 

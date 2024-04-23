@@ -51,8 +51,6 @@ lc::RigidBody::RigidBody(sf::FloatRect _collider, sf::Vector2f _velocity, sf::Ve
 	m_collider = _collider;
 	m_velocity = _velocity;
 	m_relativePosition = _relative;
-	m_posBeforeSimulate = posBeforeSimulate;
-	m_showCollider = showCollide;
 	m_isKinetic = kinetic;
 	m_type = TYPE::RIGIDBODY;
 }
@@ -61,53 +59,17 @@ lc::RigidBody::~RigidBody()
 {
 }
 
-void lc::RigidBody::Save(std::ofstream& save, sf::RenderTexture& texture, int _depth)
-{
-	// texture.draw(m_renderer);
-	if (!getParent()->getIsSaved())
-	{
-		save << (int)m_type
-			<< " " << Tools::replaceSpace(m_typeName, true)
-			<< " " << m_collider.left
-			<< " " << m_collider.top
-			<< " " << m_collider.width
-			<< " " << m_collider.height
-			<< " " << m_velocity.x
-			<< " " << m_velocity.y
-			<< " " << m_relativePosition.x
-			<< " " << m_relativePosition.y
-			<< " " << m_isKinetic
-			<< " " << Tools::replaceSpace(m_name, true) << std::endl;
-	}
-}
-
-void lc::RigidBody::Export(std::ofstream& exportation)
-{
-	exportation << (int)m_type
-		<< " " << m_collider.left
-		<< " " << m_collider.top
-		<< " " << m_collider.width
-		<< " " << m_collider.height
-		<< " " << m_relativePosition.x
-		<< " " << m_relativePosition.y
-		<< " " << m_isKinetic << std::endl;
-}
 
 void lc::RigidBody::Load(std::ifstream& load)
 {
-	load >> m_typeName
+	load
 		>> m_collider.left
 		>> m_collider.top
 		>> m_collider.width
 		>> m_collider.height
-		>> m_velocity.x
-		>> m_velocity.y
 		>> m_relativePosition.x
 		>> m_relativePosition.y
-		>> m_isKinetic
-		>> m_name;
-	Tools::replaceSpace(m_typeName, false);
-	Tools::replaceSpace(m_name, false);
+		>> m_isKinetic;
 }
 
 void lc::RigidBody::UpdateEvent(sf::Event& _window)
@@ -134,14 +96,14 @@ void lc::RigidBody::Update(WindowManager& _window)
 			i(this);
 	}
 
-	if(m_isKinetic and m_simulate)
+	if(m_isKinetic)
 	{
 		m_velocity.y += (g)*Tools::getDeltaTime();
 		CheckAllObject(scene);
 	}
 	else m_velocity = { 0.f,0.f };
 
-	if (m_isKinetic and m_simulate)
+	if (m_isKinetic)
 		if (getParent())
 		{
 			getParent()->getTransform().getPosition() += m_velocity * Tools::getDeltaTime();
@@ -152,28 +114,12 @@ void lc::RigidBody::Update(WindowManager& _window)
 
 void lc::RigidBody::Draw(WindowManager& _window)
 {
-	if (m_showCollider)
-	{
-		m_shape.setSize(m_collider.getSize());
-		m_shape.setPosition(getParent()->getTransform().getPosition() + m_collider.getPosition());
-		m_shape.setFillColor(sf::Color::Transparent);
-		m_shape.setOutlineColor(sf::Color::White);
-		m_shape.setOutlineThickness(5.f);
-		_window.draw(m_shape);
-	}
+	
 }
 
 void lc::RigidBody::Draw(sf::RenderTexture& _window)
 {
-	if (m_showCollider)
-	{
-		m_shape.setSize(m_collider.getSize());
-		m_shape.setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
-		m_shape.setFillColor(sf::Color::Transparent);
-		m_shape.setOutlineColor(sf::Color::White);
-		m_shape.setOutlineThickness(- 3.f);
-		_window.draw(m_shape);
-	}
+	
 }
 
 std::shared_ptr<lc::GameComponent> lc::RigidBody::Clone()
@@ -181,34 +127,6 @@ std::shared_ptr<lc::GameComponent> lc::RigidBody::Clone()
 	return std::make_shared<lc::RigidBody>(*this);
 }
 
-void lc::RigidBody::setHierarchieFunc()
-{
-	m_hierarchieInformation = [this] {
-		float tmp[4]{ m_relativePosition.x, m_relativePosition.y, m_collider.width, m_collider.height };
-		ImGui::DragFloat4("Collider", tmp);
-		m_relativePosition.x = tmp[0], m_relativePosition.y = tmp[1], m_collider.width = tmp[2], m_collider.height = tmp[3];
-		ImGui::Checkbox("Kinetic", &m_isKinetic);
-		if (m_isKinetic)
-		{
-			if (ImGui::Checkbox("Simulate Gravity", &m_simulate))
-			{
-				if (m_simulate)
-					m_posBeforeSimulate = getParent()->getTransform().getPosition();
-				else
-					getParent()->getTransform().getPosition() = m_posBeforeSimulate;
-			}
-		}
-		else m_simulate = false;
-
-
-
-		if(m_collider.width <= 0.f)
-			m_collider.width = 1.f;
-		if(m_collider.height <= 0.f)
-			m_collider.height = 1.f;
-		ImGui::Checkbox("Show Collider", &m_showCollider);
-		};
-}
 
 void lc::RigidBody::AddInputFunction(std::function<void(lc::RigidBody*)> func)
 {

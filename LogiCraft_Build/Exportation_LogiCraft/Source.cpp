@@ -10,8 +10,10 @@ int main()
 	sf::View view(viewSize / 2.f, viewSize);
 	window.getWindow().setView(view);
 
+	Tools::restartClock();
 	while (!window.isDone())
 	{
+		Tools::restartClock();
 		window.EventUpdate();
 
 		world->Update(window);
