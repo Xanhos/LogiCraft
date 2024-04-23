@@ -34,9 +34,42 @@ SOFTWARE.
 
 #pragma once
 #include "Ressource.h"
+#include "Texture.h"
 
 namespace lc
 {
+	class AnimationKey
+	{
+	public:
+		AnimationKey();
+		AnimationKey(std::string _name, int _maxFrame, float _frameTimer, sf::IntRect _frameRect);
+		~AnimationKey();
+
+		std::string& getName();
+
+		std::vector<sf::IntRect>& getFramesRects();
+
+		sf::IntRect& getBaseIntRect();
+
+		int& getMaxFrame();
+		int& getActualFrame();
+
+		float& getFrameTimer();
+		float& getFrameTime();
+	private:
+		std::string m_name;
+
+		std::vector<sf::IntRect> m_framesRects;
+
+		sf::IntRect m_baseFrameRect;
+
+		int m_maxFrame;
+		int m_actualFrame;
+
+		float m_frameTimer;
+		float m_frameTime;
+	};
+
 	class Animation : public lc::Ressource
 	{
 	public:
@@ -56,7 +89,13 @@ namespace lc
 		virtual void setHierarchieFunc() override;
 	private:
 		sf::IntRect m_baseIntRect;
-		sf::Vector2f m_baseMaxFrame;
 		float m_baseFrameTimer;
+		std::string m_baseName;
+		int m_baseMaxFrame;
+
+		std::weak_ptr<lc::Texture> m_texture;
+
+		std::weak_ptr<AnimationKey> m_actualAnimationKey;
+		std::unordered_map<std::string, std::shared_ptr<AnimationKey>> m_animationKeys;
 	};
 }

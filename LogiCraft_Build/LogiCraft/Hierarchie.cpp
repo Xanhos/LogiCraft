@@ -38,6 +38,7 @@ SOFTWARE.
 #include "Particule.h"
 #include "Button.h"
 #include "Texture.h"
+#include "Animation.h"
 
 Hierarchie::Hierarchie()
 	: m_hasMoveAnObject(false), m_wantToCreateAGameObject(false), m_copyPasteTimer(0.f)
@@ -200,7 +201,8 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
 						if (ImGui::Button("Add AI"))
 							tmp_object->addComponent<lc::AI>();
 					
-					
+					if (ImGui::Button("Add Animation"))
+						tmp_object->addComponent<lc::Animation>();
 
 					ImGui::TreePop();
 				}

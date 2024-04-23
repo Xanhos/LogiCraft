@@ -341,15 +341,18 @@ namespace lc
 				{
 					if (auto tmp_textureConponent = std::dynamic_pointer_cast<lc::Texture>(component))
 					{
-						if (ImGui::Selectable(std::string(tmp_textureConponent->getName() + "##" + std::to_string(tmp_textureConponent->getID())).c_str(), tmp_isSelected))
+						if (!tmp_textureConponent->isUsedByAComponent())
 						{
-							if (!m_particulesTexture.expired())
-								m_particulesTexture.lock()->isUsedByAComponent() = false;
+							if (ImGui::Selectable(std::string(tmp_textureConponent->getName() + "##" + std::to_string(tmp_textureConponent->getID())).c_str(), tmp_isSelected))
+							{
+								if (!m_particulesTexture.expired())
+									m_particulesTexture.lock()->isUsedByAComponent() = false;
 
-							m_particulesTexture = tmp_textureConponent;
-							tmp_textureConponent->isUsedByAComponent() = true;
-							m_textureSize = tmp_textureConponent->getShape().getSize();
-							m_particulesOrigin = m_textureSize / 2.f;
+								m_particulesTexture = tmp_textureConponent;
+								tmp_textureConponent->isUsedByAComponent() = true;
+								m_textureSize = tmp_textureConponent->getShape().getSize();
+								m_particulesOrigin = m_textureSize / 2.f;
+							}
 						}
 					}
 				}
@@ -491,6 +494,7 @@ namespace lc
 	void Particules::Save(std::ofstream& save, sf::RenderTexture& texture, int _depth)
 	{
 		save << static_cast<int>(m_type)
+			<< " " << m_typeName
 			<< " " << static_cast<int>(m_particulesType)
 			<< " " << static_cast<int>(m_spawnColor.r) 
 			<< " " << static_cast<int>(m_spawnColor.g) 
@@ -523,7 +527,8 @@ namespace lc
 		std::string tmp_textureName;
 		int tmp_Color[4]{ 0, 0, 0, 0 };
 
-		load >> tmp_ParticulesSystemType
+		load >> m_typeName
+			>> tmp_ParticulesSystemType
 			>> tmp_Color[0]
 			>> tmp_Color[1]
 			>> tmp_Color[2]

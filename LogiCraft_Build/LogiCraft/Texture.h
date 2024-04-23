@@ -47,6 +47,7 @@ namespace lc
 		Texture(std::string name, sf::IntRect rect, std::string path, std::string newRepo = "");
 		Texture(const Texture& _texture);
 		~Texture();
+
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) override;
 		virtual void Load(std::ifstream& load) override;
 
