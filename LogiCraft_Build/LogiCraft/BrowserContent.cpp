@@ -312,7 +312,6 @@ void BrowserContent::PutRessources(std::shared_ptr<lc::GameObject> _object, Wind
 					ImGui::End();
 				}
 			}
-
 			_viewport.wantToPlaceAnObject() = true;
 		}
 	}

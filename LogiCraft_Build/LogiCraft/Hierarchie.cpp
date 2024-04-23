@@ -157,7 +157,7 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
 
 					ImGui::DragFloat2("Origin", tmp_object->getTransform().getOrigin());
 
-					ImGui::DragFloat2("Scale", tmp_object->getTransform().getScale());
+					ImGui::DragFloat2("Scale", tmp_object->getTransform().getScale(), 0.01f);
 
 					ImGui::DragFloat("Rotation", &tmp_object->getTransform().getRotation());
 					ImGui::PopItemWidth();
