@@ -18,16 +18,16 @@ int main()
 
 		if (KEY(Add))
 		{
-			view.zoom(0.9f);
+			view.zoom(0.99f);
 		}
 		if (KEY(Subtract))
 		{
-			view.zoom(1.1f);
+			view.zoom(1.01f);
 		}
 
 
 
-
+		window.getWindow().setView(view);
 		window.clear(sf::Color::Black);
 		world->Draw(window);
 		window.display();

@@ -43,15 +43,15 @@ SOFTWARE.
 
 
 lc::GameObject::GameObject()
-	: m_name(""), m_depth(0), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true)
+	: m_name(""), m_depth(0), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
 {}
 
 lc::GameObject::GameObject(std::string _name)
-	: m_name(""), m_depth(0), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true)
+	: m_name(""), m_depth(0), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
 {}
 
 lc::GameObject::GameObject(std::string _name, unsigned char _depth)
-	: m_name(_name), m_depth(_depth), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true)
+	: m_name(_name), m_depth(_depth), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
 {}
 
 lc::GameObject::~GameObject()
@@ -77,7 +77,8 @@ void lc::GameObject::Save(std::ofstream& save, std::ofstream& exportation,sf::Re
 		save << std::endl;
 		exportation << std::endl;
 		component->Save(save, texture, _depth);
-		component->Export(exportation);
+		if(getNeedToBeExported())
+			component->Export(exportation);
 	}
 	exportation << std::endl << "}" << std::endl;
 	save << std::endl << "}" << std::endl;
@@ -95,10 +96,11 @@ void lc::GameObject::Save(std::ofstream& save, std::ofstream& exportation,sf::Re
 
 void lc::GameObject::SaveRenderer(sf::RenderTexture& texture, int _depth)
 {
-	for (auto& components : m_components)
-	{
-		components->SaveRenderer(texture, _depth);
-	}
+	if(!getNeedToBeExported())
+		for (auto& components : m_components)
+		{
+				components->SaveRenderer(texture, _depth);
+		}
 	for (auto& objects : m_objects)
 	{
 		if (objects->getDepth() == _depth)
@@ -202,6 +204,27 @@ void lc::GameObject::Load(std::ifstream& load)
 
 
 }
+
+void lc::GameObject::NeedToBeExported(std::list<std::string> ComponentToCheck)
+{
+	m_needToBeExported = false;
+
+	for (auto& i : ComponentToCheck)
+	{
+		if (hasComponent(i))
+		{
+			m_needToBeExported = true;
+			break;
+		}
+	}
+
+	for (auto& object : m_objects)
+	{
+		object->NeedToBeExported(ComponentToCheck);
+	}
+}
+
+
 
 
 std::shared_ptr<lc::GameObject> lc::GameObject::CreateGameObject(std::string _name, unsigned char _depth)
