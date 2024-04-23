@@ -215,9 +215,11 @@ void ToolsBar::ShowHelp()
 
 void ToolsBar::Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _viewports, sf::RenderWindow& _window)
 {
+	Tools::s_filePool.clear();
 	std::ofstream save("../Ressources/" + std::string(m_path) + "/save.lcp");
+	FileWriter exportation("../Ressources/" + std::string(m_path) + "/export.lcg");
 	sf::RenderTexture render_texture;
-	_game_object->Save(save, render_texture, s_actualLayer.first);
+	_game_object->Save(save, exportation, render_texture, s_actualLayer.first);
 
 	render_texture.create(1920u * 2, 1080u * 2);
 	for (auto& screen : _viewports.getAllScreenzone())
@@ -232,7 +234,7 @@ void ToolsBar::Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _v
 				sf::Image image;
 				image = render_texture.getTexture().copyToImage();
 				image.flipVertically();
-				image.saveToFile("../Ressources/" + std::string(m_path) + "/" + std::string(std::to_string(screen.getScreenIndex().x) + "_" + std::to_string(screen.getScreenIndex().y)) + "_" + std::string(m_path) + "_layer" + std::to_string(depth) + ".png");
+				image.saveToFile("../Ressources/" + std::string(m_path) + "/" + std::string(std::to_string(screen.getScreenIndex().x) + "_" + std::to_string(screen.getScreenIndex().y)) + "_" + std::string(m_path) + "_layer_" + std::to_string(depth) + ".png");
 			}
 		}
 	}

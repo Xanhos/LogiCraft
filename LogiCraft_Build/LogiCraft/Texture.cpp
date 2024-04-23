@@ -152,6 +152,22 @@ void lc::Texture::Load(std::ifstream& load)
 	m_type = TYPE::TEXTURE;
 }
 
+void lc::Texture::Export(std::ofstream& exportation)
+{
+	exportation << static_cast<int>(m_type)
+		<< " " << m_textureRect.left
+		<< " " << m_textureRect.top
+		<< " " << m_textureRect.width
+		<< " " << m_textureRect.height
+		<< " " << Tools::replaceSpace(fs::path(m_texturePath).filename().string(), true)
+		<< " " << m_relativePosition.x
+		<< " " << m_relativePosition.y << std::endl;
+
+	auto tmp = dynamic_cast<FileWriter*>(&exportation);
+	if (tmp)
+		Tools::copyFile(m_texturePath, tmp->getPath().parent_path().string() + "/Ressources/" + m_textureName);
+}
+
 void lc::Texture::UpdateEvent(sf::Event& _window)
 {
 }

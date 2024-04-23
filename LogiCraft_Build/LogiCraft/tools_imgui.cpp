@@ -93,6 +93,52 @@ bool Tools::Collisions::lineLine(sf::FloatRect line_one, sf::FloatRect line_two)
 	return false;
 }
 
+bool Tools::sameFile(const std::string& sourceFile, const std::string& destFile)
+{
+	fs::path source(sourceFile), dest(destFile);
+
+	if (source == dest)
+		return true;
+
+	for (auto& i : Tools::s_filePool)
+	{
+		if (i == source.filename())
+			return true;
+	}
+
+	return false;
+}
+
+void Tools::copyFile(const fs::path& sourceFile, const fs::path& destFile)
+{
+	if (sameFile(sourceFile.string(), destFile.string()))
+		return;
+
+	if(!fs::exists(destFile.parent_path()))
+		fs::create_directories(destFile.parent_path());
+
+	std::ifstream sourceStream(sourceFile, std::ios::binary);
+	if (!sourceStream.is_open()) {
+		std::cerr << "Erreur : Impossible d'ouvrir le fichier source." << std::endl;
+		return;
+	}
+
+	std::ofstream destStream(destFile, std::ios::binary);
+	if (!destStream.is_open()) {
+		std::cerr << "Erreur : Impossible d'ouvrir le fichier de destination." << std::endl;
+		sourceStream.close();
+		return;
+	}
+
+	destStream << sourceStream.rdbuf();
+
+	Tools::s_filePool.push_back(sourceFile.filename().string());
+
+	sourceStream.close();
+	destStream.close();
+}
+
+
 void Tools::ReplaceCharacter(std::string& _sentence, unsigned char _characterToReplace, unsigned char _replaceChar)
 {
 	for (auto& character : _sentence)
@@ -123,4 +169,13 @@ std::string Tools::replaceSpace(std::string string, bool spaceOrUnderscore)
 		}
 	}
 	return string;
+}
+
+FileWriter::FileWriter(fs::path path) : std::ofstream(path), m_path(path)
+{
+}
+
+fs::path FileWriter::getPath() const
+{
+	return m_path;
 }

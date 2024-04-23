@@ -176,8 +176,9 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
 
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
 
-					if (ImGui::Button("Add RigidBody"))
-						tmp_object->addComponent<lc::RigidBody>();
+					if(!tmp_object->hasComponent("RigidBody"))
+						if (ImGui::Button("Add RigidBody"))
+							tmp_object->addComponent<lc::RigidBody>();
 
 					if (ImGui::Button("Add Button"))
 					{

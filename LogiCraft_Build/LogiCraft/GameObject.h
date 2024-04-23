@@ -52,7 +52,7 @@ namespace lc
 		GameObject(std::string _name);
 		~GameObject();
 
-		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth);
+		virtual void Save(std::ofstream& save, std::ofstream& exportation,sf::RenderTexture& texture, int _depth);
 		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth);
 		virtual void Load(std::ifstream& load);
 		

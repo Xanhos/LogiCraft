@@ -59,29 +59,38 @@ lc::GameObject::~GameObject()
 	m_components.clear();
 }
 
-void lc::GameObject::Save(std::ofstream& save, sf::RenderTexture& texture, int _depth)
+void lc::GameObject::Save(std::ofstream& save, std::ofstream& exportation,sf::RenderTexture& texture, int _depth)
 {
-	save << getName() << 
+	std::ostringstream oss;
+	oss << getName() <<
 		" " << getTransform().getPosition().x << " " << getTransform().getPosition().y << 
 		" " << getTransform().getScale().x << " " << getTransform().getScale().y << 
 		" " << getTransform().getSize().x << " " << getTransform().getSize().y << 
 		" " << getTransform().getRotation() << 
 		" " << getTransform().getOrigin().x << " " << getTransform().getOrigin().y << 
 		" " << static_cast<int>(getDepth()) << std::endl;
-	save << "Components" << std::endl << "{";
+	oss << "Components" << std::endl << "{";
+	save << oss.str();
+	exportation << oss.str();
 	for (auto& component : getComponents())
 	{
 		save << std::endl;
+		exportation << std::endl;
 		component->Save(save, texture, _depth);
+		component->Export(exportation);
 	}
+	exportation << std::endl << "}" << std::endl;
 	save << std::endl << "}" << std::endl;
+	exportation << "Objects" << std::endl << "{";
 	save << "Objects" << std::endl << "{";
 	for (auto& object : getObjects())
 	{
 		save << std::endl;
-		object->Save(save, texture, _depth);
+		exportation << std::endl;
+		object->Save(save, exportation, texture, _depth);
 	}
 	save << std::endl << "}" << std::endl;
+	exportation << std::endl << "}" << std::endl;
 }
 
 void lc::GameObject::SaveRenderer(sf::RenderTexture& texture, int _depth)

@@ -1,0 +1,19 @@
+WORLD 0 0 1 1 0 0 0 0 0 0
+Components
+{
+}
+Objects
+{
+200x200D 452.898 253.721 1 1 229 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+3 Text ../ASSETS\Square.ttf 40 0 Lorem_Ipsum 255 255 255 255 0 0 0 255 0 0
+
+}
+Objects
+{
+}
+
+}

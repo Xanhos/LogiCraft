@@ -41,41 +41,6 @@ SOFTWARE.
 #include <fstream>
 
 
-bool sameFile(const std::string& sourceFile, const std::string& destFile)
-{
-	fs::path source(sourceFile), dest(destFile);
-
-	if (source == dest)
-		return true;
-	return false;
-}
-
-void copyFile(const std::string& sourceFile, const std::string& destFile) {
-
-
-	if (sameFile(sourceFile,destFile))
-		return;
-
-	std::ifstream sourceStream(sourceFile, std::ios::binary);
-	if (!sourceStream.is_open()) {
-		std::cerr << "Erreur : Impossible d'ouvrir le fichier source." << std::endl;
-		return;
-	}
-
-	std::ofstream destStream(destFile, std::ios::binary);
-	if (!destStream.is_open()) {
-		std::cerr << "Erreur : Impossible d'ouvrir le fichier de destination." << std::endl;
-		sourceStream.close();
-		return;
-	}
-
-	destStream << sourceStream.rdbuf();
-
-	sourceStream.close();
-	destStream.close();
-}
-
-
 Folder& Folder::getFolder(std::string path)
 {
 	if (m_path.string() == path)
@@ -100,7 +65,7 @@ void Folder::Save()
 		if (ressource->m_type == lc::Ressource::TYPE::TEXTURE)
 		{
 			auto& texture = dynamic_cast<lc::Texture&>(*ressource);
-			if (!sameFile(texture.getTexturePath(), m_path.string() + "/" + texture.getName() + ".png"))
+			if (!Tools::sameFile(texture.getTexturePath(), m_path.string() + "/" + texture.getName() + ".png"))
 			{
 				sf::Image image = texture.getTexture().copyToImage();
 
@@ -124,7 +89,7 @@ void Folder::Save()
 		else if (ressource->m_type == lc::Ressource::TYPE::FONT)
 		{
 			auto& font = dynamic_cast<lc::Font&>(*ressource);
-			copyFile(font.getFontPath(), m_path.string() + "/" + font.getName() + ".ttf");
+			Tools::copyFile(font.getFontPath(), m_path.string() + "/" + font.getName() + ".ttf");
 
 		}
 		else if (ressource->m_type == lc::Ressource::TYPE::EVENT)
