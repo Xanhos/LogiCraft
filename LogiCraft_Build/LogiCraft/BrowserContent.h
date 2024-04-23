@@ -99,6 +99,16 @@ private:
 	 */
 	void PutRessources(std::shared_ptr<lc::GameObject> _object, WindowManager& _window, Viewports& _viewport);
 
+	/*
+	* @brief This function is use to make the naming object window appear.
+	*/
+	void MakeRessourcesName(std::shared_ptr<lc::GameObject> _scene);
+
+	/*
+	* @brief This function is used to check if any object in the scene have the same name as the slidingRessources.
+	*/
+	bool CheckObjectName(std::shared_ptr<lc::GameObject> _obj, std::string _name);
+
 	/**
 	 * @brief Add a component to the gameobject
 	 * 

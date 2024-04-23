@@ -64,6 +64,18 @@ public:
 
 
 
+namespace lc
+{
+	class GameObject;
+	class GameComponent;
+}
+
+typedef std::list<std::weak_ptr<lc::GameObject>> ObjWeakPtrList;
+typedef std::list<std::shared_ptr<lc::GameObject>> ObjSharedPtrList;
+
+typedef std::list<std::weak_ptr<lc::GameComponent>> CompWeakPtrList;
+typedef std::list<std::shared_ptr<lc::GameComponent>> CompSharedPtrList;
+
 namespace Tools
 {
 	extern bool CameraGrabbed;
