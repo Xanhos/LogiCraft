@@ -74,7 +74,7 @@ ScreenZone::ScreenZone(sf::Vector2i _screenIndex)
 	: m_isUsed(false), m_screenIndex(_screenIndex)
 {
 	m_screenShape.setSize(screenSize);
-	m_screenShape.setTexture(&GET_MANAGER->getTexture("Unused_Screen_Zone"));
+	m_screenShape.setTexture(&GET_MANAGER->getTexture("Unused_Screen_Zone"), true);
 	m_screenShape.setPosition(sf::Vector2f(screenSize.x * _screenIndex.x, screenSize.y * _screenIndex.y));
 }
 
@@ -84,13 +84,13 @@ ScreenZone::~ScreenZone()
 
 void ScreenZone::setScreenToUsed()
 {
-	m_screenShape.setTexture(&GET_MANAGER->getTexture("Used_Screen_Zone"));
+	m_screenShape.setTexture(&GET_MANAGER->getTexture("Used_Screen_Zone"), true);
 	m_isUsed = true;
 }
 
 void ScreenZone::setScreenToUnused()
 {
-	m_screenShape.setTexture(&GET_MANAGER->getTexture("Unused_Screen_Zone"));
+	m_screenShape.setTexture(&GET_MANAGER->getTexture("Unused_Screen_Zone"), true);
 	m_isUsed = false;
 }
 

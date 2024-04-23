@@ -219,12 +219,12 @@ void ToolsBar::Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _v
 	sf::RenderTexture render_texture;
 	_game_object->Save(save, render_texture, s_actualLayer.first);
 
-	render_texture.create(1920u * 2, 1080u * 2);
+	render_texture.create(screenSize.x, screenSize.y);
 	for (auto& screen : _viewports.getAllScreenzone())
 	{
 		if (screen.isUsed())
 		{
-			render_texture.setView(sf::View(sf::Vector2f(screenSize.x + (screenSize.x * screen.getScreenIndex().x), screenSize.y + (screenSize.y * screen.getScreenIndex().y)), sf::Vector2f(screenSize.x * 2.f, screenSize.y * 2.f)));
+			render_texture.setView(sf::View(sf::Vector2f(screenSize.x / 2.f + (screenSize.x * screen.getScreenIndex().x), screenSize.y / 2.f + (screenSize.y * screen.getScreenIndex().y)), sf::Vector2f(screenSize.x, screenSize.y)));
 			for (int depth = 0; depth <= 8; depth++)
 			{
 				render_texture.clear(sf::Color::Transparent);

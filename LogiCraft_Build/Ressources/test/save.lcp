@@ -4,19 +4,7 @@ Components
 }
 Objects
 {
-200x200D 307.973 117.75 1 1 200 200 0 0 0 0
-Components
-{
-0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
-
-0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
-
-}
-Objects
-{
-}
-
-200x200D 758.63 68.4853 1 1 200 200 0 0 0 0
+200x200D 59.1971 58.3239 1 1 200 200 0 0 0 0
 Components
 {
 0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
@@ -26,7 +14,37 @@ Objects
 {
 }
 
-Square 744.13 153.985 1 1 229 29 0 0 0 0
+200x200D4 3591.34 1876.08 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+200x200D3 4214.33 61.1294 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+200x200D5 7446.46 1897.84 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+Square -3054.64 428.973 1 1 229 29 0 0 0 0
 Components
 {
 3 Text ../ASSETS\Square.ttf 40 0 Lorem_Ipsum 255 255 255 255 0 0 0 255 0 0
@@ -36,30 +54,20 @@ Objects
 {
 }
 
-200x200D 540.25 331.559 1 1 200 200 0 0 0 0
+The Wild Breath of Zelda 1782.57 -2048.24 1 1 182 33 0 0 0 0
 Components
 {
-0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+3 Text ../ASSETS\The_Wild_Breath_of_Zelda.ttf 40 0 Lorem_Ipsum 255 255 255 255 0 0 0 255 0 0
 
 }
 Objects
 {
 }
 
-200x200D 853.923 332.544 1 1 200 200 0 0 0 0
+The_Wild_Breath_of_Zelda2 1790.59 4168.98 1 1 182 33 0 0 0 0
 Components
 {
-0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
-
-}
-Objects
-{
-}
-
-EVENT 396.686 429.897 1 1 100 25 0 0 0 0
-Components
-{
-8 Event -1 0 200x200D 200x200D
+3 Text ../ASSETS\The_Wild_Breath_of_Zelda.ttf 40 0 Lorem_Ipsum 255 255 255 255 0 0 0 255 0 0
 
 }
 Objects
