@@ -76,7 +76,7 @@ void lc::Button::Save(std::ofstream& save, sf::RenderTexture& texture, int _dept
 
 void lc::Button::Load(std::ifstream& load)
 {
-    load >> m_typeName >> m_relativePosition.x >> m_relativePosition.y >> m_function;
+    load >> m_typeName >> m_function;
 }
 
 void lc::Button::UpdateEvent(sf::Event& _window)

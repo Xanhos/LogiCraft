@@ -1,0 +1,69 @@
+WORLD 0 0 1 1 0 0 0 0 0 0
+Components
+{
+}
+Objects
+{
+200x200D 307.973 117.75 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+200x200D 758.63 68.4853 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+Square 744.13 153.985 1 1 229 29 0 0 0 0
+Components
+{
+3 Text ../ASSETS\Square.ttf 40 0 Lorem_Ipsum 255 255 255 255 0 0 0 255 0 0
+
+}
+Objects
+{
+}
+
+200x200D 540.25 331.559 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+200x200D 853.923 332.544 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+EVENT 396.686 429.897 1 1 100 25 0 0 0 0
+Components
+{
+8 Event -1 0 200x200D 200x200D
+
+}
+Objects
+{
+}
+
+}
