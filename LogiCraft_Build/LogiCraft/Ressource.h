@@ -45,8 +45,8 @@ namespace lc
 	class Ressource : public lc::GameComponent
 	{
 	public:
-		enum class TYPE { NONE = -1, TEXTURE, IA, BUTTON, FONT, MUSIC, SOUND, ANIMATION, RIGIDBODY, EVENT, PARTICULES_SYSTEM };
-		protected:
+		enum class TYPE { NONE = -1, TEXTURE, IA, BUTTON, FONT, MUSIC, SOUND, ANIMATION, RIGIDBODY, EVENT, PARTICULES };
+	protected:
 		sf::RectangleShape m_renderer;//Renderer of the ressource
 		bool m_displayThumbnail;
 		bool m_isUsedByAComponent;
@@ -57,11 +57,12 @@ namespace lc
 		void onDraw(WindowManager& _window, sf::Color color);//Deprecated
 	public:
 		TYPE m_type;
+
 		Ressource();
 		~Ressource();
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) = 0;
-		void SaveRenderer(sf::RenderTexture& texture, int _depth) override;
+		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth) override;
 		virtual void Load(std::ifstream& load) = 0;
 
 		virtual void UpdateEvent(sf::Event& _window) = 0;
@@ -81,8 +82,6 @@ namespace lc
 		void setPosition(sf::Vector2f pos);
 		void setSize(sf::Vector2f size) { m_thumbnailSize = size; }
 		sf::Vector2f getMaximumSize() { return  m_relativePosition + sf::Vector2f{m_renderer.getSize().x * m_renderer.getScale().x, m_renderer.getSize().y * m_renderer.getScale().y}; }
-
-
 	};
 }
 

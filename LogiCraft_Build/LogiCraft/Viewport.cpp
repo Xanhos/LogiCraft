@@ -140,7 +140,7 @@ void Viewports::UpdateEvent(sf::Event& _event)
 	}
 }
 
-void Viewports::Update(WeakPtrList& _selectedObject, std::shared_ptr<lc::GameObject> _scene, WindowManager& _window)
+void Viewports::Update(ObjWeakPtrList& _selectedObject, std::shared_ptr<lc::GameObject> _scene, WindowManager& _window)
 {
 	this->UpdateViewports(_selectedObject, _scene, _window);
 
@@ -149,7 +149,7 @@ void Viewports::Update(WeakPtrList& _selectedObject, std::shared_ptr<lc::GameObj
 	this->ViewportDeleteOnCloseBehavior();
 }
 
-void Viewports::Draw(WeakPtrList& _object, std::shared_ptr<lc::GameObject> _scene, WindowManager& _window)
+void Viewports::Draw(ObjWeakPtrList& _object, std::shared_ptr<lc::GameObject> _scene, WindowManager& _window)
 {
 	for (auto& viewport : m_viewports)
 	{
@@ -244,7 +244,7 @@ bool& Viewports::isOptionOpen()
 	return m_optionIsOpen;
 }
 
-void Viewports::UpdateViewports(WeakPtrList& _selectedObject, std::shared_ptr<lc::GameObject> _scene, WindowManager& _window)
+void Viewports::UpdateViewports(ObjWeakPtrList& _selectedObject, std::shared_ptr<lc::GameObject> _scene, WindowManager& _window)
 {
 	for (auto& viewport : m_viewports)
 	{
@@ -501,7 +501,7 @@ void Viewports::ViewportDeleteOnCloseBehavior()
 		});
 }
 
-void Viewports::ResizeSelectionBoxBehavior(sf::Vector2f _mousePositionWithView, WeakPtrList& _selectedObject, std::shared_ptr<lc::GameObject> _scene, std::shared_ptr<Viewport> _viewport, WindowManager& _window)
+void Viewports::ResizeSelectionBoxBehavior(sf::Vector2f _mousePositionWithView, ObjWeakPtrList& _selectedObject, std::shared_ptr<lc::GameObject> _scene, std::shared_ptr<Viewport> _viewport, WindowManager& _window)
 {
 	if (!MOUSE(Left) && m_hasGrabbedAnObject)
 		m_hasGrabbedAnObject = false;
@@ -540,7 +540,7 @@ void Viewports::ResizeSelectionBoxBehavior(sf::Vector2f _mousePositionWithView, 
 	}
 }
 
-void Viewports::ObjectIsSelectedOrMovedBehavior(sf::Vector2f _mousePosition, sf::Vector2f _mousePositionWithView, WeakPtrList& _selectedObject, std::shared_ptr<lc::GameObject> _scene, std::shared_ptr<Viewport> _viewport, WindowManager& _window)
+void Viewports::ObjectIsSelectedOrMovedBehavior(sf::Vector2f _mousePosition, sf::Vector2f _mousePositionWithView, ObjWeakPtrList& _selectedObject, std::shared_ptr<lc::GameObject> _scene, std::shared_ptr<Viewport> _viewport, WindowManager& _window)
 {
 	if (MOUSE(Left) && !m_wantToPlaceAnObject && !m_hasGrabbedAnObject)
 	{
@@ -564,7 +564,7 @@ void Viewports::ObjectIsSelectedOrMovedBehavior(sf::Vector2f _mousePosition, sf:
 	}
 }
 
-bool Viewports::CheckSelection(WeakPtrList& _object, std::shared_ptr<lc::GameObject> _scene, sf::Vector2f _mousePosition, std::shared_ptr<Viewport>& _viewport, WindowManager& _window)
+bool Viewports::CheckSelection(ObjWeakPtrList& _object, std::shared_ptr<lc::GameObject> _scene, sf::Vector2f _mousePosition, std::shared_ptr<Viewport>& _viewport, WindowManager& _window)
 {
 	if (std::find_if(_scene->getObjects().begin(), _scene->getObjects().end(), [this, &_window, &_object, &_viewport, _mousePosition](std::shared_ptr<lc::GameObject> _sceneObject)
 		{
@@ -604,7 +604,7 @@ bool Viewports::CheckSelection(WeakPtrList& _object, std::shared_ptr<lc::GameObj
 	return true;
 }
 
-void Viewports::ResizeRectSelection(WeakPtrList& _object, std::shared_ptr<lc::GameObject> _scene)
+void Viewports::ResizeRectSelection(ObjWeakPtrList& _object, std::shared_ptr<lc::GameObject> _scene)
 {
 	for (auto& selectedObject : _object)
 	{

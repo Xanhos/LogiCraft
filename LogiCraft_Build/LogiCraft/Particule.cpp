@@ -63,15 +63,18 @@ namespace lc
 		float _gravityForce,
 		bool _hasGravity,
 		sf::Vector2f _spawnPositionInViewport,
-		sf::Vector2f _spawnPositionInRender)
+		sf::Vector2f _spawnPositionInRender,
+		sf::Vector2f _spawnOrigin)
 		: m_despawnCooldown(_despawnCooldown), m_despawnTime(0.f), m_rotationSpeed(_rotationSpeed), m_gravityForce(_gravityForce),
 		m_hasGravity(_hasGravity), m_needToBeDeleted(false)
 	{
 		m_transform.getRotation() = _spawnRotation;
 		m_transform.getPosition() = _spawnPositionInViewport;
+		m_transform.getOrigin() = _spawnOrigin;
 
 		m_rendererTransform.getRotation() = _spawnRotation;
 		m_rendererTransform.getPosition() = _spawnPositionInRender;
+		m_rendererTransform.getOrigin() = _spawnOrigin;
 
 		m_velocity = sf::Vector2f(std::cos(_spawnAngle * (3.14159265358f / 180)) * _speed, std::sin(_spawnAngle * (3.14159265358f / 180)) * _speed);
 	}
@@ -153,7 +156,8 @@ namespace lc
 	{
 		m_name = "Particules System";
 		m_typeName = "Particules System";
-		m_type = TYPE::PARTICULES_SYSTEM;
+		m_type = TYPE::PARTICULES;
+
 		m_particulesType = ParticulesSystemType::NORMAL;
 
 		m_rendererView = sf::View(sf::Vector2f(1920.f / 2.f, 1080.f / 2.f), sf::Vector2f(1920.f, 1080.f));
@@ -200,7 +204,7 @@ namespace lc
 	{
 		m_name = "Particules System";
 		m_typeName = "Particules System";
-		m_type = TYPE::PARTICULES_SYSTEM;
+		m_type = TYPE::PARTICULES;
 		m_particulesType = _type;
 
 		m_rendererView = sf::View(sf::Vector2f(1920.f / 2.f, 1080.f / 2.f), sf::Vector2f(1920.f, 1080.f));
@@ -412,7 +416,12 @@ namespace lc
 					m_baseShape.setRadius(m_baseShapeRadius);
 
 				if (ImGui::DragInt("Base Shape Point Count", &m_baseShapePointCount))
+				{
+					if (m_baseShapePointCount < 3)
+						m_baseShapePointCount = 3;
+
 					m_baseShape.setPointCount(m_baseShapePointCount);
+				}
 
 				m_textureSize = sf::Vector2f(m_baseShapeRadius, m_baseShapeRadius);
 			}
@@ -626,7 +635,7 @@ namespace lc
 						m_spawnRotation + Tools::Rand(-m_spawnSpread / 2.f, m_spawnSpread / 2.f),
 						m_spawnAngle, m_rotationSpeed, m_gravityForce,
 						m_hasGravity,
-						tmp_spawnPosition, tmp_spawnPositionInRenderer);
+						tmp_spawnPosition, tmp_spawnPositionInRenderer, m_particulesOrigin);
 
 					m_particules.push_back(tmp_particule);
 					Particules::s_threadParticules.push_back(tmp_particule);
@@ -715,7 +724,7 @@ namespace lc
 		if (this->ParticulesHisRendered())
 		{
 			tmp_texture ? tmp_texture->getShape().setFillColor(m_spawnColor) : m_baseShape.setFillColor(m_spawnColor);
-			tmp_texture ? tmp_texture->getShape().setOrigin(m_particulesOrigin) : m_baseShape.setOrigin(m_particulesOrigin);
+			tmp_texture ? tmp_texture->getShape().setOrigin(_particule->getTransform().getOrigin()) : m_baseShape.setOrigin(_particule->getTransform().getOrigin());
 		}
 
 		if (m_isParticulesRenderedOnTheViewport)
@@ -734,7 +743,7 @@ namespace lc
 					_window.getView().getSize()
 				},
 				{
-					_particule->getTransform().getPosition() - m_particulesOrigin,
+					_particule->getTransform().getPosition() - _particule->getTransform().getOrigin(),
 					tmp_texture ? m_textureSize : sf::Vector2f(m_baseShapeRadius, m_baseShapeRadius)
 				}))
 			{
@@ -758,7 +767,7 @@ namespace lc
 					_renderer.getView().getSize()
 				},
 				{
-					_particule->getTransform().getPosition() - m_particulesOrigin,
+					_particule->getRendererTransform().getPosition() - _particule->getTransform().getOrigin(),
 					tmp_texture ? m_textureSize : sf::Vector2f(m_baseShapeRadius, m_baseShapeRadius)
 				}))
 			{

@@ -53,7 +53,8 @@ namespace lc
 			float _gravityForce,
 			bool _hasGravity,
 			sf::Vector2f _spawnPositionInViewport,
-			sf::Vector2f _spawnPositionInRender);
+			sf::Vector2f _spawnPositionInRender,
+			sf::Vector2f _spawnOrigin);
 		~Particule();
 
 		lc::Transform& getTransform();
@@ -106,6 +107,7 @@ namespace lc
 		virtual void setHierarchieFunc() override;
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) override;
+		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth) override {};
 		virtual void Load(std::ifstream& load) override;
 	private:
 		/*
