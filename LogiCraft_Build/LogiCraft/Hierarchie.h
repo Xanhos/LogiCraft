@@ -68,6 +68,8 @@ private:
 	*/
 	void CopyPaste(std::shared_ptr<lc::GameObject> _scene, Viewports& _viewport);
 
+	void AddSelectedObject(std::shared_ptr<lc::GameObject> _object);
+
 	void VerifyThePasteObject(std::shared_ptr<lc::GameObject>& _object);
 
 	/*

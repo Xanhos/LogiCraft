@@ -53,7 +53,8 @@ namespace lc
 			float _gravityForce,
 			bool _hasGravity,
 			sf::Vector2f _spawnPositionInViewport,
-			sf::Vector2f _spawnPositionInRender);
+			sf::Vector2f _spawnPositionInRender,
+			sf::Vector2f _spawnOrigin);
 		~Particule();
 
 		lc::Transform& getTransform();

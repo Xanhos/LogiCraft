@@ -282,13 +282,8 @@ void Hierarchie::CopyPaste(std::shared_ptr<lc::GameObject> _scene, Viewports& _v
 		m_selectedGameObjects.clear();
 		for (auto& newObject : m_copyPasteObjects)
 		{
-			for (auto& child : newObject->getObjects())
-			{
-				child->getName() += "_copie_" + std::to_string(lc::GameObject::getGeneralID());
-			}
-			newObject->getName() += "_copie_" + std::to_string(lc::GameObject::getGeneralID());
 			_scene->addObject(newObject);
-			m_selectedGameObjects.push_back(newObject);
+			this->AddSelectedObject(newObject);
 
 			newObject = newObject->Clone();
 			this->VerifyThePasteObject(newObject);
@@ -297,6 +292,17 @@ void Hierarchie::CopyPaste(std::shared_ptr<lc::GameObject> _scene, Viewports& _v
 		_viewport.getActualSelectedObjectNumber() = 0u;
 
 		m_copyPasteTimer = 0.f;
+	}
+}
+
+void Hierarchie::AddSelectedObject(std::shared_ptr<lc::GameObject> _object)
+{
+	_object->getName() += "_copie_" + std::to_string(_object->getID());
+
+	m_selectedGameObjects.push_back(_object);
+	for (auto& object : _object->getObjects())
+	{
+		this->AddSelectedObject(object);
 	}
 }
 
