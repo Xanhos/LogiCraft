@@ -280,10 +280,10 @@ void BrowserContent::PutRessources(std::shared_ptr<lc::GameObject> _object, Wind
 {
 	if (m_slidingRessources)
 	{
-		if (!MOUSE(Left))
-		{
+		if (!MOUSE(Left) && !KEY(LControl))
 			m_choosingName = true;
-		}
+		else if (!MOUSE(Left) && KEY(LControl))
+			m_nameIsReady = true;
 		else
 		{
 			for (auto& viewport : _viewport.getAllViewport())
