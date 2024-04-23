@@ -424,16 +424,15 @@ void Hierarchie::SelectionBehavior(std::shared_ptr<lc::GameObject> _gameObject)
 		if (!KEY(LControl))
 			m_selectedGameObjects.clear();
 
-		if (!_gameObject->isLock())
-			if (std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&_gameObject](std::weak_ptr<lc::GameObject> _wptrObject)
-				{
-					if (!_wptrObject.expired())
-						if (_gameObject == _wptrObject.lock())
-							return true;
+		if (std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&_gameObject](std::weak_ptr<lc::GameObject> _wptrObject)
+			{
+				if (!_wptrObject.expired())
+					if (_gameObject == _wptrObject.lock())
+						return true;
 
-					return false;
-				}) == m_selectedGameObjects.end())
-				m_selectedGameObjects.push_back(_gameObject);
+				return false;
+			}) == m_selectedGameObjects.end())
+			m_selectedGameObjects.push_back(_gameObject);
 	}
 
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
