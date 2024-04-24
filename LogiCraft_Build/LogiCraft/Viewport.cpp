@@ -580,7 +580,7 @@ bool Viewports::CheckSelection(ObjWeakPtrList& _object, std::shared_ptr<lc::Game
 {
 	if (std::find_if(_scene->getObjects().begin(), _scene->getObjects().end(), [this, &_window, &_object, &_viewport, _mousePosition](std::shared_ptr<lc::GameObject> _sceneObject)
 		{
-			if (Tools::Collisions::point_rect(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow()), _viewport->getView()), { _sceneObject->getTransform().getPosition(), _sceneObject->getTransform().getSize() }))
+			if (Tools::Collisions::point_rect(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow()), _viewport->getView()), { _sceneObject->getTransform().getPosition(), _sceneObject->getTransform().getSize() }) && _sceneObject->getDepth() == ToolsBar::GetActualLayer().first)
 			{
 				if (!KEY(LControl))
 					_object.clear();
