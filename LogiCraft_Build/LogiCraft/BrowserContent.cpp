@@ -319,6 +319,8 @@ void BrowserContent::PutRessources(std::shared_ptr<lc::GameObject> _object, Wind
 	{
 		if (m_slidingRessources->getTypeName() != "Event")
 			this->MakeRessourcesName(_object);
+		else
+			m_nameIsReady = true;
 	}
 	if (m_nameIsReady)
 	{
