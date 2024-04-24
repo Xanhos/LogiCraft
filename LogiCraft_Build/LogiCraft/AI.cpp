@@ -52,11 +52,19 @@ void lc::AI::Save(std::ofstream& save, sf::RenderTexture& texture, int _depth)
 	m_root.Save(save);
 }
 
+void lc::AI::Export(std::ofstream& exportation)
+{
+    exportation << static_cast<int>(m_type) << " " << std::endl;
+    m_root.Save(exportation);
+}
+
+
 void lc::AI::Load(std::ifstream& load)
 {
     load >> m_typeName;
     m_root.Load(load);
 }
+
 
 void lc::AI::UpdateEvent(sf::Event& _window)
 {

@@ -1,3 +1,4 @@
+#include "AI.h"
 #include "GameObject.h"
 #include "Tools_LC.h"
 #include "SFML_ENGINE/WindowManager.h"
@@ -5,6 +6,7 @@
 int main()
 {
 	auto world = lc::GameObject::LoadScene("Test");
+
 	WindowManager window(1920, 1080, "test", false);
 	const sf::Vector2f viewSize(1920 * 2, 1080 * 2);
 	sf::View view(viewSize / 2.f, viewSize);

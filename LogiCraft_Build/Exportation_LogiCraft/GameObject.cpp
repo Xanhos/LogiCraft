@@ -35,6 +35,8 @@ SOFTWARE.
 #include "GameObject.h"
 #include "Texture.h"
 #include "RigidBody.h"
+#include "Font.h"
+#include "AI.h"
 
 lc::GameObject::GameObject()
 	: m_name(""), m_depth(0), m_ID(m_generalID++), m_needToBeRemove(false)
@@ -55,12 +57,12 @@ lc::GameObject::~GameObject()
 
 void lc::GameObject::Load(std::ifstream& load)
 {
-	std::string Garbage;
+	std::string garbage;
 	auto check = [&](char c) {
-		auto t = load.tellg();
-		load >> Garbage;
-		if (Garbage.find(c) == std::string::npos)
-			load.seekg(t);
+		auto fileCursorPos = load.tellg();
+		load >> garbage;
+		if (garbage.find(c) == std::string::npos)
+			load.seekg(fileCursorPos);
 		};
 
 	int tmp;
@@ -71,60 +73,65 @@ void lc::GameObject::Load(std::ifstream& load)
 	load >> m_transform.getRotation();
 	load >> m_transform.getOrigin().x >> m_transform.getOrigin().y;
 	load >> tmp;
-	m_depth = (unsigned char)tmp;
-	while (Garbage.find("{") == std::string::npos)
+	m_depth = static_cast<unsigned char>(tmp);
+	while (garbage.find('{') == std::string::npos)
 	{
-		load >> Garbage;
+		load >> garbage;
 	}
 	check('}');
 
 
-	while (Garbage.find("}") == std::string::npos)
+	while (garbage.find('}') == std::string::npos)
 	{
 		int type;
 		load >> type;
-		if ((Ressource::TYPE)type == Ressource::TYPE::NONE)
+		if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::NONE)
 		{
 
 		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::TEXTURE)
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::TEXTURE)
 		{
 			auto texture = std::make_shared<Texture>();
 			texture->Load(load);
 			addComponent(texture);
 		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::FONT)
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::FONT)
 		{
+			auto font = std::make_shared<Font>();
+			font->Load(load);
+			addComponent(font);
 		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::IA)
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::IA)
 		{
+			auto ai = std::make_shared<AI>();
+			addComponent(ai)->Load(load);
 		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::RIGIDBODY)
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::RIGIDBODY)
 		{
 			auto rigid = std::make_shared<RigidBody>();
 			rigid->Load(load);
 			addComponent(rigid);
 		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::EVENT)
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::EVENT)
 		{
 		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::BUTTON)
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::BUTTON)
 		{
 		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::PARTICULES_SYSTEM)
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::PARTICULES_SYSTEM)
 		{
 		}
 		check('}');
 	}
 
-	load >> Garbage;
-	while (Garbage.find("{") == std::string::npos)
+	load >> garbage;
+	while (garbage.find('{') == std::string::npos)
 	{
-		load >> Garbage;
+		load >> garbage;
 	}
 
 	check('}');
-	while (Garbage.find("}") == std::string::npos)
+	while (garbage.find('}') == std::string::npos)
 	{
 		this->addObject(CreateGameObject("OBJECT"))->Load(load);
 		check('}');
@@ -153,13 +160,13 @@ std::shared_ptr<lc::GameObject> lc::GameObject::LoadScene(std::string _SceneToLo
 		if (dir_entry.path().extension() == ".png")
 		{
 			std::istringstream iss(Tools::replaceSpace(dir_entry.path().filename().stem().string()));
-
-			std::string garbarge;
-			int posBGx(0), posBGy(0), depth(0);
+			
+			std::string garbage;
+			int pos_bg_x(0), pos_bg_y(0), depth(0);
 			sf::Vector2f position(0,0);
-			iss >> posBGx >> posBGy >> garbarge >> garbarge >> depth;
-			position = sf::Vector2f(0 + (screenResolution.x * posBGx), 0 + (screenResolution.y * posBGy));
-			world->addObject("BACKGROUND",depth)->addComponent(std::make_shared<Texture>(dir_entry.path().filename().string(), dir_entry.path().string()))->setRelativePosition(position);
+			iss >> pos_bg_x >> pos_bg_y >> garbage >> garbage >> depth;
+			position = sf::Vector2f(static_cast<float>(0 + (screenResolution.x * pos_bg_x)), static_cast<float>(0 + (screenResolution.y * pos_bg_y)));
+			world->addObject("BACKGROUND",static_cast<unsigned char>(depth))->addComponent(std::make_shared<Texture>(dir_entry.path().filename().string(), dir_entry.path().string()))->setRelativePosition(position);
 		}
 	}
 
@@ -206,7 +213,7 @@ void lc::GameObject::Update(WindowManager& _window)
 		if ((*object)->hasToBeRemoved())
 			object = m_objects.erase(object);
 		else
-			object++;
+			++object;
 	}
 
 	for (auto component = m_components.begin(); component != m_components.end();)
@@ -216,7 +223,7 @@ void lc::GameObject::Update(WindowManager& _window)
 		if ((*component)->needToBeDeleted())
 			component = m_components.erase(component);
 		else
-			component++;
+			++component;
 	}
 
 	CheckMaxSize();	

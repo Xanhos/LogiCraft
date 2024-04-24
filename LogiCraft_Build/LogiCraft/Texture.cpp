@@ -163,8 +163,7 @@ void lc::Texture::Export(std::ofstream& exportation)
 		<< " " << m_relativePosition.x
 		<< " " << m_relativePosition.y << std::endl;
 
-	auto tmp = dynamic_cast<FileWriter*>(&exportation);
-	if (tmp)
+	if (const auto tmp = dynamic_cast<FileWriter*>(&exportation))
 		Tools::copyFile(m_texturePath, tmp->getPath().parent_path().string() + "/Ressources/" + m_textureName);
 }
 

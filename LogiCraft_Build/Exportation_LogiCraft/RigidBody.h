@@ -33,7 +33,10 @@ SOFTWARE.
 ---------------------------------------------------------------------------------*/
 
 #pragma once
+#include <any>
+
 #include "Ressource.h"
+
 
 namespace lc
 {
@@ -44,23 +47,24 @@ namespace lc
 		RigidBody(sf::FloatRect _collider, sf::Vector2f _velocity, sf::Vector2f _relative, sf::Vector2f posBeforeSimulate, bool showCollide, bool kinetic);
 		~RigidBody();
 
-		virtual void Load(std::ifstream& load) override;
+		void Load(std::ifstream& load) override;
 		
-		virtual void UpdateEvent(sf::Event& _window) override;
-		virtual void Update(WindowManager& _window) override;
-		virtual void Draw(WindowManager& _window) override;
-		virtual void Draw(sf::RenderTexture& _window) override;
-		virtual std::shared_ptr<lc::GameComponent> Clone() override;
+		void UpdateEvent(sf::Event& _window) override;
+		void Update(WindowManager& _window) override;
+		void Draw(WindowManager& _window) override;
+		void Draw(sf::RenderTexture& _window) override;
+		std::shared_ptr<lc::GameComponent> Clone() override;
 
 		virtual void AddInputFunction(std::function<void(lc::RigidBody*)> func);
 
+
 		sf::Vector2f& getVelocity() { return m_velocity; }
+		const sf::FloatRect getCollider() const { return m_collider; }
 	private:
 		bool CheckAllObject(std::shared_ptr<lc::GameObject> _object);
 
 		sf::FloatRect m_collider;
 		sf::Vector2f m_velocity;
-		sf::Vector2f m_relativePosition;
 		bool m_isKinetic = false;
 		std::list<std::function<void(lc::RigidBody*)>> m_inputFunc;
 	};

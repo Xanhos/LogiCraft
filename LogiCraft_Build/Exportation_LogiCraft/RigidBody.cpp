@@ -107,9 +107,13 @@ void lc::RigidBody::Update(WindowManager& _window)
 		if (getParent())
 		{
 			getParent()->getTransform().getPosition() += m_velocity * Tools::getDeltaTime();
-			m_collider.left = getParent()->getTransform().getPosition().x;
-			m_collider.top = getParent()->getTransform().getPosition().y;
+			std::cout << m_velocity.x << " " << m_velocity.y << std::endl;
 		}
+	if (getParent())
+	{
+		m_collider.left = getParent()->getTransform().getPosition().x + m_relativePosition.x;
+		m_collider.top = getParent()->getTransform().getPosition().y + m_relativePosition.y;
+	}
 }
 
 void lc::RigidBody::Draw(WindowManager& _window)
@@ -143,7 +147,10 @@ bool lc::RigidBody::CheckAllObject(std::shared_ptr<lc::GameObject> _object)
 				if(m_velocity.y > 0.f)
 				{
 					if (Tools::Collisions::lineRect({ m_relativePosition + m_collider.getPosition() + sf::Vector2f{0.f,m_collider.getSize().y} + sf::Vector2f{0.f,m_velocity.y} *Tools::getDeltaTime(), {{m_relativePosition + m_collider.getPosition() + m_collider.getSize() + sf::Vector2f{0.f,m_velocity.y}*Tools::getDeltaTime() }} }, { rb->getParent()->getTransform().getPosition() + rb->m_relativePosition, rb->m_collider.getSize()}))
+					{
 						m_velocity.y = 0.f;
+						m_collider.top = rb->getCollider().top - m_collider.height - 0.9f;
+					}
 				}
 				else if (m_velocity.y < 0.f)
 				{

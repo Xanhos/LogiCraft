@@ -42,6 +42,7 @@ class PatronNode;
 typedef std::unordered_map<std::string, std::function<void(PatronNode*, std::ofstream& file)>> DecoratorSaveMethod;
 typedef std::unordered_map<std::string, std::function<void(PatronNode*, std::ifstream& file)>> DecoratorLoadMethod;
 typedef std::unordered_map<std::string, std::function<void(PatronNode*)>> DecoratorMethod;
+typedef std::unordered_map<std::string, std::function<void(PatronNode*, PatronNode*)>> DecoratorCopyMethod;
 
 /*
  * @brief Class that represent a node of a behavior tree
@@ -64,6 +65,7 @@ class PatronNode
 	static DecoratorLoadMethod s_DecoratorLoadMethod;
 	static DecoratorMethod s_DecoratorInitMethod;
 	static DecoratorMethod s_DecoratorUpdateMethod;
+	static DecoratorCopyMethod s_DecoratorCopyMethod;
 	static std::unordered_map<std::string, int> s_ConditionContainer;
 	static std::unordered_map<std::string, int> s_NodeContainer;
 	inline static int s_id = 0;
@@ -126,6 +128,10 @@ public:
 
 	PatronNode(int type);
 	PatronNode(const PatronNode& node);
+	PatronNode(PatronNode&& node);
+
+	PatronNode& operator=(const PatronNode& node) = default;
+
 
 	/**
 	 * @brief Create a new node and add it to the current node

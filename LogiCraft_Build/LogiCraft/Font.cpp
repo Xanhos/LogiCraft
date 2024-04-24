@@ -176,6 +176,28 @@ void lc::Font::Save(std::ofstream& save, sf::RenderTexture& texture, int _depth)
 	}
 }
 
+void lc::Font::Export(std::ofstream& exportation)
+{
+	exportation << static_cast<int>(m_type)
+		<< " " << Tools::replaceSpace(m_fontName, true)
+		<< " " << m_characterSize
+		<< " " << m_outlineThickness
+		<< " " << Tools::replaceSpace(m_sentence, true)
+		<< " " << static_cast<int>(m_insideColor.r)
+		<< " " << static_cast<int>(m_insideColor.g)
+		<< " " << static_cast<int>(m_insideColor.b)
+		<< " " << static_cast<int>(m_insideColor.a)
+		<< " " << static_cast<int>(m_outLineColor.r)
+		<< " " << static_cast<int>(m_outLineColor.g)
+		<< " " << static_cast<int>(m_outLineColor.b)
+		<< " " << static_cast<int>(m_outLineColor.a)
+		<< " " << m_relativePosition.x
+		<< " " << m_relativePosition.y << std::endl;
+	
+	if (const auto tmp = dynamic_cast<FileWriter*>(&exportation))
+		Tools::copyFile(m_fontPath, tmp->getPath().parent_path().string() + "/Ressources/" + m_fontName);
+}
+
 void lc::Font::Load(std::ifstream& load)
 {
 	int tmp[8];

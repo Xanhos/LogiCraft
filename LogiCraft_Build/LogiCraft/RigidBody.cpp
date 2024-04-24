@@ -141,13 +141,16 @@ void lc::RigidBody::Update(WindowManager& _window)
 	}
 	else m_velocity = { 0.f,0.f };
 
-	if (m_isKinetic and m_simulate)
+	if (m_isKinetic)
 		if (getParent())
 		{
 			getParent()->getTransform().getPosition() += m_velocity * Tools::getDeltaTime();
-			m_collider.left = getParent()->getTransform().getPosition().x;
-			m_collider.top = getParent()->getTransform().getPosition().y;
 		}
+	if (getParent())
+	{
+		m_collider.left = getParent()->getTransform().getPosition().x + m_relativePosition.x;
+		m_collider.top = getParent()->getTransform().getPosition().y + m_relativePosition.y;
+	}
 }
 
 void lc::RigidBody::Draw(WindowManager& _window)

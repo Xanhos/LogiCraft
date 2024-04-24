@@ -40,6 +40,7 @@ DecoratorSaveMethod PatronNode::s_DecoratorSaveMethod = {};
 DecoratorLoadMethod PatronNode::s_DecoratorLoadMethod = {};
 DecoratorMethod PatronNode::s_DecoratorInitMethod = {};
 DecoratorMethod PatronNode::s_DecoratorUpdateMethod = {};
+DecoratorCopyMethod PatronNode::s_DecoratorCopyMethod = {};
 
 void PatronNode::SetupAllNode()
 {
@@ -183,6 +184,9 @@ void PatronNode::SetupAllNode()
 		s_DecoratorInitMethod["MOVE TO"] = [](PatronNode* node) {
 			node->m_decoratorData = std::string();
 			};
+		s_DecoratorCopyMethod["MOVE TO"] = [](PatronNode* node, PatronNode* node_copied) {
+			node->m_decoratorData = std::any_cast<std::string>(node_copied->m_decoratorData);
+			};
 		s_DecoratorUpdateMethod["MOVE TO"] = [](PatronNode* node) {
 			auto TAG = std::any_cast<std::string>(node->m_decoratorData);
 			ImGui::InputText("TAG", TAG, 100);
@@ -197,6 +201,7 @@ void PatronNode::SetupAllNode()
 			std::string tag;
 			file >> tag;
 			node->m_decoratorData = tag;
+			auto t = std::any_cast<std::string>(node->m_decoratorData);
 			};
 	}
 
@@ -205,6 +210,9 @@ void PatronNode::SetupAllNode()
 	{
 		s_DecoratorInitMethod["PLAY ANIMATION"] = [](PatronNode* node) {
 			node->m_decoratorData = std::string();
+			};
+		s_DecoratorCopyMethod["PLAY ANIMATION"] = [](PatronNode* node, PatronNode* node_copied) {
+			node->m_decoratorData = std::any_cast<std::string>(node_copied->m_decoratorData);
 			};
 		s_DecoratorUpdateMethod["PLAY ANIMATION"] = [](PatronNode* node) {
 			auto TAG = std::any_cast<std::string>(node->m_decoratorData);
@@ -228,6 +236,9 @@ void PatronNode::SetupAllNode()
 		s_DecoratorInitMethod["PLAY SOUND"] = [](PatronNode* node) {
 			node->m_decoratorData = std::string();
 			};
+		s_DecoratorCopyMethod["PLAY SOUND"] = [](PatronNode* node, PatronNode* node_copied) {
+				node->m_decoratorData = std::any_cast<std::string>(node_copied->m_decoratorData);
+				};
 		s_DecoratorUpdateMethod["PLAY SOUND"] = [](PatronNode* node) {
 			auto TAG = std::any_cast<std::string>(node->m_decoratorData);
 			ImGui::InputText("TAG", TAG, 100);
@@ -249,6 +260,9 @@ void PatronNode::SetupAllNode()
 	{
 		s_DecoratorInitMethod["ROTATE TO"] = [](PatronNode* node) {
 			node->m_decoratorData = std::string();
+			};
+		s_DecoratorCopyMethod["ROTATE TO"] = [](PatronNode* node, PatronNode* node_copied) {
+			node->m_decoratorData = std::any_cast<std::string>(node_copied->m_decoratorData);
 			};
 		s_DecoratorUpdateMethod["ROTATE TO"] = [](PatronNode* node) {
 			auto TAG = std::any_cast<std::string>(node->m_decoratorData);
@@ -324,7 +338,6 @@ PatronNode::PatronNode(const PatronNode& node)
 {
 	m_type = node.m_type;
 	m_conditionType = node.m_conditionType;
-	m_decoratorData = node.m_decoratorData;
 	m_id = s_id++;
 	m_isOpen = node.m_isOpen;
 	m_newNodeIsAdded = node.m_newNodeIsAdded;
@@ -335,8 +348,26 @@ PatronNode::PatronNode(const PatronNode& node)
 		Add(*i);
 	}
 
-	if (s_DecoratorInitMethod[getNodeName(m_type)])
-		s_DecoratorInitMethod[getNodeName(m_type)](this);
+	if (s_DecoratorCopyMethod[getNodeName(m_type)])
+		s_DecoratorCopyMethod[getNodeName(m_type)](this, const_cast<PatronNode*>(&node));
+}
+
+PatronNode::PatronNode(PatronNode&& node)
+{
+	m_type = node.m_type;
+	m_conditionType = node.m_conditionType;
+	m_id = s_id++;
+	m_isOpen = node.m_isOpen;
+	m_newNodeIsAdded = node.m_newNodeIsAdded;
+	m_parent = nullptr;
+	m_child.clear();
+	for (auto& i : node.m_child)
+	{
+		Add(*i);
+	}
+
+	if (s_DecoratorCopyMethod[getNodeName(m_type)])
+		s_DecoratorCopyMethod[getNodeName(m_type)](this, const_cast<PatronNode*>(&node));
 }
 
 PatronNode* PatronNode::Add(const PatronNode& node)
