@@ -77,9 +77,10 @@ ObjWeakPtrList& Hierarchie::getSelectedGameObject()
 
 void Hierarchie::GameObjectsDisplay(std::shared_ptr<lc::GameObject> _gameObject, std::shared_ptr<lc::GameObject> _scene, std::list<std::shared_ptr<lc::GameObject>>* _gameObjectList)
 {
-	if (ImGui::TreeNodeEx(std::string(_gameObject->getName() + " <ID:" + std::to_string(_gameObject->getID()) + ">").c_str(),
-		ImGuiTreeNodeFlags_Selected | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap,
-		_gameObject->getName().c_str()))
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_Selected;
+	_gameObject->getObjects().size() == 0 ? flags |= ImGuiTreeNodeFlags_Leaf : flags |= (ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick);
+
+	if (ImGui::TreeNodeEx(std::string(_gameObject->getName() + "##<ID:" + std::to_string(_gameObject->getID()) + ">").c_str(), flags))
 	{
 		this->SelectionBehavior(_gameObject);
 
@@ -94,7 +95,6 @@ void Hierarchie::GameObjectsDisplay(std::shared_ptr<lc::GameObject> _gameObject,
 			if (m_hasMoveAnObject)
 				break;
 		}
-
 		ImGui::TreePop();
 	}
 	else
