@@ -80,6 +80,9 @@ void Hierarchie::GameObjectsDisplay(std::shared_ptr<lc::GameObject> _gameObject,
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_Selected;
 	_gameObject->getObjects().size() == 0 ? flags |= ImGuiTreeNodeFlags_Leaf : flags |= (ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick);
 
+	std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&](std::weak_ptr<lc::GameObject>& obj) {return _gameObject == obj.lock(); })
+		!= m_selectedGameObjects.end() ? ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.25882f, 0.5882f, 1.f, 1.f)) : ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1215f, 0.22352f, 0.3450f, 1.f));
+
 	if (ImGui::TreeNodeEx(std::string(_gameObject->getName() + "##<ID:" + std::to_string(_gameObject->getID()) + ">").c_str(), flags))
 	{
 		this->SelectionBehavior(_gameObject);
@@ -105,7 +108,7 @@ void Hierarchie::GameObjectsDisplay(std::shared_ptr<lc::GameObject> _gameObject,
 
 		this->MoveDownUpBehavior(_gameObject, _gameObjectList);
 	}
-
+	ImGui::PopStyleColor();
 	if (_gameObject->getName() == "")
 		_gameObject->getName() = "No_Name";
 	else
@@ -321,8 +324,6 @@ void Hierarchie::VerifyThePasteObject(std::shared_ptr<lc::GameObject>& _object)
 		this->VerifyThePasteObject(child);
 	}
 }
-
-
 
 void Hierarchie::MoveDownUpBehavior(std::shared_ptr<lc::GameObject> _gameObject, ObjSharedPtrList* _gameObjectList)
 {
