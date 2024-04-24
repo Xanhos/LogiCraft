@@ -209,6 +209,7 @@ void ToolsBar::ShowHelp()
 	ImGui::BulletText("LControl + Left Click on multiple objects => Multiple Selection.");
 	ImGui::BulletText("LControl + C => Copy all selected objects.");
 	ImGui::BulletText("LControl + V => Paste all selected objects.");
+	ImGui::BulletText("LShift + Left Click => Select object and all his child in hierarchy.");
 
 	ImGui::End();
 }

@@ -124,7 +124,7 @@ void Viewports::UpdateEvent(sf::Event& _event)
 {
 	for (auto& viewport : m_viewports)
 	{
-		if (viewport->hasWindowFocus() && !viewport->isZoomLocked())
+		if (viewport->hasWindowFocus() && !viewport->isZoomLocked() && viewport->isInWindow(ImGui::GetMousePos()))
 		{
 			if (_event.type == sf::Event::MouseWheelScrolled)
 			{
