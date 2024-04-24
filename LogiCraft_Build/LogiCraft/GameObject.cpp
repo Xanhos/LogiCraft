@@ -171,7 +171,7 @@ void lc::GameObject::Load(std::ifstream& load)
 		}
 		else if ((Ressource::TYPE)type == Ressource::TYPE::PARTICULES)
 		{
-			auto particulesSystem = std::make_shared<Particules>();
+			auto particulesSystem = std::make_shared<lc::Particles>();
 			particulesSystem->Load(load);
 			addComponent(particulesSystem);
 		}

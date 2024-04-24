@@ -53,7 +53,7 @@ namespace lc
 	public:
 		Event();
 		Event(std::string name, short function);
-		~Event();
+		virtual ~Event();
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth);
 		void SaveRenderer(sf::RenderTexture& texture, int _depth) override {};

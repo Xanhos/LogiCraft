@@ -40,11 +40,11 @@ SOFTWARE.
 
 namespace lc
 {
-	class Particule
+	class Particle
 	{
 	public:
-		Particule();
-		Particule(
+		Particle();
+		Particle(
 			float _speed,
 			float _despawnCooldown,
 			float _spawnAngle,
@@ -55,7 +55,7 @@ namespace lc
 			sf::Vector2f _spawnPositionInViewport,
 			sf::Vector2f _spawnPositionInRender,
 			sf::Vector2f _spawnOrigin);
-		~Particule();
+		~Particle();
 
 		lc::Transform& getTransform();
 		lc::Transform& getRendererTransform();
@@ -83,20 +83,20 @@ namespace lc
 		bool m_needToBeDeleted;
 	};
 
-	class Particules : public Ressource
+	class Particles : public Ressource
 	{
 	public:
-		enum class ParticulesSystemType
+		enum class ParticlesSystemType
 		{
 			PSTNULL = -1,
-			NORMAL, //Just the normal particules system.
-			ONE_TIME, //This type will do the particules and never do it again.
-			LIFE_TIME //This type will do the particules for an amount of time.
+			NORMAL, //Just the normal particles' system.
+			ONE_TIME, //This type will do the particles and never do it again.
+			LIFE_TIME //This type will do the particles for an amount of time.
 		};
 	public:
-		Particules();
-		Particules(ParticulesSystemType _type);
-		~Particules();
+		Particles();
+		Particles(ParticlesSystemType _type);
+		virtual ~Particles() override;
 
 		virtual void UpdateEvent(sf::Event& _event) override;
 		virtual void Update(WindowManager& _window) override;
@@ -111,8 +111,8 @@ namespace lc
 		virtual void Load(std::ifstream& load) override;
 	private:
 		/*
-		* @brief When the particules system is load by a save it can have a texture,
-		* @brief so this function found the texture component that he need.
+		* @brief When the particles system is load by a save it can have a texture,
+		* @brief so this function found the texture component that he needs.
 		*/
 		void HasToFoundHisTexture();
 
@@ -122,49 +122,39 @@ namespace lc
 		void UpdateValue();
 
 		/*
-		* @brief Function to update the particules tester window that use ImGui.
+		* @brief Function to update the particles tester window that use ImGui.
 		*/
 		void UpdateRendererWindow();
 
 		/*
-		* @brief Function and update and spawn the particule when the timer is good.
+		* @brief Function and update and spawn the particle when the timer is good.
 		*/
-		void SpawnParticules();
+		void SpawnParticles();
 
 		/*
-		* @brief Function to update value used by the renderer.
-		*/
-		void UpdateRenderer();
-
-		/*
-		* @brief Function to make the grab with the camera.
-		*/
-		void RendererMovement();
-
-		/*
-		* @brief Function to draw the spawn point of the particules
+		* @brief Function to draw the spawn point of the particles
 		*/
 		void SpawnPointDraw(sf::RenderTexture& _window);
 
 		/*
-		* @brief Function to draw particules.
+		* @brief Function to draw particles.
 		*/
-		void ParticulesDraw(sf::RenderTexture& _window);
+		void particles_draw(sf::RenderTexture& _window);
 
 		/*
-		* @brief Function to draw particule.
+		* @brief Function to draw Particle.
 		*/
-		void ParticuleDraw(std::shared_ptr<Particule> _particule, sf::RenderTexture& _window, sf::RenderTexture& _renderer);
+		void ParticleDraw(const std::shared_ptr<Particle>& _particle, sf::RenderTexture& _window);
 
 		/*
 		* @brief Function to know if how of the render option is on.
 		* 
 		* @return True if one of them is on then false.
 		*/
-		bool ParticulesHisRendered() const;
+		bool ParticlesHisRendered() const;
 
 		/*
-		* @brief Function to update all the particules so it took less performance.
+		* @brief Function to update all the particles, so it took less performance.
 		*/
 		void ThreadUpdate();
 
@@ -185,38 +175,31 @@ namespace lc
 		* 
 		* @return Return the Vector2f that as been modified. 
 		*/
-		sf::Vector2f GetExtendSpawnPoint(sf::Vector2f _centerPosition);
+		sf::Vector2f GetExtendSpawnPoint(sf::Vector2f _centerPosition) const;
 	private:
-		static std::list<std::shared_ptr<Particule>> s_threadParticules;
+		static std::list<std::shared_ptr<Particle>> s_threadParticles;
 		static bool s_threadUpdateIsOn;
-		static int s_numberOfParticuleSystem;
+		static int s_numberOfParticleSystem;
 		static std::thread s_updateThread;
 		static sf::Clock s_updateClock;
 		static sf::Time s_updateTime;
 
-		std::shared_ptr<sf::RenderTexture> m_renderer;
-		sf::Vector2f m_redererAddedPosition;
-		sf::Vector2f m_redererLastAddedPosition;
-		sf::Vector2f m_rendererSize;
-		sf::View m_rendererView;
-		bool m_renderderIsFocus;
-		bool m_rendererIsGrabbed;
-		float m_rendererZoom;
+		Tools::Renderer m_renderer_;
 
-		ParticulesSystemType m_particulesType;
+		ParticlesSystemType m_particlesType;
 
-		std::list<std::shared_ptr<Particule>> m_particules;
+		std::list<std::shared_ptr<Particle>> m_particles;
 
 		sf::CircleShape m_baseShape;
-		sf::CircleShape m_spawnPointParticules;
-		sf::RectangleShape m_spawnPointParticulesExtend;
+		sf::CircleShape m_spawnPointParticles;
+		sf::RectangleShape m_spawnPointParticlesExtend;
 
-		std::weak_ptr<lc::Texture> m_particulesTexture;
+		std::weak_ptr<lc::Texture> m_particlesTexture;
 
 		sf::Color m_spawnColor;
 		sf::Vector2f m_textureSize;
-		sf::Vector2f m_particulesOrigin;
-		sf::Vector2f m_particulesSpawnCenter;
+		sf::Vector2f m_particlesOrigin;
+		sf::Vector2f m_particlesSpawnCenter;
 
 		float m_spawnPointExtendSize;
 		
@@ -238,9 +221,9 @@ namespace lc
 		int m_baseShapePointCount;
 		int m_spawnCount;
 
-		bool m_hasProductHisParticules;
+		bool m_hasProductHisParticles;
 		bool m_hasGravity;
-		bool m_isParticulesRenderedOnTheViewport;
+		bool m_isParticlesRenderedOnTheViewport;
 		bool m_isWindowTestIsOpen;
 		std::pair<bool, std::string> m_hasToFoundHisTexture;
 	};

@@ -43,7 +43,7 @@ namespace lc
 	{
 	public:
 		AI();
-		~AI();
+		virtual ~AI();
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) override;
 		void SaveRenderer(sf::RenderTexture& texture, int _depth) override {};

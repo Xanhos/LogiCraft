@@ -59,7 +59,7 @@ namespace lc
 		TYPE m_type;
 
 		Ressource();
-		~Ressource();
+		virtual ~Ressource();
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) = 0;
 		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth) override;

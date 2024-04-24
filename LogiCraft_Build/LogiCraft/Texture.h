@@ -46,7 +46,7 @@ namespace lc
 		Texture(std::string name, sf::IntRect rect, std::string path, sf::Vector2f _position, sf::Vector2f _scale, sf::Vector2f _relative); // load constructor
 		Texture(std::string name, sf::IntRect rect, std::string path, std::string newRepo = "");
 		Texture(const Texture& _texture);
-		~Texture();
+		virtual ~Texture();
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) override;
 		virtual void Load(std::ifstream& load) override;

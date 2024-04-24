@@ -195,7 +195,7 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
 					}
 
 					if (ImGui::Button("Add Particules System"))
-						tmp_object->addComponent<lc::Particules>();
+						tmp_object->addComponent<lc::Particles>();
 
 					if (tmp_object->hasComponent("RigidBody") and !tmp_object->hasComponent("AI"))
 						if (ImGui::Button("Add AI"))
