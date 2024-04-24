@@ -145,17 +145,37 @@ void lc::Event::setHierarchieFunc()
 				while (scene->getParent())
 					scene = std::make_shared<lc::GameObject>(*scene->getParent());
 
-				if(ImGui::Begin(std::string(getName() + "'s Window##" + std::to_string(getID())).c_str(), &m_setFunction))
+				if(ImGui::Begin(std::string(getName() + "'s Window##lc" + std::to_string(getID())).c_str(), &m_setFunction))
 				{
 					static int linkid = 0;
 					ImNodes::BeginNodeEditor();
 
 					static std::vector<std::pair<int, std::pair<int, int>>> links;
 					static const float text_width = ImGui::CalcTextSize("=> Receive information").x;
+
 					for (int i = 0; i < links.size(); ++i)
 					{
 						ImNodes::Link(links[i].first, links[i].second.first, links[i].second.second);
+						if (ImNodes::IsLinkSelected(links[i].first) && KEY(Backspace))
+						{
+							if (!m_objectA.expired())
+							{
+								if (links[i].second.first == m_objectA.lock()->getID() || links[i].second.first == m_objectA.lock()->getID() + 100000)
+								{
+									m_objectA.reset();
+								}
+							}
+							if (!m_objectB.expired())
+							{
+								if (links[i].second.second == m_objectB.lock()->getID() || links[i].second.second == m_objectB.lock()->getID() + 100000)
+								{
+									m_objectB.reset();
+								}
+							}
+							links.erase(links.begin() + i);
+						}
 					}
+
 					for (auto& objects : scene->getObjects())
 					{
 						while (objects->getObjects().size() != 0)
@@ -173,10 +193,12 @@ void lc::Event::setHierarchieFunc()
 									ImNodes::BeginInputAttribute(it->getID());
 									ImGui::Text("=> Receive information");
 									ImNodes::EndInputAttribute();
+									m_objectA.lock() ? ImGui::Text(m_objectA.lock()->getName().c_str()) : ImGui::Text("Object A");
 									ImNodes::BeginOutputAttribute(it->getID() + 100000);
 									ImGui::Indent(text_width);
 									ImGui::Text("Send information =>");
 									ImNodes::EndOutputAttribute();
+									m_objectB.lock() ? ImGui::Text(m_objectB.lock()->getName().c_str()) : ImGui::Text("Object B");
 									setCondition();
 									ImGui::Checkbox("Is interaction reversed if resolved", &m_isReverse);
 								}
@@ -207,10 +229,12 @@ void lc::Event::setHierarchieFunc()
 							ImNodes::BeginInputAttribute(objects->getID());
 							ImGui::Text("=> Receive information");
 							ImNodes::EndInputAttribute();
+							m_objectA.lock() ? ImGui::Text(m_objectA.lock()->getName().c_str()) : ImGui::Text("Object A");
 							ImNodes::BeginOutputAttribute(objects->getID() + 100000);
 							ImGui::Indent(text_width);
 							ImGui::Text("Send information =>");
 							ImNodes::EndOutputAttribute();
+							m_objectB.lock() ? ImGui::Text(m_objectB.lock()->getName().c_str()) : ImGui::Text("Object B");
 							setCondition();
 							ImGui::Checkbox("Is interaction reversed if resolved", &m_isReverse);
 						}
