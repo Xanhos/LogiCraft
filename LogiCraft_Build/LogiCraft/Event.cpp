@@ -145,12 +145,11 @@ void lc::Event::setHierarchieFunc()
 				while (scene->getParent())
 					scene = std::make_shared<lc::GameObject>(*scene->getParent());
 
-				std::vector<std::string> container = setContainer(scene);
-
 				if(ImGui::Begin(std::string(getName() + "'s Window##" + std::to_string(getID())).c_str(), &m_setFunction))
 				{
 					static int linkid = 0;
 					ImNodes::BeginNodeEditor();
+
 					static std::vector<std::pair<int, std::pair<int, int>>> links;
 					static const float text_width = ImGui::CalcTextSize("=> Receive information").x;
 					for (int i = 0; i < links.size(); ++i)
@@ -271,30 +270,6 @@ void lc::Event::setHierarchieFunc()
 				m_isOpen = false;
 			}
 		};
-}
-
-std::vector<std::string> lc::Event::setContainer(std::shared_ptr<lc::GameObject> scene)
-{
-	std::vector<std::string> container;
-	for (auto& objects : scene->getObjects())
-	{
-		while (objects->getObjects().size() != 0)
-		{
-			for (auto& it : objects->getObjects())
-			{
-				objects = it;
-				if (it->getName() != "EVENT")
-				{
-					container.push_back(it->getName() + std::string(" " + std::to_string(it->getID())));
-				}
-			}
-		}
-		if (objects->getName() != "EVENT")
-		{
-			container.push_back(objects->getName() + std::string(" " + std::to_string(objects->getID())));
-		}
-	}
-	return container;
 }
 
 void lc::Event::setCondition()

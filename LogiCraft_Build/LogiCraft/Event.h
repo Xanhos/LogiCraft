@@ -68,7 +68,6 @@ namespace lc
 		* @brief Open a window to set event's interaction.
 		*/
 		void setHierarchieFunc();
-		std::vector<std::string> setContainer(std::shared_ptr<lc::GameObject> _scene);
 		void setCondition();
 	};
 }
