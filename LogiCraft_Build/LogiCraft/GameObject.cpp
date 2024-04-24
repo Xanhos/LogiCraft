@@ -40,6 +40,7 @@ SOFTWARE.
 #include "RigidBody.h"
 #include "Event.h"
 #include "Particule.h"
+#include "Animation.h"
 
 
 lc::GameObject::GameObject()
@@ -174,6 +175,12 @@ void lc::GameObject::Load(std::ifstream& load)
 			auto particulesSystem = std::make_shared<lc::Particles>();
 			particulesSystem->Load(load);
 			addComponent(particulesSystem);
+		}
+		else if ((Ressource::TYPE)type == Ressource::TYPE::ANIMATION)
+		{
+			auto tmp_animation = std::make_shared<lc::Animation>();
+			tmp_animation->Load(load);
+			addComponent(tmp_animation);
 		}
 		check('}');
 	}

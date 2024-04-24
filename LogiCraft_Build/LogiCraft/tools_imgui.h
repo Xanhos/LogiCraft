@@ -63,6 +63,8 @@ typedef std::list<std::shared_ptr<lc::GameObject>> ObjSharedPtrList;
 typedef std::list<std::weak_ptr<lc::GameComponent>> CompWeakPtrList;
 typedef std::list<std::shared_ptr<lc::GameComponent>> CompSharedPtrList;
 
+typedef std::pair<bool, std::string> TextureToSearch;
+
 namespace Tools
 {
 	extern bool camera_grabbed;
@@ -165,3 +167,26 @@ namespace Tools
 	std::string replaceSpace(std::string string, bool spaceOrUnderscore = 0);
 }
 
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const sf::Vector2<T>& vec)
+{
+	return os << vec.x << " " << vec.y;
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const sf::Rect<T>& rect)
+{
+	return os << rect.left << " " << rect.top << " " << rect.width << " " << rect.height;
+}
+
+template<typename T>
+std::istream& operator>>(std::istream& is, sf::Vector2<T>& vec)
+{
+	return is >> vec.x >> vec.y;
+}
+
+template<typename T>
+std::istream& operator>>(std::istream& is, sf::Rect<T>& rect)
+{
+	return is >> rect.left >> rect.top >> rect.width >> rect.height;
+}

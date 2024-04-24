@@ -72,7 +72,7 @@ namespace lc
 		int m_actual_frame_;
 
 		float m_frame_timer_;
-		float m_frameTime;
+		float m_frame_time_;
 	};
 
 	class Animation : public lc::Ressource
@@ -94,7 +94,17 @@ namespace lc
 		virtual void setHierarchieFunc() override;
 
 		void select_animation_key(const std::string& name, const bool reset_last_anim_key = false);
+
+		void current_animation_is_paused(const bool paused = true);
+
+		void current_animation_is_reversed(const bool reversed = true);
 	private:
+		void texture_to_search();
+
+		void update_renderer_window();
+	private:
+		std::string m_animation_name_;
+
 		int m_base_total_frame_;
 		float m_base_frame_time_;
 		std::string m_base_name_;
@@ -102,7 +112,8 @@ namespace lc
 		sf::Vector2i m_base_max_frame_;
 
 		bool m_window_his_open_;
-		bool m_animation_his_paused_;
+		bool m_animation_is_paused_;
+		bool m_animation_is_reversed_;
 
 		Tools::Renderer m_renderer_;
 
@@ -110,5 +121,7 @@ namespace lc
 
 		std::weak_ptr<AnimationKey> m_actual_animation_key_;
 		std::unordered_map<std::string, std::shared_ptr<AnimationKey>> m_animation_keys_;
+
+		TextureToSearch m_texture_to_search_;
 	};
 }

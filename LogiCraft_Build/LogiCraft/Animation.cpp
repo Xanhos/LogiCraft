@@ -5,13 +5,13 @@
 namespace lc
 {
 	AnimationKey::AnimationKey()
-		: m_total_frame_(0), m_actual_frame_(0), m_frame_timer_(0.f), m_frameTime(0.f)
+		: m_total_frame_(0), m_actual_frame_(0), m_frame_timer_(0.f), m_frame_time_(0.f)
 	{
 	}
 
 	AnimationKey::AnimationKey(std::string name, int total_frame, sf::Vector2i max_frame, float frame_time, sf::IntRect frame_rect)
 		: m_name_(name), m_base_frame_rect_(frame_rect), m_max_frame_(max_frame), m_total_frame_(total_frame), m_actual_frame_(0), m_frame_timer_(0.f),
-		  m_frameTime(frame_time)
+		  m_frame_time_(frame_time)
 	{
 		this->create_frames_rect();
 	}
@@ -57,7 +57,7 @@ namespace lc
 
 	float& AnimationKey::get_frame_time()
 	{
-		return m_frameTime;
+		return m_frame_time_;
 	}
 
 	void AnimationKey::create_frames_rect()
@@ -85,7 +85,7 @@ namespace lc
 	}
 
 	Animation::Animation()
-		: m_base_total_frame_(0), m_base_frame_time_(0.f), m_window_his_open_(false), m_animation_his_paused_(false)
+		: m_animation_name_("No Name"), m_base_total_frame_(0), m_base_frame_time_(0.f), m_window_his_open_(false), m_animation_is_paused_(false)
 	{
 		m_name = "Animation";
 		m_typeName = "Animation";
@@ -103,14 +103,9 @@ namespace lc
 
 	void Animation::Update(WindowManager& window)
 	{
-		if (m_window_his_open_)
-		{
-			ImGui::Begin(std::string("Window Animation Tester##" + std::to_string(m_ID) + std::to_string(getParent()->getID()) + "lc").c_str(), &m_window_his_open_);
+		this->texture_to_search();
 
-			m_renderer_.Update();
-
-			ImGui::End();
-		}
+		this->update_renderer_window();
 	}
 
 	void Animation::Draw(WindowManager& window)
@@ -125,13 +120,16 @@ namespace lc
 		{
 			if (const auto tmp_animation_key = m_actual_animation_key_.lock())
 			{
-				if (!m_animation_his_paused_)
+				if (!m_animation_is_paused_)
 				{
 					tmp_animation_key->get_frame_timer() += Tools::getDeltaTime();
 					if (tmp_animation_key->get_frame_timer() >= tmp_animation_key->get_frame_time())
 					{
-						tmp_animation_key->get_actual_frame()++;
-						if (tmp_animation_key->get_actual_frame() > tmp_animation_key->get_total_frame() - 1)
+						m_animation_is_reversed_ ? tmp_animation_key->get_actual_frame()-- : tmp_animation_key->get_actual_frame()++;
+
+						if (tmp_animation_key->get_actual_frame() <= 0 && m_animation_is_reversed_)
+							tmp_animation_key->get_actual_frame() = tmp_animation_key->get_total_frame() - 1;
+						else if (tmp_animation_key->get_actual_frame() > tmp_animation_key->get_total_frame() - 1 && !m_animation_is_reversed_)
 							tmp_animation_key->get_actual_frame() = 0;
 
 						tmp_animation_key->get_frame_timer() = 0.f;
@@ -142,15 +140,18 @@ namespace lc
 				}
 			}
 
-			tmp_texture->getShape().setOrigin(getParent()->getTransform().getOrigin());
-			tmp_texture->getShape().setScale(getParent()->getTransform().getScale());
-			tmp_texture->getShape().setRotation(getParent()->getTransform().getRotation());
+			if (!m_isUsedByAComponent)
+			{
+				tmp_texture->getShape().setOrigin(getParent()->getTransform().getOrigin());
+				tmp_texture->getShape().setScale(getParent()->getTransform().getScale());
+				tmp_texture->getShape().setRotation(getParent()->getTransform().getRotation());
+
+				tmp_texture->getShape().setPosition(getParent()->getTransform().getPosition());
+				window.draw(tmp_texture->getShape());
+			}
 
 			tmp_texture->getShape().setPosition(m_renderer_.get_size() / 2.f);
 			m_renderer_.Draw(tmp_texture->getShape());
-
-			tmp_texture->getShape().setPosition(getParent()->getTransform().getPosition());
-			window.draw(tmp_texture->getShape());
 		}
 
 		m_renderer_.Display();
@@ -158,10 +159,51 @@ namespace lc
 
 	void Animation::Save(std::ofstream& save, sf::RenderTexture& texture, int depth)
 	{
+		save << static_cast<int>(m_type)
+			 << " " << m_typeName
+			 << " " << m_animation_name_
+			 << " " << (m_texture_.expired() ? static_cast<std::string>("No_Texture") : m_texture_.lock()->getName())
+			 << " " << static_cast<int>(m_animation_keys_.size()) << '\n';
+
+		for (const auto& animation_key_pair : m_animation_keys_)
+		{
+			const auto tmp_animation_key = animation_key_pair.second;
+
+			save << tmp_animation_key->get_name() << '\n';
+			save << tmp_animation_key->get_base_int_rect() << '\n';
+			save << tmp_animation_key->get_max_frame() << '\n';
+			save << tmp_animation_key->get_frame_time() << '\n';
+			save << tmp_animation_key->get_total_frame() << '\n';
+		}
 	}
 
 	void Animation::Load(std::ifstream& load)
 	{
+		int tmp_animation_key_cout(0);
+		std::string tmp_texture_name;
+
+		load >> m_typeName
+			 >> m_animation_name_
+			 >> tmp_texture_name
+			 >> tmp_animation_key_cout;
+
+		std::shared_ptr<AnimationKey> tmp_animation_key;
+		for (int i = 0; i < tmp_animation_key_cout; i++)
+		{
+			tmp_animation_key = std::make_shared<AnimationKey>();
+			
+			load >> tmp_animation_key->get_name()
+				 >> tmp_animation_key->get_base_int_rect()
+				 >> tmp_animation_key->get_max_frame()
+				 >> tmp_animation_key->get_frame_time()
+				 >> tmp_animation_key->get_total_frame();
+
+			tmp_animation_key->create_frames_rect();
+
+			m_animation_keys_.emplace(tmp_animation_key->get_name(), tmp_animation_key);
+		}
+		
+		m_texture_to_search_ = std::make_pair(true, tmp_texture_name);
 	}
 
 	std::shared_ptr<lc::GameComponent> Animation::Clone()
@@ -175,10 +217,15 @@ namespace lc
 			{
 				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
 
-				ImGui::Checkbox("Pause Animation", &m_animation_his_paused_);
+				ImGui::Checkbox("Pause Animation", &m_animation_is_paused_);
+				ImGui::Checkbox("Reverse Animation", &m_animation_is_reversed_);
 
 				if (ImGui::Button("Open Animation Window Test"))
 					m_window_his_open_ = true;
+
+				ImGui::InputText("Animation Name", m_animation_name_, 80);
+
+				Tools::ReplaceCharacter(m_animation_name_, ' ', '_');
 
 				if (ImGui::BeginCombo("Selected Texture", m_texture_.expired() ? "No Texture Selected" : m_texture_.lock()->getName().c_str()))
 				{
@@ -259,7 +306,9 @@ namespace lc
 				{
 					if (ImGui::Button("Create Animation Key"))
 					{
-						const auto tmp_name(m_base_name_.empty() ? "No_Name" : m_base_name_);
+						auto tmp_name(m_base_name_.empty() ? "No_Name" : m_base_name_);
+
+						Tools::ReplaceCharacter(tmp_name, ' ', '_');
 
 						if (!m_animation_keys_.contains(tmp_name))
 							m_animation_keys_.emplace(tmp_name, std::make_shared<lc::AnimationKey>(tmp_name, m_base_total_frame_, m_base_max_frame_, m_base_frame_time_, m_base_int_rect_));
@@ -343,6 +392,49 @@ namespace lc
 			const auto tmp_texture = m_texture_.lock();
 			tmp_texture->getShape().setTextureRect(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()]);
 			tmp_texture->getShape().setSize(sf::Vector2f(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()].getSize()));
+		}
+	}
+
+	void Animation::current_animation_is_paused(const bool paused)
+	{
+		m_animation_is_paused_ = paused;
+	}
+
+	void Animation::current_animation_is_reversed(const bool reversed)
+	{
+		m_animation_is_reversed_ = reversed;
+	}
+
+	void Animation::texture_to_search()
+	{
+		if (m_texture_to_search_.first)
+		{
+			for (auto& component : getParent()->getComponents())
+			{
+				if (auto tmp_texture = std::dynamic_pointer_cast<lc::Texture>(component))
+				{
+					if (m_texture_to_search_.second == tmp_texture->getName())
+					{
+						m_texture_ = tmp_texture;
+						tmp_texture->isUsedByAComponent() = true;
+						break;
+					}
+				}
+			}
+
+			m_texture_to_search_.first = false;
+		}
+	}
+
+	void Animation::update_renderer_window()
+	{
+		if (m_window_his_open_)
+		{
+			ImGui::Begin(std::string("Window Animation Tester##" + std::to_string(m_ID) + std::to_string(getParent()->getID()) + "lc").c_str(), &m_window_his_open_);
+
+			m_renderer_.Update();
+
+			ImGui::End();
 		}
 	}
 }
