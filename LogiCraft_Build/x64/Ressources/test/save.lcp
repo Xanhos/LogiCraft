@@ -1,0 +1,77 @@
+WORLD 0 0 1 1 0 0 0 0 0 0
+Components
+{
+}
+Objects
+{
+200x200D 217.644 97.0588 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+Starborn 677.204 400.735 1 1 356 38 0 0 0 0
+Components
+{
+3 Text ../ASSETS\Starborn.ttf 40 0 Lorem_Ipsum 255 255 255 255 0 0 0 255 0 0
+
+}
+Objects
+{
+}
+
+200x200D2 -2151.84 898.86 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+200x200D3 1791.36 3096.5 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+200x200D4 5589.12 826.675 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+200x200D5 1670.16 -1090.24 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+Starborn2 1791.52 3747.83 1 1 343 38 0 0 0 0
+Components
+{
+3 Text ../ASSETS\Starborn.ttf 40 0 Lorem_Ipsum 255 255 255 255 0 0 0 255 0 0
+
+}
+Objects
+{
+}
+
+}

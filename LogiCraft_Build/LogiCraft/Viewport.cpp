@@ -33,6 +33,7 @@ SOFTWARE.
 ---------------------------------------------------------------------------------*/
 
 #include "Viewport.h"
+#include "ToolsBar.h"
 
 Viewport::Viewport() :
 	m_name(""), //STRING
@@ -74,7 +75,7 @@ ScreenZone::ScreenZone(sf::Vector2i _screenIndex)
 	: m_isUsed(false), m_screenIndex(_screenIndex)
 {
 	m_screenShape.setSize(screenSize);
-	m_screenShape.setTexture(&GET_MANAGER->getTexture("Unused_Screen_Zone"));
+	m_screenShape.setTexture(&GET_MANAGER->getTexture("Unused_Screen_Zone"), true);
 	m_screenShape.setPosition(sf::Vector2f(screenSize.x * _screenIndex.x, screenSize.y * _screenIndex.y));
 }
 
@@ -84,13 +85,13 @@ ScreenZone::~ScreenZone()
 
 void ScreenZone::setScreenToUsed()
 {
-	m_screenShape.setTexture(&GET_MANAGER->getTexture("Used_Screen_Zone"));
+	m_screenShape.setTexture(&GET_MANAGER->getTexture("Used_Screen_Zone"), true);
 	m_isUsed = true;
 }
 
 void ScreenZone::setScreenToUnused()
 {
-	m_screenShape.setTexture(&GET_MANAGER->getTexture("Unused_Screen_Zone"));
+	m_screenShape.setTexture(&GET_MANAGER->getTexture("Unused_Screen_Zone"), true);
 	m_isUsed = false;
 }
 
@@ -123,7 +124,7 @@ void Viewports::UpdateEvent(sf::Event& _event)
 {
 	for (auto& viewport : m_viewports)
 	{
-		if (viewport->hasWindowFocus() && !viewport->isZoomLocked())
+		if (viewport->hasWindowFocus() && !viewport->isZoomLocked() && viewport->isInWindow(ImGui::GetMousePos()))
 		{
 			if (_event.type == sf::Event::MouseWheelScrolled)
 			{
@@ -515,7 +516,18 @@ void Viewports::ResizeSelectionBoxBehavior(sf::Vector2f _mousePositionWithView, 
 				for (auto& selectedObject : _selectedObject)
 					if (!selectedObject.expired())
 						if (!selectedObject.lock()->isLock())
-							selectedObject.lock()->getTransform().getPosition() = _mousePositionWithView + selectedObject.lock()->getTransform().getDistance();
+						{
+							if (ToolsBar::GetActualLayer().second == "Player Plan" && selectedObject.lock()->getDepth() == 4)
+							{
+								selectedObject.lock()->getTransform().getPosition() = 
+									sf::Vector2f((int)(_mousePositionWithView.x + selectedObject.lock()->getTransform().getDistance().x) / 120 * 120,
+										(int)(_mousePositionWithView.y + selectedObject.lock()->getTransform().getDistance().y) / 120 * 120);
+							}
+							else
+							{
+								selectedObject.lock()->getTransform().getPosition() = _mousePositionWithView + selectedObject.lock()->getTransform().getDistance();
+							}
+						}
 			}
 
 			m_maxSelectedObjectPosition = sf::Vector2f(INFINITY, INFINITY);
@@ -568,7 +580,7 @@ bool Viewports::CheckSelection(ObjWeakPtrList& _object, std::shared_ptr<lc::Game
 {
 	if (std::find_if(_scene->getObjects().begin(), _scene->getObjects().end(), [this, &_window, &_object, &_viewport, _mousePosition](std::shared_ptr<lc::GameObject> _sceneObject)
 		{
-			if (Tools::Collisions::point_rect(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow()), _viewport->getView()), { _sceneObject->getTransform().getPosition(), _sceneObject->getTransform().getSize() }))
+			if (Tools::Collisions::point_rect(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow()), _viewport->getView()), { _sceneObject->getTransform().getPosition(), _sceneObject->getTransform().getSize() }) && _sceneObject->getDepth() == ToolsBar::GetActualLayer().first)
 			{
 				if (!KEY(LControl))
 					_object.clear();

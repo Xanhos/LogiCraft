@@ -36,7 +36,7 @@ SOFTWARE.
 
 #include "ToolsBar.h"
 
-Layers ToolsBar::s_layers = { {8, "BackGround 7"},{7,"BackGround 6"},{ 6, "BackGround 5"},{5, "BackGround 4"},{4, "BackGround 3"},{ 3, "BackGround 2"},{2, "BackGround 1"},{1, "Player Plan"},{0, "Front Plan"} };
+Layers ToolsBar::s_layers = { {11, "BackGround 7"},{10,"BackGround 6"},{ 9, "BackGround 5"},{8, "BackGround 4"},{7, "BackGround 3"},{ 6, "BackGround 2"},{5, "BackGround 1"},{4, "Player Plan"},{3, "Front Plan 4"}, {2, "Front Plan 3"}, {1, "Front Plan 2"}, {0, "Front Plan 1"} };
 Layer ToolsBar::s_actualLayer = *ToolsBar::s_layers.begin();
 
 ToolsBar::ToolsBar()
@@ -209,6 +209,7 @@ void ToolsBar::ShowHelp()
 	ImGui::BulletText("LControl + Left Click on multiple objects => Multiple Selection.");
 	ImGui::BulletText("LControl + C => Copy all selected objects.");
 	ImGui::BulletText("LControl + V => Paste all selected objects.");
+	ImGui::BulletText("LShift + Left Click => Select object and all his child in hierarchy.");
 
 	ImGui::End();
 }
@@ -219,20 +220,20 @@ void ToolsBar::Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _v
 	sf::RenderTexture render_texture;
 	_game_object->Save(save, render_texture, s_actualLayer.first);
 
-	render_texture.create(1920u * 2, 1080u * 2);
+	render_texture.create(screenSize.x, screenSize.y);
 	for (auto& screen : _viewports.getAllScreenzone())
 	{
 		if (screen.isUsed())
 		{
-			render_texture.setView(sf::View(sf::Vector2f(screenSize.x + (screenSize.x * screen.getScreenIndex().x), screenSize.y + (screenSize.y * screen.getScreenIndex().y)), sf::Vector2f(screenSize.x * 2.f, screenSize.y * 2.f)));
-			for (int depth = 0; depth <= 8; depth++)
+			render_texture.setView(sf::View(sf::Vector2f(screenSize.x / 2.f + (screenSize.x * screen.getScreenIndex().x), screenSize.y / 2.f + (screenSize.y * screen.getScreenIndex().y)), sf::Vector2f(screenSize.x, screenSize.y)));
+			for (int depth = 0; depth <= s_layers.size(); depth++)
 			{
 				render_texture.clear(sf::Color::Transparent);
 				_game_object->SaveRenderer(render_texture, depth);
 				sf::Image image;
 				image = render_texture.getTexture().copyToImage();
 				image.flipVertically();
-				image.saveToFile("../Ressources/" + std::string(m_path) + "/" + std::string(std::to_string(screen.getScreenIndex().x) + "_" + std::to_string(screen.getScreenIndex().y)) + "_" + std::string(m_path) + "_layer" + std::to_string(depth) + ".png");
+				image.saveToFile("../Ressources/" + std::string(m_path) + "/" + std::string(std::to_string(screen.getScreenIndex().x) + "_" + std::to_string(screen.getScreenIndex().y)) + "_" + std::string(m_path) + "_layer_" + std::to_string(depth) + ".png");
 			}
 		}
 	}

@@ -1,0 +1,27 @@
+WORLD 0 0 1 1 0 0 0 0 0 0
+Components
+{
+}
+Objects
+{
+200x200D 474.736 167.015 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+200x200D2 3281.63 1737.67 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+}
