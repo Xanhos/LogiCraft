@@ -74,6 +74,11 @@ void lc::Button::Save(std::ofstream& save, sf::RenderTexture& texture, int _dept
         << " " << m_function;
 }
 
+void lc::Button::Export(std::ofstream& exportation)
+{
+    exportation << static_cast<int>(m_type) << m_function;
+}
+
 void lc::Button::Load(std::ifstream& load)
 {
     load >> m_typeName >> m_function;

@@ -33,7 +33,6 @@ SOFTWARE.
 ---------------------------------------------------------------------------------*/
 
 #include "Font.h"
-#include <filesystem>
 #include "GameObject.h"
 #include "Transform.h"
 
@@ -51,20 +50,15 @@ lc::Font::Font(const std::string& name,const std::string& path,const std::string
 	fs::path p = path;
 	m_name = name;
 	m_font.loadFromFile(path);
-	sf::RenderTexture rt;
 	m_characterSize = 40u;
-	sf::Text text(sentence, m_font, m_characterSize);
-	text.setOrigin(text.getGlobalBounds().getSize() / 2.f + sf::Vector2f(text.getLetterSpacing(),text.getLineSpacing() + m_font.getLineSpacing(m_characterSize)) /2.f);
-	rt.clear(sf::Color::Transparent);
-	rt.draw(text);
-	rt.display();
-	m_rendererTexture = rt.getTexture();
-	m_renderer.setTexture(&m_rendererTexture);
 	m_type = TYPE::FONT;
 	m_sentence = "Lorem Ipsum";
 	m_insideColor = sf::Color::White;
 	m_outlineThickness = 0;
 	m_outLineColor = sf::Color::Black;
+
+	UpdateText();
+
 }
 
 
@@ -88,6 +82,9 @@ lc::Font::Font(const Font& font)
 	m_type = font.m_type;
 	m_typeName = font.m_typeName;
 	m_name = font.m_name;
+
+	UpdateText();
+
 }
 
 lc::Font::~Font()
@@ -96,6 +93,12 @@ lc::Font::~Font()
 
 
 
+
+void lc::Font::setNewSentence(const std::string& sentence)
+{
+	m_sentence = sentence;
+	UpdateText();
+}
 
 void lc::Font::Load(std::ifstream& load)
 {
@@ -113,6 +116,8 @@ void lc::Font::Load(std::ifstream& load)
 	{
 		m_font.loadFromFile(file->getPath().parent_path().string() + "/Ressources/" + m_name);
 	}
+
+	UpdateText();
 }
 
 
@@ -122,22 +127,6 @@ void lc::Font::UpdateEvent(sf::Event& _window)
 
 void lc::Font::Update(WindowManager& _window)
 {
-	sf::RenderTexture rt;
-	sf::Text text(m_sentence, m_font, static_cast<unsigned>(m_characterSize));
-	text.setFillColor(m_insideColor);
-	text.setOutlineColor(m_outLineColor);
-	text.setOutlineThickness(static_cast<float>(m_outlineThickness));
-	text.setOrigin(text.getGlobalBounds().getSize() / 2.f);
-	const auto render_texture_size = sf::Vector2f(text.getGlobalBounds().getSize().x, text.getGlobalBounds().getSize().y + text.getFont()->getLineSpacing(m_characterSize));
-	rt.create(static_cast<unsigned>(render_texture_size.x),static_cast<unsigned>(render_texture_size.y));
-	text.setPosition(render_texture_size / 2.f);
-	rt.clear(sf::Color(0, 0, 0, 0));
-	rt.draw(text);
-	rt.display();
-	m_rendererTexture = rt.getTexture();
-	m_renderer.setTexture(&m_rendererTexture,true);
-	m_renderer.setSize(text.getGlobalBounds().getSize() + sf::Vector2f(text.getLetterSpacing(), text.getLineSpacing()));
-	m_renderer.setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
 }
 
 void lc::Font::Draw(WindowManager& _window)
@@ -169,4 +158,24 @@ void lc::Font::Draw(sf::RenderTexture& _window)
 std::shared_ptr<lc::GameComponent> lc::Font::Clone()
 {
 	return std::make_shared<lc::Font>(*this);
+}
+
+void lc::Font::UpdateText()
+{
+	sf::RenderTexture rt;
+	sf::Text text(m_sentence, m_font, static_cast<unsigned>(m_characterSize));
+	text.setFillColor(m_insideColor);
+	text.setOutlineColor(m_outLineColor);
+	text.setOutlineThickness(static_cast<float>(m_outlineThickness));
+	text.setOrigin(text.getGlobalBounds().getSize() / 2.f);
+	const auto render_texture_size = sf::Vector2f(text.getGlobalBounds().getSize().x, text.getGlobalBounds().getSize().y + text.getFont()->getLineSpacing(m_characterSize));
+	rt.create(static_cast<unsigned>(render_texture_size.x), static_cast<unsigned>(render_texture_size.y));
+	text.setPosition(render_texture_size / 2.f);
+	rt.clear(sf::Color(0, 0, 0, 0));
+	rt.draw(text);
+	rt.display();
+	m_rendererTexture = rt.getTexture();
+	m_renderer.setTexture(&m_rendererTexture, true);
+	m_renderer.setSize(text.getGlobalBounds().getSize() + sf::Vector2f(text.getLetterSpacing(), text.getLineSpacing()));
+	m_renderer.setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
 }

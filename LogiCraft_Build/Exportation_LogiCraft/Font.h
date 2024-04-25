@@ -45,7 +45,8 @@ namespace lc
 		Font(const Font& font);
 		~Font();
 		sf::Font& getFont() { return m_font; }
-		std::string& getSentence() { return m_sentence; }
+		const std::string& getSentence() { return m_sentence; }
+		void setNewSentence(const std::string& sentence);
 
 		virtual void Load(std::ifstream& load) override;
 	private:
@@ -54,6 +55,8 @@ namespace lc
 		virtual void Draw(WindowManager& _window) override;
 		virtual void Draw(sf::RenderTexture& _window) override;
 		virtual std::shared_ptr<lc::GameComponent> Clone() override;
+
+		void UpdateText();
 
 		sf::Font m_font;
 		int m_characterSize;

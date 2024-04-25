@@ -284,7 +284,7 @@ void PatronNode::SetupAllNode()
 	//WAIT
 	{
 		s_DecoratorInitMethod["WAIT"] = [](PatronNode* node) {
-			node->m_decoratorData = 0.f;
+			node->m_decoratorData = float(0.f);
 			};
 		s_DecoratorUpdateMethod["WAIT"] = [](PatronNode* node) {
 			float timer = std::any_cast<float>(node->m_decoratorData);
@@ -338,6 +338,7 @@ PatronNode::PatronNode(const PatronNode& node)
 {
 	m_type = node.m_type;
 	m_conditionType = node.m_conditionType;
+	m_decoratorData = node.m_decoratorData;
 	m_id = s_id++;
 	m_isOpen = node.m_isOpen;
 	m_newNodeIsAdded = node.m_newNodeIsAdded;
@@ -356,6 +357,7 @@ PatronNode::PatronNode(PatronNode&& node)
 {
 	m_type = node.m_type;
 	m_conditionType = node.m_conditionType;
+	m_decoratorData = node.m_decoratorData;
 	m_id = s_id++;
 	m_isOpen = node.m_isOpen;
 	m_newNodeIsAdded = node.m_newNodeIsAdded;

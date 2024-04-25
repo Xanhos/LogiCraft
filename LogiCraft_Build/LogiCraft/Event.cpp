@@ -71,16 +71,24 @@ lc::Event::~Event()
 
 void lc::Event::Save(std::ofstream& save, sf::RenderTexture& texture, int _depth)
 {
-	if (!getParent()->getIsSaved())
-	{
-		save << static_cast<int>(m_type)
-			<< " " << Tools::replaceSpace(m_typeName, true)
-			<< " " << m_condition
-			<< " " << static_cast<int>(m_isReverse)
-			<< " " << Tools::replaceSpace(m_objectA.lock()->getName(), true)
-			<< " " << Tools::replaceSpace(m_objectB.lock()->getName(), true)
-			<< std::endl;
-	}
+
+	save << static_cast<int>(m_type)
+		<< " " << Tools::replaceSpace(m_typeName, true)
+		<< " " << m_condition
+		<< " " << static_cast<int>(m_isReverse)
+		<< " " << Tools::replaceSpace(m_objectA.lock()->getName(), true)
+		<< " " << Tools::replaceSpace(m_objectB.lock()->getName(), true)
+		<< std::endl;
+	
+}
+
+void lc::Event::Export(std::ofstream& exportation)
+{
+	exportation << static_cast<int>(m_type)
+	<< m_condition << static_cast<int>(m_isReverse)
+	<< Tools::replaceSpace(m_objectA.lock()->getName(), true)
+	<< Tools::replaceSpace(m_objectB.lock()->getName(), true);
+
 }
 
 void lc::Event::Load(std::ifstream& load)

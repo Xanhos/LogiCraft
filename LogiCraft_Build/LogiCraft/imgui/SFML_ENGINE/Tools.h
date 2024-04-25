@@ -120,7 +120,7 @@ namespace Tools
             return _v / getNorme(_v);
         }
     }
-    
+
     namespace Collisions
     {
         bool SFMLENGINE_API  point_circle(sf::Vector2<float> _mpos, sf::Vector2<float> _cpos, float _r);
@@ -132,4 +132,5 @@ namespace Tools
 
 
 }
+
 

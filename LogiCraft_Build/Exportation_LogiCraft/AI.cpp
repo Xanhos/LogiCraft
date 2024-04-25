@@ -75,6 +75,38 @@ void lc::AI::Load(std::ifstream& load)
             node = bt::Node::New(bt::ActionNode::Wander(getParent()));
             std::dynamic_pointer_cast<bt::ActionNode::Wander>(node)->Setup(node);
         }
+        if(type_cast == bt::node_type::COOLDOWN)
+        {
+        	float time;
+			load >> time;
+			node = bt::Node::New(bt::Decorator::Cooldown());
+            std::dynamic_pointer_cast<bt::Decorator::Cooldown>(node)->setTimer(time);
+            if(child_size)
+            {
+                auto task = std::dynamic_pointer_cast<bt::Decorator::Cooldown>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
+                load_node_and_child(task);;
+			}
+        }
+        if (type_cast == bt::node_type::LOOP)
+        {
+            int loop;
+            load >> loop;
+            node = bt::Node::New(bt::Decorator::Loop());
+            std::dynamic_pointer_cast<bt::Decorator::Loop>(node)->setLoop(loop);
+            if (child_size)
+            {
+                auto task = std::dynamic_pointer_cast<bt::Decorator::Loop>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
+                load_node_and_child(task);
+            }
+        }
+        if (type_cast == bt::node_type::INVERSER or type_cast == bt::node_type::FORCE_SUCCESS)
+        {
+            if (child_size)
+            {
+                auto task = std::dynamic_pointer_cast<bt::Decorator::Loop>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
+                load_node_and_child(task);
+            }
+        }
         if (type_cast < bt::node_type::INVERSER)
         {
         	for (int i = 0; i < child_size; i++)

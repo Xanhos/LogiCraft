@@ -137,6 +137,7 @@
   <ItemGroup>
     <ClCompile Include="AI.cpp" />
     <ClCompile Include="BehaviorTree.cpp" />
+    <ClCompile Include="Button.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="GameComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -150,6 +151,7 @@
   <ItemGroup>
     <ClInclude Include="AI.h" />
     <ClInclude Include="BehaviorTree.h" />
+    <ClInclude Include="Button.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="GameObject.h" />

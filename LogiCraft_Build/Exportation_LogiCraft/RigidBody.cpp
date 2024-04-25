@@ -35,7 +35,8 @@ SOFTWARE.
 #include "RigidBody.h"
 #include "GameObject.h"
 
-const float g = 400.f;
+constexpr float g = 400.f;
+constexpr float gravity_offset = -0.1f;
 
 lc::RigidBody::RigidBody()
 {
@@ -89,25 +90,25 @@ void lc::RigidBody::Update(WindowManager& _window)
 		m_collider.width = getParent()->getTransform().getSize().x;
 		m_collider.height = getParent()->getTransform().getSize().y;
 	}
-
-	for (auto& i : m_inputFunc)
-	{
-		if(i)
-			i(this);
-	}
-
-	if(m_isKinetic)
+	if (m_isKinetic)
 	{
 		m_velocity.y += (g)*Tools::getDeltaTime();
+		for (auto& i : m_inputFunc)
+		{
+			if (i)
+				i(this);
+		}
 		CheckAllObject(scene);
-	}
+	} 
+
+	
+
 	else m_velocity = { 0.f,0.f };
 
 	if (m_isKinetic)
 		if (getParent())
 		{
 			getParent()->getTransform().getPosition() += m_velocity * Tools::getDeltaTime();
-			std::cout << m_velocity.x << " " << m_velocity.y << std::endl;
 		}
 	if (getParent())
 	{
@@ -146,26 +147,31 @@ bool lc::RigidBody::CheckAllObject(std::shared_ptr<lc::GameObject> _object)
 			{
 				if(m_velocity.y > 0.f)
 				{
-					if (Tools::Collisions::lineRect({ m_relativePosition + m_collider.getPosition() + sf::Vector2f{0.f,m_collider.getSize().y} + sf::Vector2f{0.f,m_velocity.y} *Tools::getDeltaTime(), {{m_relativePosition + m_collider.getPosition() + m_collider.getSize() + sf::Vector2f{0.f,m_velocity.y}*Tools::getDeltaTime() }} }, { rb->getParent()->getTransform().getPosition() + rb->m_relativePosition, rb->m_collider.getSize()}))
+					if (Tools::Collisions::lineRect({  m_collider.getPosition() + sf::Vector2f{0.f,m_collider.getSize().y} + sf::Vector2f{0.f,m_velocity.y} *Tools::getDeltaTime(), {{m_collider.getPosition() + m_collider.getSize() + sf::Vector2f{0.f,m_velocity.y}*Tools::getDeltaTime() }} }, { rb->m_collider.getPosition(), rb->m_collider.getSize()}))
 					{
 						m_velocity.y = 0.f;
-						m_collider.top = rb->getCollider().top - m_collider.height - 0.9f;
 					}
 				}
 				else if (m_velocity.y < 0.f)
 				{
-					if (Tools::Collisions::lineRect({ m_relativePosition + m_collider.getPosition() + sf::Vector2f{0.f,m_velocity.y} *Tools::getDeltaTime(), {{m_relativePosition + m_collider.getPosition() + sf::Vector2f{m_collider.getSize().x,0.f} + sf::Vector2f{0.f,m_velocity.y}*Tools::getDeltaTime()}} }, { rb->getParent()->getTransform().getPosition() + rb->m_relativePosition, rb->m_collider.getSize() }))
+					if (Tools::Collisions::lineRect({  m_collider.getPosition() + sf::Vector2f{0.f,m_velocity.y} *Tools::getDeltaTime(), {{m_collider.getPosition() + sf::Vector2f{m_collider.getSize().x,0.f} + sf::Vector2f{0.f,m_velocity.y}*Tools::getDeltaTime()}} }, { rb->m_collider.getPosition() , rb->m_collider.getSize() }))
+					{
 						m_velocity.y = 0.f;
+					}
 				}
 				if (m_velocity.x < 0.f)
 				{
-					if (Tools::Collisions::lineRect({ m_relativePosition + m_collider.getPosition() + sf::Vector2f{m_velocity.x,0.f} *Tools::getDeltaTime(), {{m_relativePosition + m_collider.getPosition() + sf::Vector2f{0.f,m_collider.getSize().y} + sf::Vector2f{m_velocity.x,0.f}*Tools::getDeltaTime()}} }, { rb->getParent()->getTransform().getPosition() + rb->m_relativePosition, rb->m_collider.getSize() }))
+					if (Tools::Collisions::lineRect({  m_collider.getPosition() + sf::Vector2f{m_velocity.x,0.f} *Tools::getDeltaTime(), {{m_collider.getPosition() + sf::Vector2f{0.f,m_collider.getSize().y + gravity_offset} + sf::Vector2f{m_velocity.x,0.f}*Tools::getDeltaTime()}} }, { rb->m_collider.getPosition(), rb->m_collider.getSize() }))
+					{
 						m_velocity.x = 0.f;
+					}
 				}
 				else if (m_velocity.x > 0.f)
 				{
-					if (Tools::Collisions::lineRect({ m_relativePosition + m_collider.getPosition() + sf::Vector2f{m_collider.getSize().x,0.f} + sf::Vector2f{m_velocity.x,0.f} *Tools::getDeltaTime(), {{m_relativePosition + m_collider.getPosition() + m_collider.getSize() + sf::Vector2f{m_velocity.x,0.f}*Tools::getDeltaTime() }} }, { rb->getParent()->getTransform().getPosition() + rb->m_relativePosition, rb->m_collider.getSize()}))
+					if (Tools::Collisions::lineRect({ m_collider.getPosition() + sf::Vector2f{m_collider.getSize().x,0.f} + sf::Vector2f{m_velocity.x,0.f} *Tools::getDeltaTime(), {{ m_collider.getPosition() + m_collider.getSize() + sf::Vector2f{m_velocity.x,gravity_offset}*Tools::getDeltaTime() }} }, { rb->m_collider.getPosition(), rb->m_collider.getSize() }))
+					{
 						m_velocity.x = 0.f;
+					}
 				}
 			}
 	}

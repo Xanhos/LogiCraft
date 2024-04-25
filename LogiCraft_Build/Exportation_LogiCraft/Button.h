@@ -33,42 +33,31 @@ SOFTWARE.
 ---------------------------------------------------------------------------------*/
 
 #pragma once
-#include <any>
-
 #include "Ressource.h"
-
+#include <functional>
+#include "SFML_ENGINE/WindowManager.h"
 
 namespace lc
 {
-	class RigidBody : public lc::Ressource
+	class Button : public Ressource
 	{
 	public:
-		RigidBody();
-		RigidBody(sf::FloatRect _collider, sf::Vector2f _velocity, sf::Vector2f _relative, bool kinetic);
-		~RigidBody();
+		Button();
+		Button(std::string _name, sf::Vector2f _position, int function);
+		~Button();
 
-		void Load(std::ifstream& load) override;
-		
-		void UpdateEvent(sf::Event& _window) override;
-		void Update(WindowManager& _window) override;
-		void Draw(WindowManager& _window) override;
-		void Draw(sf::RenderTexture& _window) override;
-		std::shared_ptr<lc::GameComponent> Clone() override;
+		virtual void Load(std::ifstream& load) override;
 
-		virtual void AddInputFunction(std::function<void(lc::RigidBody*)> func);
-
-
-		sf::Vector2f& getVelocity() { return m_velocity; }
-		const sf::FloatRect getCollider() const { return m_collider; }
+		static void SetupFunctionPool(WindowManager& window);
 	private:
-		bool CheckAllObject(std::shared_ptr<lc::GameObject> _object);
+		virtual void UpdateEvent(sf::Event& _window) override;
+		virtual void Update(WindowManager& _window) override;
+		virtual void Draw(WindowManager& _window) override;
+		virtual void Draw(sf::RenderTexture& _window) override;
+		virtual std::shared_ptr<lc::GameComponent> Clone() override;
 
-		sf::FloatRect m_collider;
-		sf::Vector2f m_reposition;
-		sf::Vector2f m_velocity;
-		bool m_isKinetic = false;
-		std::list<std::function<void(lc::RigidBody*)>> m_inputFunc;
+		short m_function = -1;
+
+		inline static std::unordered_map<int, std::function<void()>> s_function_pool_;
 	};
-
 }
-

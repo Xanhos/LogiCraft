@@ -33,7 +33,7 @@ SOFTWARE.
 ---------------------------------------------------------------------------------*/
 
 #include "BehaviorTree.h"
-
+#include "SFML_ENGINE/Tools.h"
 
 bt::ActionNode::MoveTo::MoveTo(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_, const float& speed_) :m_agent_(agent_), m_target_(target_), m_speed_(speed_), m_bool_go_to_(false)
 {	
@@ -86,33 +86,84 @@ void bt::ActionNode::Wander::Setup(NodePtr node)
 				rigid_body->getVelocity().x = (node_cast->m_bool_direction_ ? +1 : -1) * node_cast->m_speed_;
 				node_cast->m_bool_wander_ = false;
 
-				
+
 				auto scene = node_cast->m_agent_.lock()->getParent();
 				while (scene->getParent())
 				{
 					scene = scene->getParent();
 				}
-				std::function<void(std::shared_ptr<lc::GameObject>&)> CheckCollision = [&](std::shared_ptr<lc::GameObject>& game_object)
-				{
-					if (game_object->hasComponent("RigidBody") and game_object != rigid_body->getParent())
+				bool is_on_a_platform = false;
+				bool has_hit_a_wall = false;
+				std::function<bool(std::shared_ptr<lc::GameObject>&)> CheckSideCollision = [&](std::shared_ptr<lc::GameObject>& game_object) ->bool
 					{
-						auto rb = game_object->getComponent<lc::RigidBody>("RigidBody");
-						auto point = (node_cast->m_bool_direction_ ? rigid_body->getCollider().getPosition() + rigid_body->getCollider().getSize() : rigid_body->getCollider().getPosition() + sf::Vector2f(0, rigid_body->getCollider().getSize().y)) + sf::Vector2f(0, 1);
-						auto rect = rb->getCollider();
-						if (!Tools::Collisions::point_rect(point,rect))
+						if (game_object->hasComponent("RigidBody") and game_object != rigid_body->getParent())
 						{
-							node_cast->m_bool_direction_ = !node_cast->m_bool_direction_;
-							return;
+							auto rb = game_object->getComponent<lc::RigidBody>("RigidBody");
+							auto rect = rb->getCollider();
+							auto side_collision = !node_cast->m_bool_direction_ ?
+								sf::FloatRect{ {rigid_body->getCollider().getPosition()}, {rigid_body->getCollider().getPosition() + sf::Vector2f{0,rigid_body->getCollider().height}}} :
+								sf::FloatRect{ {rigid_body->getCollider().getPosition() + sf::Vector2f{rigid_body->getCollider().width,0.f}},{rigid_body->getCollider().getPosition() + rigid_body->getCollider().getSize()} } ;
+							side_collision.left += rigid_body->getVelocity().x * Tools::getDeltaTime();
+							side_collision.width += rigid_body->getVelocity().x * Tools::getDeltaTime();
+							
+							side_collision.height += -0.1f;
+							if (Tools::Collisions::lineRect(side_collision, rect))
+							{
+								has_hit_a_wall = true;
+								return true;
+							}
 						}
-					}
-					for (auto& i : game_object->getObjects())
+						for (auto& i : game_object->getObjects())
+						{
+							if (CheckSideCollision(i))
+								return true;
+						}
+						return false;
+					};
+				std::function<bool(std::shared_ptr<lc::GameObject>&)>  CheckIsOnAPlatform = [&](std::shared_ptr<lc::GameObject>& game_object)
 					{
-						CheckCollision(i);
-					}
-				};
+						if (game_object->hasComponent("RigidBody") and game_object != rigid_body->getParent())
+						{
+							auto rb = game_object->getComponent<lc::RigidBody>("RigidBody");
+							auto point = (node_cast->m_bool_direction_ ?
+								rigid_body->getCollider().getPosition() + rigid_body->getCollider().getSize() :
+								rigid_body->getCollider().getPosition() + sf::Vector2f(0, rigid_body->getCollider().getSize().y))
+								+ sf::Vector2f(0, rigid_body->getVelocity().y * Tools::getDeltaTime());
+
+							auto rect = rb->getCollider();
+							if (Tools::Collisions::point_rect(point, rect))
+							{
+								is_on_a_platform = true;
+								return true;
+							}
+						}
+						for (auto& i : game_object->getObjects())
+						{
+							if (CheckIsOnAPlatform(i))
+								return true;
+						}
+						return false;
+					};
+				auto CheckCollision = [&](std::shared_ptr<lc::GameObject>& object)
+					{
+						for (auto& i : object->getObjects())
+						{
+							if (i->hasComponent("RigidBody"))
+							{
+								CheckSideCollision(i);
+								CheckIsOnAPlatform(i);
+							}
+						}
+
+					};
 				CheckCollision(scene);
-				std::cout << (node_cast->m_bool_direction_ ? "right" : "left") << std::endl;
+				if (!is_on_a_platform or has_hit_a_wall)
+				{
+					node_cast->m_bool_direction_ = !node_cast->m_bool_direction_;
+				}
 			}
+
+
 		});
 	}
 }
