@@ -138,7 +138,24 @@ lc::Font::~Font()
 void lc::Font::setHierarchieFunc()
 {
 	m_hierarchieInformation = [&] {
-		ImGui::InputTextMultiline("Texte", m_sentence, 300);
+		if (ImGui::InputTextMultiline("Texte", m_sentence, 300))
+		{
+			sf::RenderTexture rt;
+			sf::Text text(m_sentence, m_font, static_cast<unsigned>(m_characterSize));
+			text.setFillColor(m_insideColor);
+			text.setOutlineColor(m_outLineColor);
+			text.setOutlineThickness(static_cast<float>(m_outlineThickness));
+			text.setOrigin(text.getGlobalBounds().getSize() / 2.f);
+			auto t = sf::Vector2f(text.getGlobalBounds().getSize().x, text.getGlobalBounds().getSize().y + text.getFont()->getLineSpacing(m_characterSize));
+			rt.create(static_cast<unsigned>(t.x), static_cast<unsigned>(t.y));
+			text.setPosition(t / 2.f);
+			rt.clear(sf::Color(0, 0, 0, 0));
+			rt.draw(text);
+			rt.display();
+			m_rendererTexture = rt.getTexture();
+			m_renderer.setTexture(&m_rendererTexture, true);
+			m_renderer.setSize(text.getGlobalBounds().getSize() + sf::Vector2f(text.getLetterSpacing(), text.getLineSpacing()));
+		}
 		ImGui::InputInt("Character size", &m_characterSize);
 		if (m_characterSize <= 0)
 			m_characterSize = 1;
@@ -155,7 +172,7 @@ void lc::Font::Save(std::ofstream& save, sf::RenderTexture& texture, int _depth)
 
 {
 	if (getParent()->getDepth() == _depth)
-	texture.draw(m_renderer);
+		texture.draw(m_renderer);
 	{
 		save << static_cast<int>(m_type)
 			<< " " << Tools::replaceSpace(m_typeName, true)
@@ -202,21 +219,7 @@ void lc::Font::UpdateEvent(sf::Event& _window)
 
 void lc::Font::Update(WindowManager& _window)
 {
-	sf::RenderTexture rt;
-	sf::Text text(m_sentence, m_font, static_cast<unsigned>(m_characterSize));
-	text.setFillColor(m_insideColor);
-	text.setOutlineColor(m_outLineColor);
-	text.setOutlineThickness(static_cast<float>(m_outlineThickness));
-	text.setOrigin(text.getGlobalBounds().getSize() / 2.f);
-	auto t = sf::Vector2f(text.getGlobalBounds().getSize().x, text.getGlobalBounds().getSize().y + text.getFont()->getLineSpacing(m_characterSize));
-	rt.create(static_cast<unsigned>(t.x),static_cast<unsigned>(t.y));
-	text.setPosition(t / 2.f);
-	rt.clear(sf::Color(0, 0, 0, 0));
-	rt.draw(text);
-	rt.display();
-	m_rendererTexture = rt.getTexture();
-	m_renderer.setTexture(&m_rendererTexture,true);
-	m_renderer.setSize(text.getGlobalBounds().getSize() + sf::Vector2f(text.getLetterSpacing(), text.getLineSpacing()));
+	
 
 }
 

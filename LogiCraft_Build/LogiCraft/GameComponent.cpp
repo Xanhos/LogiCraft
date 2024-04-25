@@ -91,7 +91,7 @@ void lc::GameComponent::Hierarchie_Draw(unsigned int _parentID, std::list<std::s
 		}
 
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-		if (ImGui::ImageButton(std::string("Delete component" + std::to_string(_parentID) + std::to_string(m_ID)).c_str(), GET_MANAGER->getTexture(""), sf::Vector2f(15.f, 15.f)))
+		if (ImGui::ImageButton(std::string("Delete component" + std::to_string(_parentID) + std::to_string(m_ID)).c_str(), GET_MANAGER->getTexture("poubelle"), sf::Vector2f(15.f, 15.f)))
 			m_needToBeDeleted = true;
 
 		ImGui::SameLine();
