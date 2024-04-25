@@ -93,6 +93,8 @@ namespace lc
 		virtual std::shared_ptr<lc::GameComponent> Clone() override;
 		virtual void setHierarchieFunc() override;
 
+		virtual sf::RectangleShape& getShape() override;
+
 		void select_animation_key(const std::string& name, const bool reset_last_anim_key = false);
 
 		void current_animation_is_paused(const bool paused = true);
@@ -103,8 +105,6 @@ namespace lc
 
 		void update_renderer_window();
 	private:
-		std::string m_animation_name_;
-
 		int m_base_total_frame_;
 		float m_base_frame_time_;
 		std::string m_base_name_;
@@ -122,6 +122,6 @@ namespace lc
 		std::weak_ptr<AnimationKey> m_actual_animation_key_;
 		std::unordered_map<std::string, std::shared_ptr<AnimationKey>> m_animation_keys_;
 
-		TextureToSearch m_texture_to_search_;
+		RessourceToSearch m_texture_to_search_;
 	};
 }

@@ -150,7 +150,7 @@ namespace lc
 		  m_has_gravity_(false),
 		  m_is_particles_rendered_on_the_viewport_(true),
 		  m_is_window_test_is_open_(false),
-		  m_has_to_found_his_texture_(std::make_pair(false, ""))
+		  ressource_to_search_(std::make_pair(false, ""))
 	{
 		m_name = "Particles System";
 		m_typeName = "Particles System";
@@ -196,7 +196,7 @@ namespace lc
 		  m_has_gravity_(false),
 		  m_is_particles_rendered_on_the_viewport_(true),
 		  m_is_window_test_is_open_(false),
-		  m_has_to_found_his_texture_(std::make_pair(false, ""))
+		  ressource_to_search_(std::make_pair(false, ""))
 	{
 		m_name = "Particles System";
 		m_typeName = "Particles System";
@@ -276,6 +276,10 @@ namespace lc
 		tmp_clone->m_renderer_.get_render_texture()->create(
 			static_cast<unsigned int>(m_renderer_.get_size().x), 
 			static_cast<unsigned int>(m_renderer_.get_size().y));
+		if (!tmp_clone->m_particles_ressource_.expired())
+			tmp_clone->ressource_to_search_ = std::make_pair(true, tmp_clone->m_particles_ressource_.lock()->getName());
+		tmp_clone->m_particles_ressource_.reset();
+		tmp_clone->m_particles_.clear();
 		Particles::s_number_of_particle_system_++;
 		return tmp_clone;
 	}
@@ -311,37 +315,52 @@ namespace lc
 
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
 
-			if (ImGui::BeginCombo("Selected Texture", m_particles_texture_.expired() ? "No Texture Selected" : m_particles_texture_.lock()->getName().c_str()))
+			//Lock of the selected ressource (or not if there not selected ressource)
+			const auto tmp_ressource = m_particles_ressource_.lock();
+
+			if (ImGui::BeginCombo("Selected Ressource", tmp_ressource ? tmp_ressource->getName().c_str() : "No Ressource Selected"))
 			{
 				const bool tmp_is_selected(false);
 
-				if (!m_particles_texture_.expired())
+				if (tmp_ressource)
 				{
 					if (ImGui::Selectable(std::string("No Texture ##" + std::to_string(m_ID)).c_str(), tmp_is_selected))
 					{
-						if (!m_particles_texture_.expired())
-							m_particles_texture_.lock()->isUsedByAComponent() = false;
+						if (tmp_ressource)
+							tmp_ressource->isUsedByAComponent() = false;
 
+						//Reset of the origin to the one for the base shape.
 						m_particles_origin_ = { m_base_shape_radius_, m_base_shape_radius_ };
 
-						m_particles_texture_.reset();
+						m_particles_ressource_.reset();
 					}
 				}
 
 				for (const auto& component : getParent()->getComponents())
 				{
-					if (const auto tmp_textureComponent = std::dynamic_pointer_cast<lc::Texture>(component))
-					{
-						if (!tmp_textureComponent->isUsedByAComponent())
-						{
-							if (ImGui::Selectable(std::string(tmp_textureComponent->getName() + "##" + std::to_string(tmp_textureComponent->getID())).c_str(), tmp_is_selected))
-							{
-								if (!m_particles_texture_.expired())
-									m_particles_texture_.lock()->isUsedByAComponent() = false;
+					std::shared_ptr<lc::Ressource> tmp_ressource_component(std::dynamic_pointer_cast<lc::Texture>(component));
+					if (!tmp_ressource_component)
+						tmp_ressource_component = std::dynamic_pointer_cast<lc::Animation>(component);
 
-								m_particles_texture_ = tmp_textureComponent;
-								tmp_textureComponent->isUsedByAComponent() = true;
-								m_texture_size_ = tmp_textureComponent->getShape().getSize();
+					if (tmp_ressource_component)
+					{
+						//If the ressource is not already use by another component we use it.
+						if (!tmp_ressource_component->isUsedByAComponent())
+						{
+							if (ImGui::Selectable(std::string(tmp_ressource_component->getName() + "##" + std::to_string(tmp_ressource_component->getID())).c_str(), tmp_is_selected))
+							{
+								//If there were already a component used on the particles we set it to un use,
+								//to replace by the new one.
+								if (tmp_ressource)
+									tmp_ressource->isUsedByAComponent() = false;
+
+								//The new ressource is set to use.
+								tmp_ressource_component->isUsedByAComponent() = true;
+								//The weak_ptr of the ressource is set to the new one,
+								//the texture size is change to the new ressource,
+								//and the particles origin is set to the half of the size.
+								m_particles_ressource_ = tmp_ressource_component;
+								m_texture_size_ = tmp_ressource_component->getShape().getSize();
 								m_particles_origin_ = m_texture_size_ / 2.f;
 							}
 						}
@@ -406,7 +425,7 @@ namespace lc
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
 
 			ImGui::DragInt("Spawn Cout", &m_spawn_count_);
-			if (m_particles_texture_.expired())
+			if (m_particles_ressource_.expired())
 			{
 				if (ImGui::DragFloat("Base Shape Radius", &m_base_shape_radius_))
 					m_base_shape_.setRadius(m_base_shape_radius_);
@@ -424,7 +443,7 @@ namespace lc
 			else
 			{
 				if (ImGui::DragFloat2("Texture Size", m_texture_size_))
-					m_particles_texture_.lock()->getShape().setSize(m_texture_size_);
+					m_particles_ressource_.lock()->getShape().setSize(m_texture_size_);
 			}
 
 			if (ImGui::TreeNodeEx("Reset Button"))
@@ -470,7 +489,7 @@ namespace lc
 				if (ImGui::Button("Reset Spawn Cout"))
 					m_spawn_count_ = 1;
 
-				if (m_particles_texture_.expired())
+				if (m_particles_ressource_.expired())
 				{
 					if (ImGui::Button("Reset Base Shape Radius"))
 						m_base_shape_radius_ = 10.f;
@@ -511,7 +530,7 @@ namespace lc
 			 << " " << m_base_shape_point_count_
 			 << " " << m_spawn_count_
 			 << " " << m_has_gravity_
-			 << " " << (!m_particles_texture_.expired() ? m_particles_texture_.lock()->getName() : std::string("No_Texture"));
+			 << " " << (!m_particles_ressource_.expired() ? m_particles_ressource_.lock()->getName() : std::string("No_Ressource"));
 	}
 
 	void Particles::Load(std::ifstream& load)
@@ -547,7 +566,7 @@ namespace lc
 			 >> tmp_textureName;
 
 		if (tmp_textureName != "No_Texture")
-			m_has_to_found_his_texture_ = std::make_pair(true, tmp_textureName);
+			ressource_to_search_ = std::make_pair(true, tmp_textureName);
 		
 		m_particles_type_ = static_cast<ParticlesSystemType>(tmp_ParticlesSystemType);
 		m_spawn_color_ = sf::Color(tmp_Color[0], tmp_Color[1], tmp_Color[2], tmp_Color[3]);
@@ -555,22 +574,26 @@ namespace lc
 
 	void Particles::texture_to_search()
 	{
-		if (m_has_to_found_his_texture_.first)
+		if (ressource_to_search_.first)
 		{
 			for (auto& component : getParent()->getComponents())
 			{
-				if (auto tmp_texture = std::dynamic_pointer_cast<lc::Texture>(component))
+				std::shared_ptr<lc::Ressource> tmp_ressource(std::dynamic_pointer_cast<lc::Texture>(component));
+				if (!tmp_ressource)
+					tmp_ressource = std::dynamic_pointer_cast<lc::Animation>(component);
+
+				if (tmp_ressource)
 				{
-					if (m_has_to_found_his_texture_.second == tmp_texture->getName())
+					if (ressource_to_search_.second == tmp_ressource->getName())
 					{
-						m_particles_texture_ = tmp_texture;
-						tmp_texture->isUsedByAComponent() = true;
+						m_particles_ressource_ = tmp_ressource;
+						tmp_ressource->isUsedByAComponent() = true;
 						break;
 					}
 				}
 			}
 
-			m_has_to_found_his_texture_.first = false;
+			ressource_to_search_.first = false;
 		}
 	}
 
@@ -610,12 +633,22 @@ namespace lc
 			if (this->particles_his_rendered())
 				for (int i = 0; i < m_spawn_count_; i++)
 				{
-					const auto tmp_texture = m_particles_texture_.lock();
+					const auto tmp_texture = m_particles_ressource_.lock();
 
+					//tmp_spawn_center is the position to spawn in the center of the spawn point,
+					//because you can modify the origin,
+					//so if we have an origin of 10, 10 and a shape of a size of 30, 30 we divide 30 by 2,
+					//so we obtain 15, 15, and we subtract this by the origin,
+					//and we obtain 5, 5 then the center of the shape will 5 from the origin and then 10 + 5 obtain the center of the shape (30, 30 / 2).
 					const sf::Vector2f tmp_spawn_center = (tmp_texture ?
 						(tmp_texture->getShape().getSize() / 2.f) - m_particles_origin_ :
 						sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_) - m_particles_origin_);
 
+					//tmp_spawn_position is the spawn position of the particle.
+					//we subtract the center by the tmp_spawn_center, so the particle will always start from the center of the shape.
+					//Example :
+					//spawn_center (200, 200) shape size (300, 300) shape origin (20, 20)
+					//then tmp_spawn_center (130, 130) so spawn_position (70, 70)
 					const sf::Vector2f tmp_spawn_position = 
 						(m_particles_spawn_center_ - tmp_spawn_center) +
 						get_extend_spawn_point(sf::Vector2f(Tools::Rand(-m_spawn_point_extend_size_ / 2.f, m_spawn_point_extend_size_ / 2.f), 0.f));
@@ -671,22 +704,22 @@ namespace lc
 
 	void Particles::particle_draw(const std::shared_ptr<Particle>& particle, sf::RenderTexture& window)
 	{
-		const auto tmp_texture = m_particles_texture_.lock();
+		const auto tmp_ressource = m_particles_ressource_.lock();
 
 		if (this->particles_his_rendered())
 		{
-			tmp_texture ? tmp_texture->getShape().setFillColor(m_spawn_color_) : m_base_shape_.setFillColor(m_spawn_color_);
-			tmp_texture ? tmp_texture->getShape().setOrigin(particle->get_transform().getOrigin()) : m_base_shape_.setOrigin(particle->get_transform().getOrigin());
+			tmp_ressource ? tmp_ressource->getShape().setFillColor(m_spawn_color_) : m_base_shape_.setFillColor(m_spawn_color_);
+			tmp_ressource ? tmp_ressource->getShape().setOrigin(particle->get_transform().getOrigin()) : m_base_shape_.setOrigin(particle->get_transform().getOrigin());
 		}
 
 		if (m_is_particles_rendered_on_the_viewport_)
 		{
-			tmp_texture ? 
-				tmp_texture->getShape().setPosition(particle->get_transform().getPosition()) : 
+			tmp_ressource ? 
+				tmp_ressource->getShape().setPosition(particle->get_transform().getPosition()) : 
 				m_base_shape_.setPosition(particle->get_transform().getPosition());
 
-			tmp_texture ? 
-				tmp_texture->getShape().setRotation(particle->get_transform().getRotation()) : 
+			tmp_ressource ? 
+				tmp_ressource->getShape().setRotation(particle->get_transform().getRotation()) : 
 				m_base_shape_.setRotation(particle->get_transform().getRotation());
 
 			if (Tools::Collisions::rect_rect(
@@ -696,21 +729,21 @@ namespace lc
 				},
 				{
 					particle->get_transform().getPosition() - particle->get_transform().getOrigin(),
-					tmp_texture ? m_texture_size_ : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_)
+					tmp_ressource ? m_texture_size_ : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_)
 				}))
 			{
-				tmp_texture ? window.draw(tmp_texture->getShape()) : window.draw(m_base_shape_);
+				tmp_ressource ? window.draw(tmp_ressource->getShape()) : window.draw(m_base_shape_);
 			}
 		}
 
 		if (m_is_window_test_is_open_)
 		{
-			tmp_texture ? 
-				tmp_texture->getShape().setPosition(particle->get_renderer_transform().getPosition()) : 
+			tmp_ressource ? 
+				tmp_ressource->getShape().setPosition(particle->get_renderer_transform().getPosition()) : 
 				m_base_shape_.setPosition(particle->get_renderer_transform().getPosition());
 
-			tmp_texture ? 
-				tmp_texture->getShape().setRotation(particle->get_renderer_transform().getRotation()) : 
+			tmp_ressource ? 
+				tmp_ressource->getShape().setRotation(particle->get_renderer_transform().getRotation()) : 
 				m_base_shape_.setRotation(particle->get_renderer_transform().getRotation());
 
 			if (Tools::Collisions::rect_rect(
@@ -720,10 +753,10 @@ namespace lc
 				},
 				{
 					particle->get_renderer_transform().getPosition() - particle->get_transform().getOrigin(),
-					tmp_texture ? m_texture_size_ : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_)
+					tmp_ressource ? m_texture_size_ : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_)
 				}))
 			{
-				tmp_texture ? m_renderer_.Draw(tmp_texture->getShape()) : m_renderer_.Draw(m_base_shape_);
+				tmp_ressource ? m_renderer_.Draw(tmp_ressource->getShape()) : m_renderer_.Draw(m_base_shape_);
 			}
 		}
 	}

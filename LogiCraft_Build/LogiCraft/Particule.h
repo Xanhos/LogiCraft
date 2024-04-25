@@ -35,6 +35,7 @@ SOFTWARE.
 #pragma once
 #include "Ressource.h"
 #include "Texture.h"
+#include "Animation.h"
 #include "RigidBody.h"
 #include "Viewport.h"
 
@@ -194,7 +195,7 @@ namespace lc
 		sf::CircleShape m_spawn_point_particles_;
 		sf::RectangleShape m_spawn_point_particles_extend_;
 
-		std::weak_ptr<lc::Texture> m_particles_texture_;
+		std::weak_ptr<lc::Ressource> m_particles_ressource_;
 
 		sf::Color m_spawn_color_;
 		sf::Vector2f m_texture_size_;
@@ -225,6 +226,7 @@ namespace lc
 		bool m_has_gravity_;
 		bool m_is_particles_rendered_on_the_viewport_;
 		bool m_is_window_test_is_open_;
-		TextureToSearch m_has_to_found_his_texture_;
+
+		RessourceToSearch ressource_to_search_;
 	};
 }

@@ -63,7 +63,7 @@ typedef std::list<std::shared_ptr<lc::GameObject>> ObjSharedPtrList;
 typedef std::list<std::weak_ptr<lc::GameComponent>> CompWeakPtrList;
 typedef std::list<std::shared_ptr<lc::GameComponent>> CompSharedPtrList;
 
-typedef std::pair<bool, std::string> TextureToSearch;
+typedef std::pair<bool, std::string> RessourceToSearch;
 
 namespace Tools
 {

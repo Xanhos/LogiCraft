@@ -85,7 +85,8 @@ namespace lc
 	}
 
 	Animation::Animation()
-		: m_animation_name_("No Name"), m_base_total_frame_(0), m_base_frame_time_(0.f), m_window_his_open_(false), m_animation_is_paused_(false)
+		: m_base_total_frame_(0), m_base_frame_time_(0.f),
+		m_window_his_open_(false), m_animation_is_paused_(false), m_animation_is_reversed_(false)
 	{
 		m_name = "Animation";
 		m_typeName = "Animation";
@@ -161,7 +162,7 @@ namespace lc
 	{
 		save << static_cast<int>(m_type)
 			 << " " << m_typeName
-			 << " " << m_animation_name_
+			 << " " << m_name
 			 << " " << (m_texture_.expired() ? static_cast<std::string>("No_Texture") : m_texture_.lock()->getName())
 			 << " " << static_cast<int>(m_animation_keys_.size()) << '\n';
 
@@ -169,11 +170,11 @@ namespace lc
 		{
 			const auto tmp_animation_key = animation_key_pair.second;
 
-			save << tmp_animation_key->get_name() << '\n';
-			save << tmp_animation_key->get_base_int_rect() << '\n';
-			save << tmp_animation_key->get_max_frame() << '\n';
-			save << tmp_animation_key->get_frame_time() << '\n';
-			save << tmp_animation_key->get_total_frame() << '\n';
+			save << tmp_animation_key->get_name()
+				 << " " << tmp_animation_key->get_base_int_rect()
+				 << " " << tmp_animation_key->get_max_frame()
+				 << " " << tmp_animation_key->get_frame_time()
+				 << " " << tmp_animation_key->get_total_frame() << '\n';
 		}
 	}
 
@@ -183,7 +184,7 @@ namespace lc
 		std::string tmp_texture_name;
 
 		load >> m_typeName
-			 >> m_animation_name_
+			 >> m_name
 			 >> tmp_texture_name
 			 >> tmp_animation_key_cout;
 
@@ -208,7 +209,23 @@ namespace lc
 
 	std::shared_ptr<lc::GameComponent> Animation::Clone()
 	{
-		return std::make_shared<lc::Animation>(*this);
+		auto tmp_clone = std::make_shared<lc::Animation>(*this);
+		tmp_clone->m_renderer_.get_render_texture() = std::make_shared<sf::RenderTexture>();
+		tmp_clone->m_renderer_.get_render_texture()->create(
+			static_cast<unsigned int>(m_renderer_.get_size().x),
+			static_cast<unsigned int>(m_renderer_.get_size().y));
+		if (!tmp_clone->m_texture_.expired())
+			tmp_clone->m_texture_to_search_ = std::make_pair(true, tmp_clone->m_texture_.lock()->getName());
+		tmp_clone->m_texture_.reset();
+
+		tmp_clone->m_animation_keys_.clear();
+		for (const auto& animation_key_pair : m_animation_keys_)
+		{
+			tmp_clone->m_animation_keys_.emplace(animation_key_pair.first, std::make_shared<AnimationKey>(*animation_key_pair.second));
+			tmp_clone->m_actual_animation_key_ = tmp_clone->m_animation_keys_[animation_key_pair.first];
+		}
+
+		return tmp_clone;
 	}
 
 	void Animation::setHierarchieFunc()
@@ -223,9 +240,12 @@ namespace lc
 				if (ImGui::Button("Open Animation Window Test"))
 					m_window_his_open_ = true;
 
-				ImGui::InputText("Animation Name", m_animation_name_, 80);
+				ImGui::InputText("Animation Name", m_name, 80);
 
-				Tools::ReplaceCharacter(m_animation_name_, ' ', '_');
+				if (m_name.empty())
+					m_name = "No_Name";
+
+				Tools::ReplaceCharacter(m_name, ' ', '_');
 
 				if (ImGui::BeginCombo("Selected Texture", m_texture_.expired() ? "No Texture Selected" : m_texture_.lock()->getName().c_str()))
 				{
@@ -328,10 +348,10 @@ namespace lc
 
 					ImGui::BeginChild(std::string("All Key" + std::to_string(m_ID)).c_str(), sf::Vector2f(ImGui::GetContentRegionAvail().x, 100.f), ImGuiChildFlags_Border);
 					{
-						for (auto animation_key = m_animation_keys_.begin(); animation_key != m_animation_keys_.end();)
+						for (auto animation_key_pair = m_animation_keys_.begin(); animation_key_pair != m_animation_keys_.end();)
 						{
 							auto tmp_need_to_be_deleted(false);
-							const auto tmp_animation_key = (*animation_key);
+							const auto tmp_animation_key = (*animation_key_pair);
 							if (ImGui::TreeNodeEx(std::string(tmp_animation_key.first + "##" + std::to_string(m_ID)).c_str(), ImGuiTreeNodeFlags_Selected))
 							{
 								if (ImGui::ImageButton(std::string("Delete Animation Key" + std::to_string(m_ID)).c_str(), GET_MANAGER->getTexture(""), sf::Vector2f(15.f, 15.f)))
@@ -365,14 +385,19 @@ namespace lc
 							}
 
 							if (tmp_need_to_be_deleted)
-								animation_key = m_animation_keys_.erase(animation_key);
+								animation_key_pair = m_animation_keys_.erase(animation_key_pair);
 							else
-								++animation_key;
+								++animation_key_pair;
 						}
 					}
 					ImGui::EndChild();
 				}
 			};
+	}
+
+	sf::RectangleShape& Animation::getShape()
+	{
+		return (m_texture_.expired() ? m_renderer : m_texture_.lock()->getShape());
 	}
 
 	void Animation::select_animation_key(const std::string& name, const bool reset_last_anim_key)
