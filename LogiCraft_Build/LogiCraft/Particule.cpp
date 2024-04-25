@@ -313,7 +313,7 @@ namespace lc
 			if (ImGui::Button("Open Renderer Window"))
 				m_is_window_test_is_open_ = true;
 
-			if (ImGui::Button("Save Animation As A .anim"))
+			if (ImGui::Button("Save Animation As A .ptcl"))
 				this->save_animation_file();
 
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
