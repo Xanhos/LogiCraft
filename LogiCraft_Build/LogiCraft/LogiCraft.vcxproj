@@ -141,6 +141,7 @@
     <ClCompile Include="BehaviorTree.cpp" />
     <ClCompile Include="BrowserContent.cpp" />
     <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Convex.cpp" />
     <ClCompile Include="EditorState.cpp" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="Folder.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="BehaviorTree.h" />
     <ClInclude Include="BrowserContent.h" />
     <ClInclude Include="Button.h" />
+    <ClInclude Include="Convex.h" />
     <ClInclude Include="EditorState.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="Folder.h" />

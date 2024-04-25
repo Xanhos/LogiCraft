@@ -38,6 +38,7 @@ SOFTWARE.
 #include "Button.h"
 #include "Font.h"
 #include "RigidBody.h"
+#include "Convex.h"
 #include "Event.h"
 #include "Particule.h"
 
@@ -174,6 +175,12 @@ void lc::GameObject::Load(std::ifstream& load)
 			auto particulesSystem = std::make_shared<Particules>();
 			particulesSystem->Load(load);
 			addComponent(particulesSystem);
+		}
+		else if ((Ressource::TYPE)type == Ressource::TYPE::CONVEX)
+		{
+			auto convex = std::make_shared<Convex>();
+			convex->Load(load);
+			addComponent(convex);
 		}
 		check('}');
 	}
