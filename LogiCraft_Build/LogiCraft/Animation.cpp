@@ -136,8 +136,12 @@ namespace lc
 						tmp_animation_key->get_frame_timer() = 0.f;
 					}
 
-					tmp_texture->getShape().setTextureRect(tmp_animation_key->get_frames_rects()[tmp_animation_key->get_actual_frame()]);
-					tmp_texture->getShape().setSize(sf::Vector2f(tmp_animation_key->get_frames_rects()[tmp_animation_key->get_actual_frame()].getSize()));
+					if (!tmp_animation_key->get_frames_rects().empty())
+					{
+						tmp_texture->getShape().setTextureRect(tmp_animation_key->get_frames_rects()[tmp_animation_key->get_actual_frame()]);
+						if (!m_isUsedByAComponent)
+							tmp_texture->getShape().setSize(sf::Vector2f(tmp_animation_key->get_frames_rects()[tmp_animation_key->get_actual_frame()].getSize()));
+					}
 				}
 			}
 
@@ -147,7 +151,7 @@ namespace lc
 				tmp_texture->getShape().setScale(getParent()->getTransform().getScale());
 				tmp_texture->getShape().setRotation(getParent()->getTransform().getRotation());
 
-				tmp_texture->getShape().setPosition(getParent()->getTransform().getPosition());
+				tmp_texture->getShape().setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
 				window.draw(tmp_texture->getShape());
 			}
 
@@ -247,6 +251,11 @@ namespace lc
 				if (ImGui::Button("Open Animation Window Test"))
 					m_window_his_open_ = true;
 
+				if (ImGui::Button("Save Animation As A .anim") && !m_texture_.expired())
+					this->save_animation_file();
+
+				ImGui::DragFloat2("Relative Position", m_relativePosition);
+
 				ImGui::InputText("Animation Name", m_name, 80);
 
 				if (m_name.empty())
@@ -262,12 +271,9 @@ namespace lc
 					{
 						if (ImGui::Selectable(std::string("No Texture ##" + std::to_string(m_ID)).c_str(), tmp_is_selected))
 						{
-							if (!m_texture_.expired())
-							{
-								const auto tmp_texture = m_texture_.lock();
-								tmp_texture->isUsedByAComponent() = false;
-								tmp_texture->getShape().setTextureRect(tmp_texture->getTextureRect());
-							}
+							const auto tmp_texture = m_texture_.lock();
+							tmp_texture->isUsedByAComponent() = false;
+							tmp_texture->getShape().setTextureRect(tmp_texture->getTextureRect());
 
 							m_texture_.reset();
 						}
@@ -407,6 +413,11 @@ namespace lc
 		return (m_texture_.expired() ? m_renderer : m_texture_.lock()->getShape());
 	}
 
+	std::shared_ptr<lc::Texture> Animation::get_texture() const
+	{
+		return m_texture_.lock();
+	}
+
 	void Animation::select_animation_key(const std::string& name, const bool reset_last_anim_key)
 	{
 		const auto tmp_act_anim_key = m_actual_animation_key_.lock();
@@ -422,8 +433,11 @@ namespace lc
 
 			const auto tmp_act_anim_key = m_actual_animation_key_.lock();
 			const auto tmp_texture = m_texture_.lock();
-			tmp_texture->getShape().setTextureRect(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()]);
-			tmp_texture->getShape().setSize(sf::Vector2f(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()].getSize()));
+			if (!tmp_act_anim_key->get_frames_rects().empty())
+			{
+				tmp_texture->getShape().setTextureRect(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()]);
+				tmp_texture->getShape().setSize(sf::Vector2f(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()].getSize()));
+			}
 		}
 	}
 
@@ -435,6 +449,47 @@ namespace lc
 	void Animation::current_animation_is_reversed(const bool reversed)
 	{
 		m_animation_is_reversed_ = reversed;
+	}
+
+	void Animation::save_animation_file(const bool open_file_browser, std::string path) const
+	{
+		std::string tmp_extention_name("anim");
+
+		if (open_file_browser)
+			Tools::IG::SaveRessourcesFromFile(path, tmp_extention_name.c_str());
+
+		if (!path.empty())
+		{
+			//This is to separate the path and name of the file.
+			std::string tmp_file_name(Tools::split_path_and_file_name(path));
+
+			//This is to erase the .anim if is in the tmp_file_name.
+			Tools::remove_extention(tmp_file_name, tmp_extention_name);
+
+			if (!fs::exists(path + tmp_file_name))
+				fs::create_directory(path + tmp_file_name);
+
+			//Then we write every information in the .anim file.
+			std::ofstream tmp_save_animation(path + '\\' + tmp_file_name + '\\' + tmp_file_name + "." + tmp_extention_name, std::ios::out);
+			{
+				tmp_save_animation << m_name << '\n';
+				tmp_save_animation << (m_texture_.expired() ? "No_texture" : m_texture_.lock()->getName()) << '\n';
+				tmp_save_animation << static_cast<int>(m_animation_keys_.size()) << '\n';
+				for (const auto& animation_key_pair : m_animation_keys_)
+				{
+					tmp_save_animation << animation_key_pair.second->get_name() << '\n';
+					tmp_save_animation << animation_key_pair.second->get_base_int_rect() << '\n';
+					tmp_save_animation << animation_key_pair.second->get_max_frame() << '\n';
+					tmp_save_animation << animation_key_pair.second->get_frame_time() << '\n';
+					tmp_save_animation << animation_key_pair.second->get_total_frame() << '\n';
+				}
+			}
+			tmp_save_animation.close();
+
+			//And the image is register.
+			if (!m_texture_.expired())
+				m_texture_.lock()->getTexture().copyToImage().saveToFile(path + '\\' + tmp_file_name + '\\' + tmp_file_name + ".png");
+		}
 	}
 
 	void Animation::texture_to_search()

@@ -110,6 +110,8 @@ namespace lc
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int depth) override;
 		virtual void SaveRenderer(sf::RenderTexture& texture, int depth) override {};
 		virtual void Load(std::ifstream& load) override;
+
+		void save_animation_file(const bool open_file_browser = true, std::string path = "") const;
 	private:
 		/*
 		* @brief When the particles system is load by a save it can have a texture,
@@ -176,7 +178,7 @@ namespace lc
 		* 
 		* @return Return the Vector2f that as been modified. 
 		*/
-		sf::Vector2f get_extend_spawn_point(sf::Vector2f center_position) const;
+		sf::Vector2f get_extend_spawn_point(const sf::Vector2f& center_position) const;
 	private:
 		static std::list<std::shared_ptr<Particle>> s_thread_particles_;
 		static bool s_thread_update_is_on_;
@@ -205,7 +207,7 @@ namespace lc
 		float m_spawn_point_extend_size_;
 		
 		float m_spawn_cooldown_;
-		float m_spawn_time_;
+		float m_spawn_timer_;
 		float m_despawn_cooldown_;
 		float m_rotation_speed_;
 		float m_spawn_rotation_;

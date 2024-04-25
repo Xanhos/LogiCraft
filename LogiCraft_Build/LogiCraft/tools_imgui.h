@@ -152,6 +152,8 @@ namespace Tools
 
 		void LoadRessourcesFromFile(std::string& path, const char* filter = "All\0*.*\0Text\0*.TXT\0");
 
+		void SaveRessourcesFromFile(std::string& path, const char* filter = "All\0*.*\0Text\0*.TXT\0");
+
 		bool MouseIsOnAboveWindow(ImGuiWindow* _window = ImGui::GetCurrentWindow());
 	}
 
@@ -164,7 +166,19 @@ namespace Tools
 	void ReplaceCharacter(std::string& _sentence, unsigned char _characterToReplace, unsigned char _replaceChar);
 
 	//Remplace les _ par des espaces si le bool vaut 0 sinon fait l'inverse
-	std::string replaceSpace(std::string string, bool spaceOrUnderscore = 0);
+	std::string replaceSpace(std::string string, bool spaceOrUnderscore = false);
+
+	/*
+	 * @brief This function remove the extention from the string.
+	 * @brief Example : MyFile.txt, string will be MyFile.
+	 */
+	void remove_extention(std::string& string, const std::string& extention_name);
+
+	/*
+	 * @brief This function will split the path to the file and the name of it.
+	 * @brief Example : C:\\User\\MyFile.txt, path_with_file_name will be C:\\User\\ and it will return MyFile.txt.
+	 */
+	std::string split_path_and_file_name(std::string& path_with_file_name);
 }
 
 template<typename T>
@@ -179,6 +193,8 @@ std::ostream& operator<<(std::ostream& os, const sf::Rect<T>& rect)
 	return os << rect.left << " " << rect.top << " " << rect.width << " " << rect.height;
 }
 
+std::ostream& operator<<(std::ostream& os, const sf::Color& color);
+
 template<typename T>
 std::istream& operator>>(std::istream& is, sf::Vector2<T>& vec)
 {
@@ -190,3 +206,5 @@ std::istream& operator>>(std::istream& is, sf::Rect<T>& rect)
 {
 	return is >> rect.left >> rect.top >> rect.width >> rect.height;
 }
+
+std::istream& operator>>(std::istream& is, sf::Color& color);
