@@ -34,29 +34,94 @@ SOFTWARE.
 
 #pragma once
 #include "Ressource.h"
+#include "Texture.h"
 
 namespace lc
 {
+	class AnimationKey
+	{
+	public:
+		AnimationKey();
+		AnimationKey(std::string name, int total_frame, sf::Vector2i max_frame, float frame_time, sf::IntRect frame_rect);
+		~AnimationKey();
+
+		std::string& get_name();
+
+		std::vector<sf::IntRect>& get_frames_rects();
+
+		sf::IntRect& get_base_int_rect();
+
+		sf::Vector2i& get_max_frame();
+		int& get_total_frame();
+		int& get_actual_frame();
+
+		float& get_frame_timer();
+		float& get_frame_time();
+
+		void create_frames_rect();
+	private:
+		std::string m_name_;
+
+		std::vector<sf::IntRect> m_frames_rects_;
+
+		sf::IntRect m_base_frame_rect_;
+
+		sf::Vector2i m_max_frame_;
+
+		int m_total_frame_;
+		int m_actual_frame_;
+
+		float m_frame_timer_;
+		float m_frame_time_;
+	};
+
 	class Animation : public lc::Ressource
 	{
 	public:
 		Animation();
-		~Animation();
+		virtual ~Animation() override;
 
-		virtual void UpdateEvent(sf::Event& _window) override;
-		virtual void Update(WindowManager& _window) override;
-		virtual void Draw(WindowManager& _window) override;
-		virtual void Draw(sf::RenderTexture& _window) override;
+		virtual void UpdateEvent(sf::Event& event) override;
+		virtual void Update(WindowManager& window) override;
+		virtual void Draw(WindowManager& window) override;
+		virtual void Draw(sf::RenderTexture& window) override;
 
-		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) override;
-		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth) override {};
+		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int depth) override;
+		virtual void SaveRenderer(sf::RenderTexture& texture, int depth) override {}
 		virtual void Load(std::ifstream& load) override;
 
 		virtual std::shared_ptr<lc::GameComponent> Clone() override;
 		virtual void setHierarchieFunc() override;
+
+		virtual sf::RectangleShape& getShape() override;
+
+		void select_animation_key(const std::string& name, const bool reset_last_anim_key = false);
+
+		void current_animation_is_paused(const bool paused = true);
+
+		void current_animation_is_reversed(const bool reversed = true);
 	private:
-		sf::IntRect m_baseIntRect;
-		sf::Vector2f m_baseMaxFrame;
-		float m_baseFrameTimer;
+		void texture_to_search();
+
+		void update_renderer_window();
+	private:
+		int m_base_total_frame_;
+		float m_base_frame_time_;
+		std::string m_base_name_;
+		sf::IntRect m_base_int_rect_;
+		sf::Vector2i m_base_max_frame_;
+
+		bool m_window_his_open_;
+		bool m_animation_is_paused_;
+		bool m_animation_is_reversed_;
+
+		Tools::Renderer m_renderer_;
+
+		std::weak_ptr<lc::Texture> m_texture_;
+
+		std::weak_ptr<AnimationKey> m_actual_animation_key_;
+		std::unordered_map<std::string, std::shared_ptr<AnimationKey>> m_animation_keys_;
+
+		RessourceToSearch m_texture_to_search_;
 	};
 }

@@ -59,7 +59,7 @@ namespace lc
 		TYPE m_type;
 
 		Ressource();
-		~Ressource();
+		virtual ~Ressource();
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) = 0;
 		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth) override;
@@ -71,8 +71,8 @@ namespace lc
 		virtual void Draw(sf::RenderTexture& _window) = 0;
 		virtual std::shared_ptr<lc::GameComponent> Clone() = 0;
 
-		sf::RectangleShape& getShape() { return m_renderer; };
-		std::string& getName() { return m_name; };
+		virtual sf::RectangleShape& getShape() { return m_renderer; }
+		std::string& getName() { return m_name; }
 		bool getThumbnail() { return m_displayThumbnail; }
 		sf::Color getFilterColor() { return m_filterColor; }
 		bool& isUsedByAComponent() { return m_isUsedByAComponent; }

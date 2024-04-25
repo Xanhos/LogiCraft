@@ -346,8 +346,8 @@ void BrowserContent::PutRessources(std::shared_ptr<lc::GameObject> _object, Wind
 					AddComponent(object, _window, *viewport);
 					if (ToolsBar::GetActualLayer().second == "Player Plan")
 					{
-						m_putPosition.x = (int)m_putPosition.x / 120;
-						m_putPosition.y = (int)m_putPosition.y / 120;
+						m_putPosition.x = static_cast<float>((int)m_putPosition.x / 120);
+						m_putPosition.y = static_cast<float>((int)m_putPosition.y / 120);
 						object->getTransform().getPosition() = (sf::Vector2f(m_putPosition.x * 120, m_putPosition.y * 120));
 					}
 					else

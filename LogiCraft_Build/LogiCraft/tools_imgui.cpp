@@ -35,12 +35,126 @@ SOFTWARE.
 #include "tools_imgui.h"
 #include "nfd.h"
 
-bool Tools::CameraGrabbed = false;
+bool Tools::camera_grabbed = false;
+
+Tools::Renderer::Renderer()
+	: m_renderer_is_focus_(false), m_renderer_is_grabbed_(false), m_renderer_zoom_(1.f)
+{
+	m_renderer_view_ = sf::View(sf::Vector2f(960.f, 540.f), sf::Vector2f(1920.f, 1080.f));
+
+	m_renderer_ = std::make_shared<sf::RenderTexture>();
+	m_renderer_->create(1920u, 1080u);
+	m_renderer_->setView(m_renderer_view_);
+}
+
+Tools::Renderer::~Renderer()
+{
+	m_renderer_.reset();
+}
+
+void Tools::Renderer::UpdateZoom(const sf::Event& _event)
+{
+	if (_event.type == sf::Event::MouseWheelScrolled && m_renderer_is_focus_)
+	{
+		if (_event.mouseWheelScroll.delta > 0.f && m_renderer_zoom_ > 0.2f)
+			m_renderer_zoom_ *= (1 / 1.1f);
+		else if (_event.mouseWheelScroll.delta < 0.f && m_renderer_zoom_ < 8.f)
+			m_renderer_zoom_ *= 1.1f;
+	}
+}
+
+void Tools::Renderer::Update()
+{
+	this->UpdateResize();
+
+	this->UpdateMovement();
+
+	ImGui::Image(*m_renderer_, m_renderer_size_);
+}
+
+void Tools::Renderer::Clear()
+{
+	m_renderer_->clear(sf::Color::Transparent);
+	m_renderer_->setView(m_renderer_view_);
+}
+
+void Tools::Renderer::Draw(const sf::Drawable& drawable, const sf::RenderStates& states)
+{ m_renderer_->draw(drawable, states); }
+
+void Tools::Renderer::Draw(const sf::Vertex* vertices, std::size_t vertexCount, sf::PrimitiveType type, const sf::RenderStates& states)
+{ m_renderer_->draw(vertices, vertexCount, type, states); }
+
+void Tools::Renderer::Draw(const sf::VertexBuffer& vertexBuffer, const sf::RenderStates& states)
+{ m_renderer_->draw(vertexBuffer, states); }
+
+void Tools::Renderer::Draw(const sf::VertexBuffer& vertexBuffer, std::size_t firstVertex, std::size_t vertexCount, const sf::RenderStates& states)
+{ m_renderer_->draw(vertexBuffer, firstVertex, vertexCount, states); }
+
+void Tools::Renderer::Display()
+{ m_renderer_->display(); }
+
+std::shared_ptr<sf::RenderTexture>& Tools::Renderer::get_render_texture() { return m_renderer_; }
+
+sf::Vector2f& Tools::Renderer::get_added_position() { return m_renderer_added_position_; }
+
+sf::Vector2f& Tools::Renderer::get_last_added_position() { return m_renderer_last_added_position_; }
+
+sf::Vector2f& Tools::Renderer::get_size() { return m_renderer_size_; }
+
+sf::View& Tools::Renderer::get_view() { return m_renderer_view_; }
+
+bool& Tools::Renderer::his_focus() { return m_renderer_is_focus_; }
+
+bool& Tools::Renderer::his_grabbed() { return m_renderer_is_grabbed_; }
+
+float& Tools::Renderer::get_zoom() { return m_renderer_zoom_; }
+
+void Tools::Renderer::UpdateResize()
+{
+	m_renderer_is_focus_ = ImGui::IsWindowFocused();
+
+	m_renderer_view_.setCenter((m_renderer_size_ / 2.f + m_renderer_added_position_) * m_renderer_zoom_);
+	m_renderer_view_.setSize(m_renderer_size_ * m_renderer_zoom_);
+
+	if (m_renderer_size_ != sf::Vector2f(ImGui::GetContentRegionAvail()))
+	{
+		m_renderer_size_ = ImGui::GetContentRegionAvail();
+		m_renderer_->create(static_cast<unsigned>(m_renderer_size_.x), static_cast<unsigned>(m_renderer_size_.y));
+	}
+}
+
+void Tools::Renderer::UpdateMovement()
+{
+	if (MOUSE(Right))
+	{
+		//If mouse right is press and its in the window bounds.
+		if (Tools::Collisions::point_rect(ImGui::GetMousePos(), { ImGui::GetWindowPos(), ImGui::GetWindowSize() }) &&
+			!m_renderer_is_grabbed_ && !Tools::camera_grabbed)
+		{
+			//And the mouse is not on another window the camera is grabbed.
+			if (!Tools::IG::MouseIsOnAboveWindow())
+			{
+				Tools::camera_grabbed = true;
+				m_renderer_is_grabbed_ = true;
+				m_renderer_last_added_position_ = m_renderer_added_position_;
+				ImGui::SetWindowFocus();
+			}
+		}
+		else if (m_renderer_is_grabbed_)
+		{
+			m_renderer_added_position_ = -sf::Vector2f(ImGui::GetMouseDragDelta(ImGuiMouseButton_Right)) + m_renderer_last_added_position_;
+		}
+	}
+	else
+	{
+		Tools::camera_grabbed = false;
+		m_renderer_is_grabbed_ = false;
+	}
+}
 
 void Tools::IG::LoadRessourcesFromFile(std::string& path, const char* filter)
 {
 	{
-
 		nfdchar_t* outPath = NULL;
 		nfdresult_t result = NFD_OpenDialog(filter, NULL, &outPath);
 		path = "";

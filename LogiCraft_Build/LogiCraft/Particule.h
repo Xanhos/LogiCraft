@@ -35,213 +35,198 @@ SOFTWARE.
 #pragma once
 #include "Ressource.h"
 #include "Texture.h"
+#include "Animation.h"
 #include "RigidBody.h"
 #include "Viewport.h"
 
 namespace lc
 {
-	class Particule
+	class Particle
 	{
 	public:
-		Particule();
-		Particule(
-			float _speed,
-			float _despawnCooldown,
-			float _spawnAngle,
-			float _spawnRotation,
-			float _rotationSpeed,
-			float _gravityForce,
-			bool _hasGravity,
-			sf::Vector2f _spawnPositionInViewport,
-			sf::Vector2f _spawnPositionInRender,
-			sf::Vector2f _spawnOrigin);
-		~Particule();
+		Particle();
+		Particle(
+			float speed,
+			float despawn_cooldown,
+			float spawn_angle,
+			float spawn_rotation,
+			float rotation_speed,
+			float gravity_force,
+			bool has_gravity,
+			sf::Vector2f spawn_position_in_viewport,
+			sf::Vector2f spawn_position_in_render,
+			sf::Vector2f spawn_origin);
+		~Particle();
 
-		lc::Transform& getTransform();
-		lc::Transform& getRendererTransform();
+		lc::Transform& get_transform();
+		lc::Transform& get_renderer_transform();
 
-		sf::Vector2f& getVelocity();
+		sf::Vector2f& get_velocity();
 
-		float& getDespawnCooldown();
-		float& getDespawnTime();
-		float& getGravityForce();
-		float& getRotationSpeed();
+		float& get_despawn_cooldown();
+		float& get_despawn_time();
+		float& get_gravity_force();
+		float& get_rotation_speed();
 
-		bool& hasGravity();
-		bool& needToBeDeleted();
+		bool& has_gravity();
+		bool& need_to_be_deleted();
 	private:
-		lc::Transform m_transform;
-		lc::Transform m_rendererTransform;
-		sf::Vector2f m_velocity;
+		lc::Transform m_transform_;
+		lc::Transform m_renderer_transform_;
+		sf::Vector2f m_velocity_;
 
-		float m_despawnCooldown;
-		float m_despawnTime;
-		float m_gravityForce;
-		float m_rotationSpeed;
+		float m_despawn_cooldown_;
+		float m_despawn_time_;
+		float m_gravity_force_;
+		float m_rotation_speed_;
 
-		bool m_hasGravity;
-		bool m_needToBeDeleted;
+		bool m_has_gravity_;
+		bool m_need_to_be_deleted_;
 	};
 
-	class Particules : public Ressource
+	class Particles : public Ressource
 	{
 	public:
-		enum class ParticulesSystemType
+		enum class ParticlesSystemType
 		{
 			PSTNULL = -1,
-			NORMAL, //Just the normal particules system.
-			ONE_TIME, //This type will do the particules and never do it again.
-			LIFE_TIME //This type will do the particules for an amount of time.
+			NORMAL, //Just the normal particles' system.
+			ONE_TIME, //This type will do the particles and never do it again.
+			LIFE_TIME //This type will do the particles for an amount of time.
 		};
 	public:
-		Particules();
-		Particules(ParticulesSystemType _type);
-		~Particules();
+		Particles();
+		Particles(const ParticlesSystemType type);
+		virtual ~Particles() override;
 
-		virtual void UpdateEvent(sf::Event& _event) override;
-		virtual void Update(WindowManager& _window) override;
-		virtual void Draw(WindowManager& _window) override;
-		virtual void Draw(sf::RenderTexture& _window) override;
+		virtual void UpdateEvent(sf::Event& event) override;
+		virtual void Update(WindowManager& window) override;
+		virtual void Draw(WindowManager& window) override;
+		virtual void Draw(sf::RenderTexture& window) override;
 
 		virtual std::shared_ptr<lc::GameComponent> Clone() override;
 		virtual void setHierarchieFunc() override;
 
-		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) override;
-		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth) override {};
+		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int depth) override;
+		virtual void SaveRenderer(sf::RenderTexture& texture, int depth) override {};
 		virtual void Load(std::ifstream& load) override;
 	private:
 		/*
-		* @brief When the particules system is load by a save it can have a texture,
-		* @brief so this function found the texture component that he need.
+		* @brief When the particles system is load by a save it can have a texture,
+		* @brief so this function found the texture component that he needs.
 		*/
-		void HasToFoundHisTexture();
+		void texture_to_search();
 
 		/*
 		* @brief Function to update all the useful values.
 		*/
-		void UpdateValue();
+		void update_value();
 
 		/*
-		* @brief Function to update the particules tester window that use ImGui.
+		* @brief Function to update the particles tester window that use ImGui.
 		*/
-		void UpdateRendererWindow();
+		void update_renderer_window();
 
 		/*
-		* @brief Function and update and spawn the particule when the timer is good.
+		* @brief Function and update and spawn the particle when the timer is good.
 		*/
-		void SpawnParticules();
+		void spawn_particles();
 
 		/*
-		* @brief Function to update value used by the renderer.
+		* @brief Function to draw the spawn point of the particles
 		*/
-		void UpdateRenderer();
+		void spawn_point_draw(sf::RenderTexture& window);
 
 		/*
-		* @brief Function to make the grab with the camera.
+		* @brief Function to draw particles.
 		*/
-		void RendererMovement();
+		void particles_draw(sf::RenderTexture& window);
 
 		/*
-		* @brief Function to draw the spawn point of the particules
+		* @brief Function to draw Particle.
 		*/
-		void SpawnPointDraw(sf::RenderTexture& _window);
-
-		/*
-		* @brief Function to draw particules.
-		*/
-		void ParticulesDraw(sf::RenderTexture& _window);
-
-		/*
-		* @brief Function to draw particule.
-		*/
-		void ParticuleDraw(std::shared_ptr<Particule> _particule, sf::RenderTexture& _window, sf::RenderTexture& _renderer);
+		void particle_draw(const std::shared_ptr<Particle>& particle, sf::RenderTexture& window);
 
 		/*
 		* @brief Function to know if how of the render option is on.
 		* 
 		* @return True if one of them is on then false.
 		*/
-		bool ParticulesHisRendered() const;
+		bool particles_his_rendered() const;
 
 		/*
-		* @brief Function to update all the particules so it took less performance.
+		* @brief Function to update all the particles, so it took less performance.
 		*/
-		void ThreadUpdate();
+		void thread_update();
 
 		/*
 		* @brief Function to restart the clock of the thread.
 		*/
-		static void RestartThreadClock();
+		static void restart_thread_clock();
 
 		/*
 		* @brief Function to return delta time of the thread.
 		* 
 		* @return Return the delta time.
 		*/
-		static float GetThreadDeltaTime();
+		static float get_thread_delta_time();
 
 		/*
 		* @brief Take the _centerPosition and Rotate it from the angle.
 		* 
 		* @return Return the Vector2f that as been modified. 
 		*/
-		sf::Vector2f GetExtendSpawnPoint(sf::Vector2f _centerPosition);
+		sf::Vector2f get_extend_spawn_point(sf::Vector2f center_position) const;
 	private:
-		static std::list<std::shared_ptr<Particule>> s_threadParticules;
-		static bool s_threadUpdateIsOn;
-		static int s_numberOfParticuleSystem;
-		static std::thread s_updateThread;
-		static sf::Clock s_updateClock;
-		static sf::Time s_updateTime;
+		static std::list<std::shared_ptr<Particle>> s_thread_particles_;
+		static bool s_thread_update_is_on_;
+		static int s_number_of_particle_system_;
+		static std::thread s_update_thread_;
+		static sf::Clock s_update_clock_;
+		static sf::Time s_update_time_;
 
-		std::shared_ptr<sf::RenderTexture> m_renderer;
-		sf::Vector2f m_redererAddedPosition;
-		sf::Vector2f m_redererLastAddedPosition;
-		sf::Vector2f m_rendererSize;
-		sf::View m_rendererView;
-		bool m_renderderIsFocus;
-		bool m_rendererIsGrabbed;
-		float m_rendererZoom;
+		Tools::Renderer m_renderer_;
 
-		ParticulesSystemType m_particulesType;
+		ParticlesSystemType m_particles_type_;
 
-		std::list<std::shared_ptr<Particule>> m_particules;
+		std::list<std::shared_ptr<Particle>> m_particles_;
 
-		sf::CircleShape m_baseShape;
-		sf::CircleShape m_spawnPointParticules;
-		sf::RectangleShape m_spawnPointParticulesExtend;
+		sf::CircleShape m_base_shape_;
+		sf::CircleShape m_spawn_point_particles_;
+		sf::RectangleShape m_spawn_point_particles_extend_;
 
-		std::weak_ptr<lc::Texture> m_particulesTexture;
+		std::weak_ptr<lc::Ressource> m_particles_ressource_;
 
-		sf::Color m_spawnColor;
-		sf::Vector2f m_textureSize;
-		sf::Vector2f m_particulesOrigin;
-		sf::Vector2f m_particulesSpawnCenter;
+		sf::Color m_spawn_color_;
+		sf::Vector2f m_texture_size_;
+		sf::Vector2f m_particles_origin_;
+		sf::Vector2f m_particles_spawn_center_;
 
-		float m_spawnPointExtendSize;
+		float m_spawn_point_extend_size_;
 		
-		float m_spawnCooldown;
-		float m_spawnTime;
-		float m_despawnCooldown;
-		float m_rotationSpeed;
-		float m_spawnRotation;
-		float m_spawnSpread;
-		float m_spawnAngle;
-		float m_spawnSpeed;
-		float m_baseShapeRadius;
+		float m_spawn_cooldown_;
+		float m_spawn_time_;
+		float m_despawn_cooldown_;
+		float m_rotation_speed_;
+		float m_spawn_rotation_;
+		float m_spawn_spread_;
+		float m_spawn_angle_;
+		float m_spawn_speed_;
+		float m_base_shape_radius_;
 
-		float m_lifeTimeTimer;
-		float m_lifeTimeTime;
+		float m_life_time_timer_;
+		float m_life_time_time_;
 
-		float m_gravityForce;
+		float m_gravity_force_;
 
-		int m_baseShapePointCount;
-		int m_spawnCount;
+		int m_base_shape_point_count_;
+		int m_spawn_count_;
 
-		bool m_hasProductHisParticules;
-		bool m_hasGravity;
-		bool m_isParticulesRenderedOnTheViewport;
-		bool m_isWindowTestIsOpen;
-		std::pair<bool, std::string> m_hasToFoundHisTexture;
+		bool m_has_product_his_particles_;
+		bool m_has_gravity_;
+		bool m_is_particles_rendered_on_the_viewport_;
+		bool m_is_window_test_is_open_;
+
+		RessourceToSearch ressource_to_search_;
 	};
 }
