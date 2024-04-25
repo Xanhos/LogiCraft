@@ -42,7 +42,6 @@ void lc::Ressource::onDraw(WindowManager& _window, sf::Color color)
 
 lc::Ressource::Ressource()
 {
-	m_typeName = "Ressources";
 	m_displayThumbnail = false;
 	m_type = Ressource::TYPE::NONE;
 	m_isUsedByAComponent = false;

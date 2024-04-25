@@ -45,7 +45,7 @@ namespace lc
 	class Ressource : public lc::GameComponent
 	{
 	public:
-		enum class TYPE { NONE = -1, TEXTURE, IA, BUTTON, FONT, MUSIC, SOUND, ANIMATION, RIGIDBODY, EVENT, PARTICULES };
+		enum class TYPE { NONE = -1, TEXTURE, IA, BUTTON, FONT, MUSIC, SOUND, ANIMATION, RIGIDBODY, EVENT, PARTICULES, CONVEX };
 	protected:
 		sf::RectangleShape m_renderer;//Renderer of the ressource
 		bool m_displayThumbnail;
