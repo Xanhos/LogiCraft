@@ -3,9 +3,25 @@
 
 namespace fs = std::filesystem;
 
-//Need to get the path of the file we open, so we make a class that inherit from std::ofstream and that store the path of the file.
+
+
+namespace lc
+{
+	class GameObject;
+	class GameComponent;
+}
+
+typedef std::list<std::weak_ptr<lc::GameObject>> ObjWeakPtrList;
+typedef std::list<std::shared_ptr<lc::GameObject>> ObjSharedPtrList;
+
+typedef std::list<std::weak_ptr<lc::GameComponent>> CompWeakPtrList;
+typedef std::list<std::shared_ptr<lc::GameComponent>> CompSharedPtrList;
+
+typedef std::pair<bool, std::string> RessourceToSearch;
 
 const sf::Vector2i screenResolution = sf::Vector2i(3840, 2160);
+
+//Need to get the path of the file we open, so we make a class that inherit from std::ofstream and that store the path of the file.
 
 class FileWriter : public std::ofstream
 {

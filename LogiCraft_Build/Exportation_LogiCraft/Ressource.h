@@ -45,7 +45,7 @@ namespace lc
 	class Ressource : public lc::GameComponent
 	{
 	public:
-		enum class TYPE { NONE = -1, TEXTURE, IA, BUTTON, FONT, MUSIC, SOUND, ANIMATION, RIGIDBODY, EVENT, PARTICULES_SYSTEM };
+		enum class TYPE { NONE = -1, TEXTURE, IA, BUTTON, FONT, MUSIC, SOUND, ANIMATION, RIGIDBODY, EVENT, PARTICULES };
 		protected:
 		sf::RectangleShape m_renderer;//Renderer of the ressource
 		bool m_isUsedByAComponent;
@@ -54,7 +54,7 @@ namespace lc
 	public:
 		TYPE m_type;
 		Ressource();
-		~Ressource();
+		virtual ~Ressource();
 
 		virtual void Load(std::ifstream& load) = 0;
 

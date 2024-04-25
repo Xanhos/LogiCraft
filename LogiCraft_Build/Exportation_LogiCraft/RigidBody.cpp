@@ -45,7 +45,7 @@ lc::RigidBody::RigidBody()
 	m_typeName = "RigidBody";
 }
 
-lc::RigidBody::RigidBody(sf::FloatRect _collider, sf::Vector2f _velocity, sf::Vector2f _relative, sf::Vector2f posBeforeSimulate, bool showCollide, bool kinetic)
+lc::RigidBody::RigidBody(sf::FloatRect _collider, sf::Vector2f _velocity, sf::Vector2f _relative, bool kinetic)
 {
 	m_name = "RigidBody";
 	m_typeName = "RigidBody";

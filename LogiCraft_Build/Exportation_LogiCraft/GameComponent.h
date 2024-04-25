@@ -102,7 +102,7 @@ namespace lc
 		GameComponent();
 		GameComponent(std::string _name);
 
-		~GameComponent();
+		virtual ~GameComponent();
 
 		virtual void UpdateEvent(sf::Event& _event) = 0;
 

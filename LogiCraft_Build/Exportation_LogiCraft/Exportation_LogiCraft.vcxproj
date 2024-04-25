@@ -141,6 +141,7 @@
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="GameComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Particule.cpp" />
     <ClCompile Include="Ressource.cpp" />
     <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="Source.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="Font.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Particule.h" />
     <ClInclude Include="Ressource.h" />
     <ClInclude Include="RigidBody.h" />
     <ClInclude Include="Texture.h" />

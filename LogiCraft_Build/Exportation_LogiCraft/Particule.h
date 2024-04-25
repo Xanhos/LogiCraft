@@ -35,9 +35,7 @@ SOFTWARE.
 #pragma once
 #include "Ressource.h"
 #include "Texture.h"
-#include "Animation.h"
-#include "RigidBody.h"
-#include "Viewport.h"
+//#include "Animation.h"
 
 namespace lc
 {
@@ -54,12 +52,10 @@ namespace lc
 			float gravity_force,
 			bool has_gravity,
 			sf::Vector2f spawn_position_in_viewport,
-			sf::Vector2f spawn_position_in_render,
 			sf::Vector2f spawn_origin);
 		~Particle();
 
 		lc::Transform& get_transform();
-		lc::Transform& get_renderer_transform();
 
 		sf::Vector2f& get_velocity();
 
@@ -72,7 +68,6 @@ namespace lc
 		bool& need_to_be_deleted();
 	private:
 		lc::Transform m_transform_;
-		lc::Transform m_renderer_transform_;
 		sf::Vector2f m_velocity_;
 
 		float m_despawn_cooldown_;
@@ -95,6 +90,7 @@ namespace lc
 			LIFE_TIME //This type will do the particles for an amount of time.
 		};
 	public:
+
 		Particles();
 		Particles(const ParticlesSystemType type);
 		virtual ~Particles() override;
@@ -105,11 +101,6 @@ namespace lc
 		virtual void Draw(sf::RenderTexture& window) override;
 
 		virtual std::shared_ptr<lc::GameComponent> Clone() override;
-		virtual void setHierarchieFunc() override;
-
-		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int depth) override;
-		virtual void SaveRenderer(sf::RenderTexture& texture, int depth) override {};
-		void Export(std::ofstream& exportation) override;
 		virtual void Load(std::ifstream& load) override;
 	private:
 		/*
@@ -123,10 +114,7 @@ namespace lc
 		*/
 		void update_value();
 
-		/*
-		* @brief Function to update the particles tester window that use ImGui.
-		*/
-		void update_renderer_window();
+		
 
 		/*
 		* @brief Function and update and spawn the particle when the timer is good.
@@ -136,25 +124,19 @@ namespace lc
 		/*
 		* @brief Function to draw the spawn point of the particles
 		*/
-		void spawn_point_draw(sf::RenderTexture& window);
+		void spawn_point_draw(WindowManager& window);
 
 		/*
 		* @brief Function to draw particles.
 		*/
-		void particles_draw(sf::RenderTexture& window);
+		void particles_draw(WindowManager& window);
 
 		/*
 		* @brief Function to draw Particle.
 		*/
-		void particle_draw(const std::shared_ptr<Particle>& particle, sf::RenderTexture& window);
+		void particle_draw(const std::shared_ptr<Particle>& particle, WindowManager& window);
 
-		/*
-		* @brief Function to know if how of the render option is on.
-		* 
-		* @return True if one of them is on then false.
-		*/
-		bool particles_his_rendered() const;
-
+		
 		/*
 		* @brief Function to update all the particles, so it took less performance.
 		*/
@@ -186,7 +168,6 @@ namespace lc
 		static sf::Clock s_update_clock_;
 		static sf::Time s_update_time_;
 
-		Tools::Renderer m_renderer_;
 
 		ParticlesSystemType m_particles_type_;
 
@@ -225,8 +206,6 @@ namespace lc
 
 		bool m_has_product_his_particles_;
 		bool m_has_gravity_;
-		bool m_is_particles_rendered_on_the_viewport_;
-		bool m_is_window_test_is_open_;
 
 		RessourceToSearch ressource_to_search_;
 	};

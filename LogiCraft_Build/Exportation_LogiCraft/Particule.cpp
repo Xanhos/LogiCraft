@@ -63,7 +63,6 @@ namespace lc
 		float gravity_force,
 		bool has_gravity,
 		sf::Vector2f spawn_position_in_viewport,
-		sf::Vector2f spawn_position_in_render,
 		sf::Vector2f spawn_origin)
 		: m_despawn_cooldown_(despawn_cooldown), m_despawn_time_(0.f), m_gravity_force_(gravity_force),
 		  m_rotation_speed_(rotation_speed),
@@ -72,10 +71,6 @@ namespace lc
 		m_transform_.getRotation() = spawn_rotation;
 		m_transform_.getPosition() = spawn_position_in_viewport;
 		m_transform_.getOrigin() = spawn_origin;
-
-		m_renderer_transform_.getRotation() = spawn_rotation;
-		m_renderer_transform_.getPosition() = spawn_position_in_render;
-		m_renderer_transform_.getOrigin() = spawn_origin;
 
 		m_velocity_ = sf::Vector2f(std::cos(spawn_angle * (3.14159265358f / 180)) * speed, std::sin(spawn_angle * (3.14159265358f / 180)) * speed);
 	}
@@ -87,11 +82,6 @@ namespace lc
 	lc::Transform& Particle::get_transform()
 	{
 		return m_transform_;
-	}
-
-	lc::Transform& Particle::get_renderer_transform()
-	{
-		return m_renderer_transform_;
 	}
 
 	sf::Vector2f& Particle::get_velocity()
@@ -148,12 +138,10 @@ namespace lc
 		  m_spawn_count_(1u),
 		  m_has_product_his_particles_(false),
 		  m_has_gravity_(false),
-		  m_is_particles_rendered_on_the_viewport_(true),
-		  m_is_window_test_is_open_(false),
 		  ressource_to_search_(std::make_pair(false, ""))
 	{
-		m_name = "Particles";
-		m_typeName = "Particles";
+		m_name = "Particles System";
+		m_typeName = "Particles System";
 		m_type = TYPE::PARTICULES;
 
 		m_particles_type_ = ParticlesSystemType::NORMAL;
@@ -194,8 +182,6 @@ namespace lc
 		  m_spawn_count_(1u),
 		  m_has_product_his_particles_(false),
 		  m_has_gravity_(false),
-		  m_is_particles_rendered_on_the_viewport_(true),
-		  m_is_window_test_is_open_(false),
 		  ressource_to_search_(std::make_pair(false, ""))
 	{
 		m_name = "Particles";
@@ -236,8 +222,6 @@ namespace lc
 
 	void Particles::UpdateEvent(sf::Event& event)
 	{
-		//Event for the zoom and dezoom. 
-		m_renderer_.UpdateZoom(event);
 	}
 
 	void Particles::Update(WindowManager& window)
@@ -246,36 +230,24 @@ namespace lc
 
 		this->update_value();
 
-		this->update_renderer_window();
 
 		this->spawn_particles();
 	}
 
 	void Particles::Draw(WindowManager& window)
 	{
+		//this->spawn_point_draw(window);
+
+		this->particles_draw(window);
 	}
 
 	void Particles::Draw(sf::RenderTexture& window)
 	{
-		if (this->particles_his_rendered())
-		{
-			m_renderer_.Clear();
-
-			this->spawn_point_draw(window);
-
-			this->particles_draw(window);
-
-			m_renderer_.Display();
-		}
 	}
 
 	std::shared_ptr<lc::GameComponent> Particles::Clone()
 	{
 		auto tmp_clone = std::make_shared<lc::Particles>(*this);
-		tmp_clone->m_renderer_.get_render_texture() = std::make_shared<sf::RenderTexture>();
-		tmp_clone->m_renderer_.get_render_texture()->create(
-			static_cast<unsigned int>(m_renderer_.get_size().x), 
-			static_cast<unsigned int>(m_renderer_.get_size().y));
 		if (!tmp_clone->m_particles_ressource_.expired())
 			tmp_clone->ressource_to_search_ = std::make_pair(true, tmp_clone->m_particles_ressource_.lock()->getName());
 		tmp_clone->m_particles_ressource_.reset();
@@ -284,283 +256,6 @@ namespace lc
 		return tmp_clone;
 	}
 
-	void Particles::setHierarchieFunc()
-	{
-		m_hierarchieInformation = [this]() 
-			{
-			ImGui::PushItemWidth(200.f);
-
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-
-			if (ImGui::Checkbox("Render On Viewport", &m_is_particles_rendered_on_the_viewport_))
-			{
-				if (m_is_particles_rendered_on_the_viewport_)
-				{
-					m_has_product_his_particles_ = false;
-					m_life_time_timer_ = 0.f;
-				}
-				else
-				{
-					for (auto& particle : m_particles_)
-						particle->need_to_be_deleted() = true;
-
-					m_particles_.clear();
-				}
-			}
-			
-			ImGui::Checkbox("Gravity", &m_has_gravity_);
-
-			if (ImGui::Button("Open Renderer Window"))
-				m_is_window_test_is_open_ = true;
-
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-
-			//Lock of the selected ressource (or not if there not selected ressource)
-			const auto tmp_ressource = m_particles_ressource_.lock();
-
-			if (ImGui::BeginCombo("Selected Ressource", tmp_ressource ? tmp_ressource->getName().c_str() : "No Ressource Selected"))
-			{
-				const bool tmp_is_selected(false);
-
-				if (tmp_ressource)
-				{
-					if (ImGui::Selectable(std::string("No Texture ##" + std::to_string(m_ID)).c_str(), tmp_is_selected))
-					{
-						if (tmp_ressource)
-							tmp_ressource->isUsedByAComponent() = false;
-
-						//Reset of the origin to the one for the base shape.
-						m_particles_origin_ = { m_base_shape_radius_, m_base_shape_radius_ };
-
-						m_particles_ressource_.reset();
-					}
-				}
-
-				for (const auto& component : getParent()->getComponents())
-				{
-					std::shared_ptr<lc::Ressource> tmp_ressource_component(std::dynamic_pointer_cast<lc::Texture>(component));
-					if (!tmp_ressource_component)
-						tmp_ressource_component = std::dynamic_pointer_cast<lc::Animation>(component);
-
-					if (tmp_ressource_component)
-					{
-						//If the ressource is not already use by another component we use it.
-						if (!tmp_ressource_component->isUsedByAComponent())
-						{
-							if (ImGui::Selectable(std::string(tmp_ressource_component->getName() + "##" + std::to_string(tmp_ressource_component->getID())).c_str(), tmp_is_selected))
-							{
-								//If there were already a component used on the particles we set it to un use,
-								//to replace by the new one.
-								if (tmp_ressource)
-									tmp_ressource->isUsedByAComponent() = false;
-
-								//The new ressource is set to use.
-								tmp_ressource_component->isUsedByAComponent() = true;
-								//The weak_ptr of the ressource is set to the new one,
-								//the texture size is change to the new ressource,
-								//and the particles origin is set to the half of the size.
-								m_particles_ressource_ = tmp_ressource_component;
-								m_texture_size_ = tmp_ressource_component->getShape().getSize();
-								m_particles_origin_ = m_texture_size_ / 2.f;
-							}
-						}
-					}
-				}
-
-				ImGui::EndCombo();
-			}
-
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-
-			ImGui::DragFloat2("Relative Position", m_relativePosition);
-			ImGui::DragFloat2("Particles Origin", m_particles_origin_);
-
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-
-			static std::map<ParticlesSystemType, std::string> tmp_particlesTypeMap{ {ParticlesSystemType::NORMAL, "Normal"},{ParticlesSystemType::ONE_TIME, "One Time"}, {ParticlesSystemType::LIFE_TIME, "Life Time"} };
-			
-			if (ImGui::BeginCombo("Particles System Type", tmp_particlesTypeMap[m_particles_type_].c_str()))
-			{
-				const bool tmp_is_selected(false);
-
-				for (const auto& particleType : tmp_particlesTypeMap)
-				{
-					if (ImGui::Selectable(particleType.second.c_str(), tmp_is_selected))
-					{
-						m_particles_type_ = particleType.first;
-
-						m_has_product_his_particles_ = false;
-						m_life_time_timer_ = 0.f;
-					}
-				}
-				ImGui::EndCombo();
-			}
-
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-
-			ImGui::DragFloat("Spawn Cooldown", &m_spawn_cooldown_);
-			ImGui::DragFloat("Despawn Cooldown", &m_despawn_cooldown_);
-
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-
-			ImGui::DragFloat("Particles Speed", &m_spawn_speed_);
-			ImGui::DragFloat("Rotation Speed", &m_rotation_speed_);
-			if (m_has_gravity_)
-				ImGui::DragFloat("Gravity Force", &m_gravity_force_);
-
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-
-			ImGui::DragFloat("Spawn Point Extend Size", &m_spawn_point_extend_size_);
-			ImGui::DragFloat("Spawn Particles Angle", &m_spawn_angle_);
-			ImGui::DragFloat("Spawn Spread", &m_spawn_spread_);
-			ImGui::DragFloat("Spawn Angle", &m_spawn_rotation_);
-			ImGui::ColorEdit4("Spawn Color", m_spawn_color_, ImGuiColorEditFlags_AlphaBar);
-
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-
-			if (m_particles_type_ == ParticlesSystemType::LIFE_TIME)
-				if (ImGui::DragFloat("Life Time Time", &m_life_time_time_))
-					m_life_time_timer_ = 0.f;
-
-			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-
-			ImGui::DragInt("Spawn Cout", &m_spawn_count_);
-			if (m_particles_ressource_.expired())
-			{
-				if (ImGui::DragFloat("Base Shape Radius", &m_base_shape_radius_))
-					m_base_shape_.setRadius(m_base_shape_radius_);
-
-				if (ImGui::DragInt("Base Shape Point Count", &m_base_shape_point_count_))
-				{
-					if (m_base_shape_point_count_ < 3)
-						m_base_shape_point_count_ = 3;
-
-					m_base_shape_.setPointCount(m_base_shape_point_count_);
-				}
-
-				m_texture_size_ = { m_base_shape_radius_, m_base_shape_radius_ };
-			}
-			else
-			{
-				if (ImGui::DragFloat2("Texture Size", m_texture_size_))
-					m_particles_ressource_.lock()->getShape().setSize(m_texture_size_);
-			}
-
-			if (ImGui::TreeNodeEx("Reset Button"))
-			{
-				if (ImGui::Button("Reset Spawn Cooldown"))
-					m_spawn_cooldown_ = 0.1f;
-				if (ImGui::Button("Reset Despawn Cooldown"))
-					m_despawn_cooldown_ = 1.f;
-
-				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-
-				if (ImGui::Button("Reset Particles Speed"))
-					m_spawn_speed_ = 50.f;
-				if (ImGui::Button("Reset Rotation Speed"))
-					m_rotation_speed_ = 1.f;
-
-				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-
-				if (ImGui::Button("Reset Spawn Particles Angle"))
-					m_spawn_angle_ = 0.f;
-				if (ImGui::Button("Reset Spawn Spread"))
-					m_spawn_spread_ = 45.f;
-				if (ImGui::Button("Reset Spawn Angle"))
-					m_spawn_rotation_ = 0.f;
-				if (ImGui::Button("Reset Spawn Color"))
-					m_spawn_color_ = sf::Color::White;
-
-				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-
-				if (m_particles_type_ == ParticlesSystemType::ONE_TIME)
-				{
-					if (ImGui::Button("Redo Particles"))
-						m_has_product_his_particles_ = false;
-				}
-				else if (m_particles_type_ == ParticlesSystemType::LIFE_TIME)
-				{
-					if (ImGui::Button("Reset Life Time Timer Particles"))
-						m_life_time_timer_ = 5.f;
-				}
-
-				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-
-				if (ImGui::Button("Reset Spawn Cout"))
-					m_spawn_count_ = 1;
-
-				if (m_particles_ressource_.expired())
-				{
-					if (ImGui::Button("Reset Base Shape Radius"))
-						m_base_shape_radius_ = 10.f;
-					if (ImGui::Button("Reset Spawn Angle"))
-						m_base_shape_point_count_ = 3;
-				}
-
-				ImGui::TreePop();
-			}
-			ImGui::PopItemWidth();
-			};
-	}
-
-	void Particles::Save(std::ofstream& save, sf::RenderTexture& texture, int depth)
-	{
-		save << static_cast<int>(m_type)
-			 << " " << m_typeName
-			 << " " << static_cast<int>(m_particles_type_)
-			 << " " << static_cast<int>(m_spawn_color_.r) 
-			 << " " << static_cast<int>(m_spawn_color_.g) 
-			 << " " << static_cast<int>(m_spawn_color_.b)
-			 << " " << static_cast<int>(m_spawn_color_.a)
-			 << " " << m_texture_size_.x
-			 << " " << m_texture_size_.y
-			 << " " << m_particles_origin_.x
-			 << " " << m_particles_origin_.y
-			 << " " << m_spawn_point_extend_size_
-			 << " " << m_spawn_cooldown_
-			 << " " << m_despawn_cooldown_
-			 << " " << m_rotation_speed_
-			 << " " << m_spawn_rotation_
-			 << " " << m_spawn_spread_
-			 << " " << m_spawn_angle_
-			 << " " << m_spawn_speed_
-			 << " " << m_base_shape_radius_
-			 << " " << m_life_time_time_
-			 << " " << m_gravity_force_
-			 << " " << m_base_shape_point_count_
-			 << " " << m_spawn_count_
-			 << " " << m_has_gravity_
-			 << " " << (!m_particles_ressource_.expired() ? m_particles_ressource_.lock()->getName() : std::string("No_Ressource"));
-	}
-
-	void Particles::Export(std::ofstream& exportation)
-	{
-		exportation << static_cast<int>(m_type)
-			<< " " << static_cast<int>(m_particles_type_)
-			<< " " << static_cast<int>(m_spawn_color_.r)
-			<< " " << static_cast<int>(m_spawn_color_.g)
-			<< " " << static_cast<int>(m_spawn_color_.b)
-			<< " " << static_cast<int>(m_spawn_color_.a)
-			<< " " << m_texture_size_.x
-			<< " " << m_texture_size_.y
-			<< " " << m_particles_origin_.x
-			<< " " << m_particles_origin_.y
-			<< " " << m_spawn_point_extend_size_
-			<< " " << m_spawn_cooldown_
-			<< " " << m_despawn_cooldown_
-			<< " " << m_rotation_speed_
-			<< " " << m_spawn_rotation_
-			<< " " << m_spawn_spread_
-			<< " " << m_spawn_angle_
-			<< " " << m_spawn_speed_
-			<< " " << m_base_shape_radius_
-			<< " " << m_life_time_time_
-			<< " " << m_gravity_force_
-			<< " " << m_base_shape_point_count_
-			<< " " << m_spawn_count_
-			<< " " << m_has_gravity_
-			<< " " << (!m_particles_ressource_.expired() ? m_particles_ressource_.lock()->getName() : std::string("No_Ressource"));
-	}
 
 	void Particles::Load(std::ifstream& load)
 	{
@@ -568,7 +263,7 @@ namespace lc
 		std::string tmp_textureName;
 		int tmp_Color[4]{ 0, 0, 0, 0 };
 
-		load >> m_typeName
+		load
 			 >> tmp_ParticlesSystemType
 			 >> tmp_Color[0]
 			 >> tmp_Color[1]
@@ -608,12 +303,12 @@ namespace lc
 			for (auto& component : getParent()->getComponents())
 			{
 				std::shared_ptr<lc::Ressource> tmp_ressource(std::dynamic_pointer_cast<lc::Texture>(component));
-				if (!tmp_ressource)
-					tmp_ressource = std::dynamic_pointer_cast<lc::Animation>(component);
+				/*if (!tmp_ressource)
+					tmp_ressource = std::dynamic_pointer_cast<lc::Animation>(component);*/
 
 				if (tmp_ressource)
 				{
-					if (ressource_to_search_.second == tmp_ressource->getName())
+					if (ressource_to_search_.second + ".png" == tmp_ressource->getName())
 					{
 						m_particles_ressource_ = tmp_ressource;
 						tmp_ressource->isUsedByAComponent() = true;
@@ -628,7 +323,7 @@ namespace lc
 
 	void Particles::update_value()
 	{
-		if (m_particles_type_ == ParticlesSystemType::LIFE_TIME && this->particles_his_rendered())
+		if (m_particles_type_ == ParticlesSystemType::LIFE_TIME)
 			m_life_time_timer_ += Tools::getDeltaTime();
 
 		m_particles_spawn_center_ = (getParent()->getTransform().getPosition() + m_relativePosition);
@@ -636,17 +331,6 @@ namespace lc
 		m_spawn_time_ += Tools::getDeltaTime();
 	}
 
-	void Particles::update_renderer_window()
-	{
-		if (m_is_window_test_is_open_)
-		{
-			ImGui::Begin(std::string("Window Particles Tester##" + std::to_string(m_ID) + std::to_string(getParent()->getID()) + "lc").c_str(), &m_is_window_test_is_open_);
-
-			m_renderer_.Update();
-
-			ImGui::End();
-		}
-	}
 
 	void Particles::spawn_particles()
 	{
@@ -659,7 +343,6 @@ namespace lc
 			if (m_particles_type_ == ParticlesSystemType::ONE_TIME)
 				m_has_product_his_particles_ = true;
 
-			if (this->particles_his_rendered())
 				for (int i = 0; i < m_spawn_count_; i++)
 				{
 					const auto tmp_texture = m_particles_ressource_.lock();
@@ -682,16 +365,13 @@ namespace lc
 						(m_particles_spawn_center_ - tmp_spawn_center) +
 						get_extend_spawn_point(sf::Vector2f(Tools::Rand(-m_spawn_point_extend_size_ / 2.f, m_spawn_point_extend_size_ / 2.f), 0.f));
 
-					const sf::Vector2f tmp_spawn_position_in_renderer =
-						sf::Vector2f(m_renderer_.get_render_texture()->getSize()) / 2.f +
-						get_extend_spawn_point(sf::Vector2f(Tools::Rand(-m_spawn_point_extend_size_ / 2.f, m_spawn_point_extend_size_ / 2.f), 0.f));
 
 					const auto tmp_particle = std::make_shared<Particle>(
 						m_spawn_speed_, m_despawn_cooldown_,
 						m_spawn_rotation_ + Tools::Rand(-m_spawn_spread_ / 2.f, m_spawn_spread_ / 2.f),
 						m_spawn_angle_, m_rotation_speed_, m_gravity_force_,
 						m_has_gravity_,
-						tmp_spawn_position, tmp_spawn_position_in_renderer, m_particles_origin_);
+						tmp_spawn_position, m_particles_origin_);
 
 					m_particles_.push_back(tmp_particle);
 					Particles::s_thread_particles_.push_back(tmp_particle);
@@ -701,7 +381,7 @@ namespace lc
 		}
 	}
 
-	void Particles::spawn_point_draw(sf::RenderTexture& window)
+	void Particles::spawn_point_draw(WindowManager& window)
 	{
 		m_spawn_point_particles_extend_.setRotation(m_spawn_rotation_ - 90.f);
 		m_spawn_point_particles_extend_.setSize(sf::Vector2f(m_spawn_point_extend_size_, m_spawn_point_particles_extend_.getSize().y));
@@ -712,13 +392,9 @@ namespace lc
 		window.draw(m_spawn_point_particles_);
 		window.draw(m_spawn_point_particles_extend_);
 
-		m_spawn_point_particles_.setPosition(sf::Vector2f(m_renderer_.get_size()) / 2.f);
-		m_spawn_point_particles_extend_.setPosition(sf::Vector2f(m_renderer_.get_render_texture()->getSize()) / 2.f);
-		m_renderer_.Draw(m_spawn_point_particles_);
-		m_renderer_.Draw(m_spawn_point_particles_extend_);
 	}
 
-	void Particles::particles_draw(sf::RenderTexture& window)
+	void Particles::particles_draw(WindowManager& window)
 	{
 		for (auto particle = m_particles_.begin(); particle != m_particles_.end();)
 		{
@@ -731,18 +407,16 @@ namespace lc
 		}
 	}
 
-	void Particles::particle_draw(const std::shared_ptr<Particle>& particle, sf::RenderTexture& window)
+	void Particles::particle_draw(const std::shared_ptr<Particle>& particle, WindowManager& window)
 	{
 		const auto tmp_ressource = m_particles_ressource_.lock();
 
-		if (this->particles_his_rendered())
-		{
-			tmp_ressource ? tmp_ressource->getShape().setFillColor(m_spawn_color_) : m_base_shape_.setFillColor(m_spawn_color_);
-			tmp_ressource ? tmp_ressource->getShape().setOrigin(particle->get_transform().getOrigin()) : m_base_shape_.setOrigin(particle->get_transform().getOrigin());
-		}
+	
+		tmp_ressource ? tmp_ressource->getShape().setFillColor(m_spawn_color_) : m_base_shape_.setFillColor(m_spawn_color_);
+		tmp_ressource ? tmp_ressource->getShape().setOrigin(particle->get_transform().getOrigin()) : m_base_shape_.setOrigin(particle->get_transform().getOrigin());
+	
 
-		if (m_is_particles_rendered_on_the_viewport_)
-		{
+		
 			tmp_ressource ? 
 				tmp_ressource->getShape().setPosition(particle->get_transform().getPosition()) : 
 				m_base_shape_.setPosition(particle->get_transform().getPosition());
@@ -753,8 +427,8 @@ namespace lc
 
 			if (Tools::Collisions::rect_rect(
 				{
-					window.getView().getCenter() - window.getView().getSize() / 2.f,
-					window.getView().getSize()
+					window.getWindow().getView().getCenter() - window.getWindow().getView().getSize() / 2.f,
+					window.getWindow().getView().getSize()
 				},
 				{
 					particle->get_transform().getPosition() - particle->get_transform().getOrigin(),
@@ -763,31 +437,7 @@ namespace lc
 			{
 				tmp_ressource ? window.draw(tmp_ressource->getShape()) : window.draw(m_base_shape_);
 			}
-		}
-
-		if (m_is_window_test_is_open_)
-		{
-			tmp_ressource ? 
-				tmp_ressource->getShape().setPosition(particle->get_renderer_transform().getPosition()) : 
-				m_base_shape_.setPosition(particle->get_renderer_transform().getPosition());
-
-			tmp_ressource ? 
-				tmp_ressource->getShape().setRotation(particle->get_renderer_transform().getRotation()) : 
-				m_base_shape_.setRotation(particle->get_renderer_transform().getRotation());
-
-			if (Tools::Collisions::rect_rect(
-				{
-					m_renderer_.get_view().getCenter() - m_renderer_.get_view().getSize() / 2.f,
-					m_renderer_.get_view().getSize()
-				},
-				{
-					particle->get_renderer_transform().getPosition() - particle->get_transform().getOrigin(),
-					tmp_ressource ? m_texture_size_ : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_)
-				}))
-			{
-				tmp_ressource ? m_renderer_.Draw(tmp_ressource->getShape()) : m_renderer_.Draw(m_base_shape_);
-			}
-		}
+		
 	}
 
 	sf::Vector2f Particles::get_extend_spawn_point(sf::Vector2f center_position) const
@@ -804,11 +454,6 @@ namespace lc
 		return {};
 	}
 
-	bool Particles::particles_his_rendered() const
-	{
-		return m_is_particles_rendered_on_the_viewport_ || m_is_window_test_is_open_;
-	}
-
 	void Particles::thread_update()
 	{
 		while (s_number_of_particle_system_)
@@ -822,8 +467,6 @@ namespace lc
 
 				(*particle)->get_transform().getPosition() += (*particle)->get_velocity() * Particles::get_thread_delta_time();
 				(*particle)->get_transform().getRotation() += (*particle)->get_rotation_speed() * Particles::get_thread_delta_time();
-				(*particle)->get_renderer_transform().getPosition() += (*particle)->get_velocity() * Particles::get_thread_delta_time();
-				(*particle)->get_renderer_transform().getRotation() += (*particle)->get_rotation_speed() * Particles::get_thread_delta_time();
 
 				(*particle)->get_despawn_time() += Particles::get_thread_delta_time();
 				if ((*particle)->get_despawn_time() > (*particle)->get_despawn_cooldown() || (*particle)->need_to_be_deleted())

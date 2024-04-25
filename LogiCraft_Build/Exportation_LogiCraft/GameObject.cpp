@@ -38,6 +38,7 @@ SOFTWARE.
 #include "Font.h"
 #include "AI.h"
 #include "Button.h"
+#include "Particule.h"
 
 lc::GameObject::GameObject()
 	: m_name(""), m_depth(0), m_ID(m_generalID++), m_needToBeRemove(false)
@@ -113,8 +114,9 @@ void lc::GameObject::Load(std::ifstream& load)
 		{
 			addComponent(std::make_shared<lc::Button>())->Load(load);
 		}
-		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::PARTICULES_SYSTEM)
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::PARTICULES)
 		{
+			addComponent(std::make_shared<lc::Particles>())->Load(load);
 		}
 		check('}');
 	}
