@@ -472,11 +472,11 @@ void Viewports::ViewportMovement(sf::Vector2f _mousePosition, std::shared_ptr<Vi
 
 		if (MOUSE(Right))
 		{
-			if (Tools::Collisions::point_rect(_mousePosition, sf::FloatRect(_viewport->getPosition(), _viewport->getSize())) && !_viewport->isCameraGrabbed() && !Tools::CameraGrabbed)
+			if (Tools::Collisions::point_rect(_mousePosition, sf::FloatRect(_viewport->getPosition(), _viewport->getSize())) && !_viewport->isCameraGrabbed() && !Tools::camera_grabbed)
 			{
 				if (!Tools::IG::MouseIsOnAboveWindow())
 				{
-					Tools::CameraGrabbed = true;
+					Tools::camera_grabbed = true;
 					_viewport->isCameraGrabbed() = true;
 					_viewport->getLastAddedPosition() = _viewport->getAddedPosition();
 					ImGui::SetWindowFocus();
@@ -489,7 +489,7 @@ void Viewports::ViewportMovement(sf::Vector2f _mousePosition, std::shared_ptr<Vi
 		}
 		else
 		{
-			Tools::CameraGrabbed = false;
+			Tools::camera_grabbed = false;
 			_viewport->isCameraGrabbed() = false;
 		}
 	}

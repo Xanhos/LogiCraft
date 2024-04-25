@@ -203,9 +203,9 @@ struct ImClickInteractionState
 
     struct
     {
-        int                     StartPinIdx;
+        int                     StartPinIdx = 0;
         ImOptionalIndex         EndPinIdx;
-        ImNodesLinkCreationType Type;
+        ImNodesLinkCreationType Type = 0;
     } LinkCreation;
 
     struct

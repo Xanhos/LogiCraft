@@ -214,6 +214,7 @@ void ToolsBar::ShowHelp()
 	ImGui::End();
 }
 
+//METTRE ANIMATION typename : Animation.
 void ToolsBar::Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _viewports, sf::RenderWindow& _window)
 {
 	std::ofstream save("../Ressources/" + std::string(m_path) + "/save.lcp");
