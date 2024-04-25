@@ -150,6 +150,9 @@
     <ClCompile Include="Animation.cpp">
       <Filter>Fichiers sources\RESSOURCES</Filter>
     </ClCompile>
+    <ClCompile Include="Convex.cpp">
+      <Filter>Fichiers sources\RESSOURCES</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IMGUI\imconfig.h">
@@ -252,6 +255,9 @@
       <Filter>Fichiers d%27en-tête\SOFTWARE UI</Filter>
     </ClInclude>
     <ClInclude Include="Animation.h">
+      <Filter>Fichiers d%27en-tête\RESSOURCES</Filter>
+    </ClInclude>
+    <ClInclude Include="Convex.h">
       <Filter>Fichiers d%27en-tête\RESSOURCES</Filter>
     </ClInclude>
   </ItemGroup>

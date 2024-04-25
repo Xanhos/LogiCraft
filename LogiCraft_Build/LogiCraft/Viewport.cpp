@@ -33,6 +33,7 @@ SOFTWARE.
 ---------------------------------------------------------------------------------*/
 
 #include "Viewport.h"
+#include "Convex.h"
 #include "ToolsBar.h"
 
 Viewport::Viewport() :
@@ -162,7 +163,7 @@ void Viewports::Draw(ObjWeakPtrList& _object, std::shared_ptr<lc::GameObject> _s
 		viewport->getRenderTexture().setView(viewport->getView());
 		viewport->getRenderTexture().draw(viewport->getBackgroundShape());
 		this->DisplayScreenZones(viewport->getRenderTexture());
-		for (int depth = 8; depth >= 0; depth--)
+		for (int depth = ToolsBar::GetLayers().size(); depth >= 0; depth--)
 		{
 			_scene->Draw(viewport->getRenderTexture(), depth);
 		}
@@ -247,6 +248,8 @@ bool& Viewports::isOptionOpen()
 
 void Viewports::UpdateViewports(ObjWeakPtrList& _selectedObject, std::shared_ptr<lc::GameObject> _scene, WindowManager& _window)
 {
+	static std::vector<sf::Vector2f> container;
+	static float timer = 0.f;
 	for (auto& viewport : m_viewports)
 	{
 		m_acutualUpdatedViewport = viewport;
@@ -261,6 +264,21 @@ void Viewports::UpdateViewports(ObjWeakPtrList& _selectedObject, std::shared_ptr
 
 			if (viewport->hasWindowFocus())
 			{
+				// put convexshape, need other method
+				timer += Tools::getDeltaTime();
+				if (KEY(Tab) && MOUSE(Left) && timer > 0.25f)
+				{
+					container.push_back(mousePositionWithView);
+					timer = 0.f;
+				}
+				if (KEY(Space) && timer > 0.5f)
+				{
+					auto convex = lc::Convex(container);
+					auto object = _scene->addObject(convex.getName(), ToolsBar::GetActualLayer().first);
+					object->getTransform().getPosition() = convex.getPosition();
+					object->addComponent<lc::Convex>(convex);
+					timer = 0.f;
+				}
 				m_actualFocusViewport = viewport;
 
 				this->UpdateScreenZones(viewport, _window);
