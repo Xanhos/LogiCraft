@@ -258,6 +258,7 @@ void Viewports::UpdateViewports(ObjWeakPtrList& _selectedObject, std::shared_ptr
 			sf::Vector2f mousePosition(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow())));
 			sf::Vector2f mousePositionWithView(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow()), viewport->getView()));
 
+
 			if (viewport->hasWindowFocus())
 			{
 				m_actualFocusViewport = viewport;
