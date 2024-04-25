@@ -95,13 +95,15 @@ namespace lc
 
 		virtual sf::RectangleShape& getShape() override;
 
+		std::shared_ptr<lc::Texture> get_texture() const;
+
 		void select_animation_key(const std::string& name, const bool reset_last_anim_key = false);
 
 		void current_animation_is_paused(const bool paused = true);
 
 		void current_animation_is_reversed(const bool reversed = true);
 
-		void save_animation_file() const;
+		void save_animation_file(const bool open_file_browser = true, std::string path = "") const;
 	private:
 		void texture_to_search();
 

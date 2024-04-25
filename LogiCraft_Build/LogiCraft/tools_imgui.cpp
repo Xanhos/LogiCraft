@@ -246,3 +246,36 @@ std::string Tools::replaceSpace(std::string string, bool spaceOrUnderscore)
 	}
 	return string;
 }
+
+void Tools::remove_extention(std::string& string, const std::string& extention_name)
+{
+	const auto tmp_off((string.find_last_of("." + extention_name)));
+	if (tmp_off != std::string::npos)
+		if (string.begin() + static_cast<int>(tmp_off) + 1 == string.end())
+			string = string.substr(0, tmp_off - 4);
+}
+
+std::string Tools::split_path_and_file_name(std::string& path_with_file_name)
+{
+	std::string tmp_file_name(path_with_file_name);
+
+	const int tmp_off(static_cast<int>(path_with_file_name.find_last_of('\\')) + 1);
+
+	path_with_file_name = path_with_file_name.substr(0, tmp_off);
+	return tmp_file_name = tmp_file_name.substr(tmp_off);
+}
+
+std::ostream& operator<<(std::ostream& os, const sf::Color& color)
+{
+	return os << static_cast<int>(color.r) << " " << static_cast<int>(color.g) << " "
+			  << static_cast<int>(color.b) << " " << static_cast<int>(color.a);
+}
+
+std::istream& operator>>(std::istream& is, sf::Color& color)
+{
+	int tmp_tab[4]{ 0, 0, 0, 0 };
+	is >> tmp_tab[0] >> tmp_tab[1] >> tmp_tab[2] >> tmp_tab[3];
+	color = sf::Color(static_cast<sf::Uint8>(tmp_tab[0]), static_cast<sf::Uint8>(tmp_tab[1]),
+		static_cast<sf::Uint8>(tmp_tab[2]), static_cast<sf::Uint8>(tmp_tab[3]));
+	return is;
+}
