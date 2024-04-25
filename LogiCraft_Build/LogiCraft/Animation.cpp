@@ -164,6 +164,7 @@ namespace lc
 			 << " " << m_typeName
 			 << " " << m_name
 			 << " " << (m_texture_.expired() ? static_cast<std::string>("No_Texture") : m_texture_.lock()->getName())
+			 << " " << (m_actual_animation_key_.expired() ? "No_Actual_Key" : m_actual_animation_key_.lock()->get_name())
 			 << " " << static_cast<int>(m_animation_keys_.size()) << '\n';
 
 		for (const auto& animation_key_pair : m_animation_keys_)
@@ -174,7 +175,7 @@ namespace lc
 				 << " " << tmp_animation_key->get_base_int_rect()
 				 << " " << tmp_animation_key->get_max_frame()
 				 << " " << tmp_animation_key->get_frame_time()
-				 << " " << tmp_animation_key->get_total_frame() << '\n';
+				 << " " << tmp_animation_key->get_total_frame() <<'\n';
 		}
 	}
 
@@ -182,10 +183,12 @@ namespace lc
 	{
 		int tmp_animation_key_cout(0);
 		std::string tmp_texture_name;
+		std::string tmp_actual_key_name;
 
 		load >> m_typeName
 			 >> m_name
 			 >> tmp_texture_name
+			 >> tmp_actual_key_name
 			 >> tmp_animation_key_cout;
 
 		std::shared_ptr<AnimationKey> tmp_animation_key;
@@ -200,6 +203,10 @@ namespace lc
 				 >> tmp_animation_key->get_total_frame();
 
 			tmp_animation_key->create_frames_rect();
+
+			if (tmp_actual_key_name != "No_Actual_Key")
+				if (tmp_animation_key->get_name() == tmp_actual_key_name)
+					m_actual_animation_key_ = tmp_animation_key;
 
 			m_animation_keys_.emplace(tmp_animation_key->get_name(), tmp_animation_key);
 		}

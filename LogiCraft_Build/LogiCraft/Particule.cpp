@@ -198,8 +198,8 @@ namespace lc
 		  m_is_window_test_is_open_(false),
 		  ressource_to_search_(std::make_pair(false, ""))
 	{
-		m_name = "Particles System";
-		m_typeName = "Particles System";
+		m_name = "Particles";
+		m_typeName = "Particles";
 		m_type = TYPE::PARTICULES;
 		m_particles_type_ = type;
 
@@ -565,7 +565,7 @@ namespace lc
 			 >> m_has_gravity_
 			 >> tmp_textureName;
 
-		if (tmp_textureName != "No_Texture")
+		if (tmp_textureName != "No_Ressource")
 			ressource_to_search_ = std::make_pair(true, tmp_textureName);
 		
 		m_particles_type_ = static_cast<ParticlesSystemType>(tmp_ParticlesSystemType);
