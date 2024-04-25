@@ -152,8 +152,8 @@ namespace lc
 		  m_is_window_test_is_open_(false),
 		  ressource_to_search_(std::make_pair(false, ""))
 	{
-		m_name = "Particles System";
-		m_typeName = "Particles System";
+		m_name = "Particles";
+		m_typeName = "Particles";
 		m_type = TYPE::PARTICULES;
 
 		m_particles_type_ = ParticlesSystemType::NORMAL;

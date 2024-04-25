@@ -247,10 +247,8 @@ namespace lc
 				if (ImGui::Button("Open Animation Window Test"))
 					m_window_his_open_ = true;
 
-				if (ImGui::Button("Save Animation As A .anim"))
-				{
+				if (ImGui::Button("Save Animation As A .anim") && !m_texture_.expired())
 					this->save_animation_file();
-				}
 
 				ImGui::InputText("Animation Name", m_name, 80);
 
@@ -442,19 +440,20 @@ namespace lc
 		m_animation_is_reversed_ = reversed;
 	}
 
-	void Animation::save_animation_file()
+	void Animation::save_animation_file() const
 	{
 		std::string tmp_path;
 		Tools::IG::SaveRessourcesFromFile(tmp_path, "anim");
 		if (!tmp_path.empty())
 		{
-			std::string tmp_file_name;
+			std::string tmp_file_name(tmp_path);
 
 			//This is to separate the path and name of the file.
 			{
-				const int tmp_off(static_cast<int>(tmp_path.find_last_of("\\")) + 1);
-				std::copy(std::next(tmp_path.begin(), tmp_off), tmp_path.end(), std::back_inserter(tmp_file_name));
-				tmp_path.erase(std::next(tmp_path.begin(), tmp_off), tmp_path.end());
+				const int tmp_off(static_cast<int>(tmp_path.find_last_of('\\')) + 1);
+
+				tmp_path = tmp_path.substr(0, tmp_off);
+				tmp_file_name = tmp_file_name.substr(tmp_off);
 			}
 
 			//This is to erase the .anim if is in the tmp_file_name.
@@ -462,11 +461,14 @@ namespace lc
 				const auto tmp_off((tmp_file_name.find_last_of(".anim")));
 				if (tmp_off != std::string::npos)
 					if (tmp_file_name.begin() + static_cast<int>(tmp_off) + 1 == tmp_file_name.end())
-						tmp_file_name.erase(std::next(tmp_file_name.begin(), static_cast<int>(tmp_off) - 4), tmp_file_name.end());
+						tmp_file_name = tmp_file_name.substr(0, tmp_off - 4);
 			}
 
+			if (!fs::exists(tmp_path + tmp_file_name))
+				fs::create_directory(tmp_path + tmp_file_name);
+
 			//Then we write every information in the .anim file.
-			std::ofstream tmp_save_animation(tmp_path + tmp_file_name + ".anim", std::ios::out);
+			std::ofstream tmp_save_animation(tmp_path + '\\' + tmp_file_name + '\\' + tmp_file_name + ".anim", std::ios::out);
 			{
 				tmp_save_animation << m_name << '\n';
 				tmp_save_animation << m_texture_.lock()->getName() << '\n';
@@ -483,7 +485,7 @@ namespace lc
 			tmp_save_animation.close();
 
 			//And the image is register.
-			m_texture_.lock()->getTexture().copyToImage().saveToFile(tmp_path + tmp_file_name + ".png");
+			m_texture_.lock()->getTexture().copyToImage().saveToFile(tmp_path + '\\' + tmp_file_name + '\\' + tmp_file_name + ".png");
 		}
 	}
 

@@ -101,7 +101,7 @@ namespace lc
 
 		void current_animation_is_reversed(const bool reversed = true);
 
-		void save_animation_file();
+		void save_animation_file() const;
 	private:
 		void texture_to_search();
 
