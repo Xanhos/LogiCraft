@@ -64,7 +64,7 @@ namespace lc
 		virtual void Draw(sf::RenderTexture& _window) = 0;
 		virtual std::shared_ptr<lc::GameComponent> Clone() = 0;
 
-		sf::RectangleShape& getShape() { return m_renderer; };
+		virtual sf::RectangleShape& getShape() { return m_renderer; };
 		std::string& getName() { return m_name; };
 		bool& isUsedByAComponent() { return m_isUsedByAComponent; }
 

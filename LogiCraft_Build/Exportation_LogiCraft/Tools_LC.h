@@ -57,3 +57,28 @@ namespace Tools
 	//Remplace les _ par des espaces si le bool vaut 0 sinon fait l'inverse
 	std::string replaceSpace(std::string string, bool spaceOrUnderscore = false);
 }
+
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const sf::Vector2<T>& vec)
+{
+	return os << vec.x << " " << vec.y;
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const sf::Rect<T>& rect)
+{
+	return os << rect.left << " " << rect.top << " " << rect.width << " " << rect.height;
+}
+
+template<typename T>
+std::istream& operator>>(std::istream& is, sf::Vector2<T>& vec)
+{
+	return is >> vec.x >> vec.y;
+}
+
+template<typename T>
+std::istream& operator>>(std::istream& is, sf::Rect<T>& rect)
+{
+	return is >> rect.left >> rect.top >> rect.width >> rect.height;
+}

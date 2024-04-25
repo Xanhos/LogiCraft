@@ -179,6 +179,26 @@ namespace lc
 		}
 	}
 
+	void Animation::Export(std::ofstream& exportation)
+	{
+		exportation << static_cast<int>(m_type)
+			 << " " << m_name
+			 << " " << (m_texture_.expired() ? static_cast<std::string>("No_Texture") : m_texture_.lock()->getName())
+			 << " " << (m_actual_animation_key_.expired() ? "No_Actual_Key" : m_actual_animation_key_.lock()->get_name())
+			 << " " << static_cast<int>(m_animation_keys_.size()) << '\n';
+
+		for (const auto& animation_key_pair : m_animation_keys_)
+		{
+			const auto tmp_animation_key = animation_key_pair.second;
+
+			exportation << tmp_animation_key->get_name()
+				 << " " << tmp_animation_key->get_base_int_rect()
+				 << " " << tmp_animation_key->get_max_frame()
+				 << " " << tmp_animation_key->get_frame_time()
+				 << " " << tmp_animation_key->get_total_frame() <<'\n';
+		}
+	}
+
 	void Animation::Load(std::ifstream& load)
 	{
 		int tmp_animation_key_cout(0);

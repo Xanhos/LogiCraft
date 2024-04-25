@@ -37,6 +37,7 @@ SOFTWARE.
 #include "RigidBody.h"
 #include "Font.h"
 #include "AI.h"
+#include "Animation.h"
 #include "Button.h"
 #include "Particule.h"
 
@@ -117,6 +118,10 @@ void lc::GameObject::Load(std::ifstream& load)
 		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::PARTICULES)
 		{
 			addComponent(std::make_shared<lc::Particles>())->Load(load);
+		}		
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::ANIMATION)
+		{
+			addComponent(std::make_shared<lc::Animation>())->Load(load);
 		}
 		check('}');
 	}

@@ -34,6 +34,8 @@ SOFTWARE.
 
 #include "Particule.h"
 
+#include "Animation.h"
+
 namespace lc
 {
 	std::list<std::shared_ptr<Particle>> Particles::s_thread_particles_;
@@ -303,12 +305,12 @@ namespace lc
 			for (auto& component : getParent()->getComponents())
 			{
 				std::shared_ptr<lc::Ressource> tmp_ressource(std::dynamic_pointer_cast<lc::Texture>(component));
-				/*if (!tmp_ressource)
-					tmp_ressource = std::dynamic_pointer_cast<lc::Animation>(component);*/
+				if (!tmp_ressource)
+					tmp_ressource = std::dynamic_pointer_cast<lc::Animation>(component);
 
 				if (tmp_ressource)
 				{
-					if (ressource_to_search_.second + ".png" == tmp_ressource->getName())
+					if (ressource_to_search_.second == fs::path(tmp_ressource->getName()).filename().stem().string())
 					{
 						m_particles_ressource_ = tmp_ressource;
 						tmp_ressource->isUsedByAComponent() = true;

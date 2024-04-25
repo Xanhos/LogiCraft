@@ -190,7 +190,7 @@ namespace lc
 		{
 			auto toLower = [](std::string str)->std::string {std::transform(str.begin(), str.end(), str.begin(), tolower); return str; };
 			for (auto& component : m_components)
-				if (toLower(component->getName()) == toLower(_name))
+				if (toLower(component->getName()) == toLower(_name) or toLower(component->getTypeName()) == toLower(_name))
 					return true;
 
 			return false;

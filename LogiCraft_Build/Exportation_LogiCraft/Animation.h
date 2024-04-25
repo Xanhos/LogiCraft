@@ -86,13 +86,9 @@ namespace lc
 		virtual void Draw(WindowManager& window) override;
 		virtual void Draw(sf::RenderTexture& window) override;
 
-		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int depth) override;
-		virtual void SaveRenderer(sf::RenderTexture& texture, int depth) override {}
-		void Export(std::ofstream& exportation) override;
 		virtual void Load(std::ifstream& load) override;
 
 		virtual std::shared_ptr<lc::GameComponent> Clone() override;
-		virtual void setHierarchieFunc() override;
 
 		virtual sf::RectangleShape& getShape() override;
 
@@ -104,7 +100,6 @@ namespace lc
 	private:
 		void texture_to_search();
 
-		void update_renderer_window();
 	private:
 		int m_base_total_frame_;
 		float m_base_frame_time_;
@@ -112,11 +107,9 @@ namespace lc
 		sf::IntRect m_base_int_rect_;
 		sf::Vector2i m_base_max_frame_;
 
-		bool m_window_his_open_;
 		bool m_animation_is_paused_;
 		bool m_animation_is_reversed_;
 
-		Tools::Renderer m_renderer_;
 
 		std::weak_ptr<lc::Texture> m_texture_;
 
