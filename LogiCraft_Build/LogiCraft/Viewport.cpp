@@ -152,9 +152,6 @@ void Viewports::Update(ObjWeakPtrList& _selectedObject, std::shared_ptr<lc::Game
 
 void Viewports::Draw(ObjWeakPtrList& _object, std::shared_ptr<lc::GameObject> _scene, WindowManager& _window)
 {
-	/*static std::vector<sf::Vector2f> container;
-	static float timer = 0.f;
-	static sf::ConvexShape test;*/
 	for (auto& viewport : m_viewports)
 	{
 		m_acutualUpdatedViewport = viewport;
@@ -191,24 +188,6 @@ void Viewports::Draw(ObjWeakPtrList& _object, std::shared_ptr<lc::GameObject> _s
 		(viewport->getPosition().x + 1.f) / static_cast<float>(_window.getSize().x), (viewport->getPosition().y + 20.f) / static_cast<float>(_window.getSize().y),
 		(viewport->getSize().x + 10.f) / static_cast<float>(_window.getSize().x), (viewport->getSize().y + 10.f) / static_cast<float>(_window.getSize().y) });
 	}
-	/*timer += Tools::getDeltaTime();
-	if (KEY(Tab) && MOUSE(Left) && timer > 0.5f)
-	{
-		container.push_back(_window.getMousePos<sf::Vector2f>());
-		timer = 0.f;
-	}
-	if (KEY(Space) && timer > 0.5f)
-	{
-		test.setPointCount(container.size());
-		for (size_t i = 0; i < container.size(); i++)
-		{
-			test.setPoint(i, container[i]);
-		}
-		container.clear();
-		test.setFillColor(sf::Color::Red);
-		timer = 0.f;
-	}
-	_window.draw(test);*/
 }
 
 void Viewports::addViewport(std::shared_ptr<Viewport> _viewport)
