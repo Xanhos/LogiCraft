@@ -2725,6 +2725,15 @@ bool ImGui::DragInt2(const char* label, int v[2], float v_speed, int v_min, int 
     return DragScalarN(label, ImGuiDataType_S32, v, 2, v_speed, &v_min, &v_max, format, flags);
 }
 
+IMGUI_API bool ImGui::DragInt2(const char* label, sf::Vector2i& _vecI, float v_speed, int v_min, int v_max, const char* format, ImGuiSliderFlags flags)
+{
+    int v[2]{ _vecI.x, _vecI.y };
+    bool tmp_valueModified(DragScalarN(label, ImGuiDataType_S32, v, 2, v_speed, &v_min, &v_max, format, flags));
+    _vecI = { v[0], v[1] };
+
+    return tmp_valueModified;
+}
+
 bool ImGui::DragInt3(const char* label, int v[3], float v_speed, int v_min, int v_max, const char* format, ImGuiSliderFlags flags)
 {
     return DragScalarN(label, ImGuiDataType_S32, v, 3, v_speed, &v_min, &v_max, format, flags);
@@ -2733,6 +2742,15 @@ bool ImGui::DragInt3(const char* label, int v[3], float v_speed, int v_min, int 
 bool ImGui::DragInt4(const char* label, int v[4], float v_speed, int v_min, int v_max, const char* format, ImGuiSliderFlags flags)
 {
     return DragScalarN(label, ImGuiDataType_S32, v, 4, v_speed, &v_min, &v_max, format, flags);
+}
+
+bool ImGui::DragInt4(const char* label, sf::IntRect& _rect, float v_speed, int v_min, int v_max, const char* format, ImGuiSliderFlags flags)
+{
+    int v[4]{ _rect.left, _rect.top, _rect.width, _rect.height };
+    bool tmp_valueModified(DragScalarN(label, ImGuiDataType_S32, v, 4, v_speed, &v_min, &v_max, format, flags));
+    _rect = { v[0], v[1], v[2], v[3] };
+
+    return tmp_valueModified;
 }
 
 // NB: You likely want to specify the ImGuiSliderFlags_AlwaysClamp when using this.

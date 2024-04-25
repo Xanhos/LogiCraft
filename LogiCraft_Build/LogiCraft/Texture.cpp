@@ -116,7 +116,6 @@ lc::Texture::~Texture()
 
 void lc::Texture::Save(std::ofstream& save, sf::RenderTexture& texture, int _depth)
 {
-	//if (!getParent()->getIsSaved())
 	{
 		save << static_cast<int>(m_type)
 			<< " " << Tools::replaceSpace(m_typeName, true)

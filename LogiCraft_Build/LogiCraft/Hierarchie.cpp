@@ -38,6 +38,7 @@ SOFTWARE.
 #include "Particule.h"
 #include "Button.h"
 #include "Texture.h"
+#include "Animation.h"
 
 Hierarchie::Hierarchie()
 	: m_hasMoveAnObject(false), m_wantToCreateAGameObject(false), m_copyPasteTimer(0.f)
@@ -77,9 +78,13 @@ ObjWeakPtrList& Hierarchie::getSelectedGameObject()
 
 void Hierarchie::GameObjectsDisplay(std::shared_ptr<lc::GameObject> _gameObject, std::shared_ptr<lc::GameObject> _scene, std::list<std::shared_ptr<lc::GameObject>>* _gameObjectList)
 {
-	if (ImGui::TreeNodeEx(std::string(_gameObject->getName() + " <ID:" + std::to_string(_gameObject->getID()) + ">").c_str(),
-		ImGuiTreeNodeFlags_Selected | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap,
-		_gameObject->getName().c_str()))
+	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_Selected;
+	_gameObject->getObjects().size() == 0 ? flags |= ImGuiTreeNodeFlags_Leaf : flags |= (ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick);
+
+	std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&](std::weak_ptr<lc::GameObject>& obj) {return _gameObject == obj.lock(); })
+		!= m_selectedGameObjects.end() ? ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.25882f, 0.5882f, 1.f, 1.f)) : ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1215f, 0.22352f, 0.3450f, 1.f));
+
+	if (ImGui::TreeNodeEx(std::string(_gameObject->getName() + "##<ID:" + std::to_string(_gameObject->getID()) + ">").c_str(), flags))
 	{
 		this->SelectionBehavior(_gameObject);
 
@@ -94,7 +99,6 @@ void Hierarchie::GameObjectsDisplay(std::shared_ptr<lc::GameObject> _gameObject,
 			if (m_hasMoveAnObject)
 				break;
 		}
-
 		ImGui::TreePop();
 	}
 	else
@@ -105,7 +109,7 @@ void Hierarchie::GameObjectsDisplay(std::shared_ptr<lc::GameObject> _gameObject,
 
 		this->MoveDownUpBehavior(_gameObject, _gameObjectList);
 	}
-
+	ImGui::PopStyleColor();
 	if (_gameObject->getName() == "")
 		_gameObject->getName() = "No_Name";
 	else
@@ -148,6 +152,37 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
 
 				ImGui::InputText("Change Name", tmp_object->getName(), 150, ImGuiInputTextFlags_EnterReturnsTrue);
 
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
+
+				if (ImGui::Button("Add Button"))
+				{
+					bool isButton = false;
+					for (auto& components : tmp_object->getComponents())
+					{
+						if (components->getTypeName() == "Button")
+						{
+							isButton = true;
+						}
+					}
+					if (!isButton)
+						tmp_object->addComponent<lc::Button>();
+				}
+
+				if (ImGui::Button("Add Particules System"))
+					tmp_object->addComponent<lc::Particles>();
+
+				if (ImGui::Button("Add Animation"))
+					tmp_object->addComponent<lc::Animation>();
+
+				if (ImGui::Button("Add RigidBody"))
+					tmp_object->addComponent<lc::RigidBody>();
+
+				if (tmp_object->hasComponent("RigidBody") and !tmp_object->hasComponent("AI"))
+					if (ImGui::Button("Add AI"))
+						tmp_object->addComponent<lc::AI>();
+
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
+
 				if (ImGui::TreeNodeEx(std::string("Transform##" + std::to_string(tmp_object->getID())).c_str(),
 					ImGuiTreeNodeFlags_Selected | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth))
 				{
@@ -175,33 +210,6 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
 						tmp_object->getTransform().getRotation() = 0.f;
 
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-
-					if(!tmp_object->hasComponent("RigidBody"))
-						if (ImGui::Button("Add RigidBody"))
-							tmp_object->addComponent<lc::RigidBody>();
-
-					if (ImGui::Button("Add Button"))
-					{
-						bool isButton = false;
-						for (auto& components : tmp_object->getComponents())
-						{
-							if (components->getTypeName() == "Button")
-							{
-								isButton = true;
-							}
-						}
-						if (!isButton)
-							tmp_object->addComponent<lc::Button>();
-					}
-
-					if (ImGui::Button("Add Particules System"))
-						tmp_object->addComponent<lc::Particules>();
-
-					if (tmp_object->hasComponent("RigidBody") and !tmp_object->hasComponent("AI"))
-						if (ImGui::Button("Add AI"))
-							tmp_object->addComponent<lc::AI>();
-					
-					
 
 					ImGui::TreePop();
 				}
@@ -322,8 +330,6 @@ void Hierarchie::VerifyThePasteObject(std::shared_ptr<lc::GameObject>& _object)
 		this->VerifyThePasteObject(child);
 	}
 }
-
-
 
 void Hierarchie::MoveDownUpBehavior(std::shared_ptr<lc::GameObject> _gameObject, ObjSharedPtrList* _gameObjectList)
 {

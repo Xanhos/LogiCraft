@@ -34,6 +34,8 @@ SOFTWARE.
 
 #pragma once
 #include "SFML_ENGINE/Tools.h"
+#include "SFML_ENGINE/WindowManager.h"
+
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "imgui-SFML.h"
@@ -76,9 +78,65 @@ typedef std::list<std::shared_ptr<lc::GameObject>> ObjSharedPtrList;
 typedef std::list<std::weak_ptr<lc::GameComponent>> CompWeakPtrList;
 typedef std::list<std::shared_ptr<lc::GameComponent>> CompSharedPtrList;
 
+typedef std::pair<bool, std::string> RessourceToSearch;
+
 namespace Tools
 {
-	extern bool CameraGrabbed;
+	extern bool camera_grabbed;
+
+	class Renderer
+	{
+	public:
+		Renderer();
+		~Renderer();
+
+		void UpdateZoom(const sf::Event& _event);
+
+		void Update();
+
+		void Clear();
+
+		void Draw(const sf::Drawable& drawable, const sf::RenderStates& states = sf::RenderStates::Default);
+
+		void Draw(const sf::Vertex* vertices, std::size_t vertexCount,
+			sf::PrimitiveType type, const sf::RenderStates& states = sf::RenderStates::Default);
+
+		void Draw(const sf::VertexBuffer& vertexBuffer, const sf::RenderStates& states = sf::RenderStates::Default);
+
+		void Draw(const sf::VertexBuffer& vertexBuffer, std::size_t firstVertex, 
+			std::size_t vertexCount, const sf::RenderStates& states = sf::RenderStates::Default);
+
+		void Display();
+
+	public:
+		std::shared_ptr<sf::RenderTexture>& get_render_texture();
+
+		sf::Vector2f& get_added_position();
+		sf::Vector2f& get_last_added_position();
+		sf::Vector2f& get_size();
+
+		sf::View& get_view();
+
+		bool& his_focus();
+		bool& his_grabbed();
+
+		float& get_zoom();
+	private:
+		void UpdateResize();
+
+		void UpdateMovement();
+	private:
+		std::shared_ptr<sf::RenderTexture> m_renderer_;
+		sf::Vector2f m_renderer_added_position_;
+		sf::Vector2f m_renderer_last_added_position_;
+		sf::Vector2f m_renderer_size_;
+		sf::View m_renderer_view_;
+
+		bool m_renderer_is_focus_;
+		bool m_renderer_is_grabbed_;
+
+		float m_renderer_zoom_;
+	};
 
 	namespace IG
 	{
@@ -131,3 +189,26 @@ namespace Tools
 	std::string replaceSpace(std::string string, bool spaceOrUnderscore = 0);
 }
 
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const sf::Vector2<T>& vec)
+{
+	return os << vec.x << " " << vec.y;
+}
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const sf::Rect<T>& rect)
+{
+	return os << rect.left << " " << rect.top << " " << rect.width << " " << rect.height;
+}
+
+template<typename T>
+std::istream& operator>>(std::istream& is, sf::Vector2<T>& vec)
+{
+	return is >> vec.x >> vec.y;
+}
+
+template<typename T>
+std::istream& operator>>(std::istream& is, sf::Rect<T>& rect)
+{
+	return is >> rect.left >> rect.top >> rect.width >> rect.height;
+}

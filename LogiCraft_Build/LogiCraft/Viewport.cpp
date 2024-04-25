@@ -33,6 +33,7 @@ SOFTWARE.
 ---------------------------------------------------------------------------------*/
 
 #include "Viewport.h"
+#include "ToolsBar.h"
 
 Viewport::Viewport() :
 	m_name(""), //STRING
@@ -123,7 +124,7 @@ void Viewports::UpdateEvent(sf::Event& _event)
 {
 	for (auto& viewport : m_viewports)
 	{
-		if (viewport->hasWindowFocus() && !viewport->isZoomLocked())
+		if (viewport->hasWindowFocus() && !viewport->isZoomLocked() && viewport->isInWindow(ImGui::GetMousePos()))
 		{
 			if (_event.type == sf::Event::MouseWheelScrolled)
 			{
@@ -256,6 +257,7 @@ void Viewports::UpdateViewports(ObjWeakPtrList& _selectedObject, std::shared_ptr
 			viewport->hasWindowFocus() = ImGui::IsWindowFocused();
 			sf::Vector2f mousePosition(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow())));
 			sf::Vector2f mousePositionWithView(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow()), viewport->getView()));
+
 
 			if (viewport->hasWindowFocus())
 			{
@@ -470,11 +472,11 @@ void Viewports::ViewportMovement(sf::Vector2f _mousePosition, std::shared_ptr<Vi
 
 		if (MOUSE(Right))
 		{
-			if (Tools::Collisions::point_rect(_mousePosition, sf::FloatRect(_viewport->getPosition(), _viewport->getSize())) && !_viewport->isCameraGrabbed() && !Tools::CameraGrabbed)
+			if (Tools::Collisions::point_rect(_mousePosition, sf::FloatRect(_viewport->getPosition(), _viewport->getSize())) && !_viewport->isCameraGrabbed() && !Tools::camera_grabbed)
 			{
 				if (!Tools::IG::MouseIsOnAboveWindow())
 				{
-					Tools::CameraGrabbed = true;
+					Tools::camera_grabbed = true;
 					_viewport->isCameraGrabbed() = true;
 					_viewport->getLastAddedPosition() = _viewport->getAddedPosition();
 					ImGui::SetWindowFocus();
@@ -487,7 +489,7 @@ void Viewports::ViewportMovement(sf::Vector2f _mousePosition, std::shared_ptr<Vi
 		}
 		else
 		{
-			Tools::CameraGrabbed = false;
+			Tools::camera_grabbed = false;
 			_viewport->isCameraGrabbed() = false;
 		}
 	}
@@ -515,7 +517,18 @@ void Viewports::ResizeSelectionBoxBehavior(sf::Vector2f _mousePositionWithView, 
 				for (auto& selectedObject : _selectedObject)
 					if (!selectedObject.expired())
 						if (!selectedObject.lock()->isLock())
-							selectedObject.lock()->getTransform().getPosition() = _mousePositionWithView + selectedObject.lock()->getTransform().getDistance();
+						{
+							if (ToolsBar::GetActualLayer().second == "Player Plan" && selectedObject.lock()->getDepth() == 4)
+							{
+								selectedObject.lock()->getTransform().getPosition() = 
+									sf::Vector2f((int)(_mousePositionWithView.x + selectedObject.lock()->getTransform().getDistance().x) / 120 * 120,
+										(int)(_mousePositionWithView.y + selectedObject.lock()->getTransform().getDistance().y) / 120 * 120);
+							}
+							else
+							{
+								selectedObject.lock()->getTransform().getPosition() = _mousePositionWithView + selectedObject.lock()->getTransform().getDistance();
+							}
+						}
 			}
 
 			m_maxSelectedObjectPosition = sf::Vector2f(INFINITY, INFINITY);
@@ -568,7 +581,7 @@ bool Viewports::CheckSelection(ObjWeakPtrList& _object, std::shared_ptr<lc::Game
 {
 	if (std::find_if(_scene->getObjects().begin(), _scene->getObjects().end(), [this, &_window, &_object, &_viewport, _mousePosition](std::shared_ptr<lc::GameObject> _sceneObject)
 		{
-			if (Tools::Collisions::point_rect(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow()), _viewport->getView()), { _sceneObject->getTransform().getPosition(), _sceneObject->getTransform().getSize() }))
+			if (Tools::Collisions::point_rect(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow()), _viewport->getView()), { _sceneObject->getTransform().getPosition(), _sceneObject->getTransform().getSize() }) && _sceneObject->getDepth() == ToolsBar::GetActualLayer().first)
 			{
 				if (!KEY(LControl))
 					_object.clear();

@@ -44,7 +44,7 @@ namespace lc
 		Font(std::string name, std::string path, std::string newRepo = "");
 		Font(std::string name, std::string path, int character_size, int outline_thickness, std::string sentence, sf::Color insideColor, sf::Color outlineColor, sf::Vector2f _relative); // load constructor
 		Font(const Font& font);
-		~Font();
+		virtual ~Font() override;
 		sf::Font& getFont() { return m_font; }
 		std::string getFontName() { return m_fontName; }
 		std::string getFontPath() { return m_fontPath; }

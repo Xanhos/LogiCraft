@@ -53,7 +53,7 @@ namespace lc
 	public:
 		Event();
 		Event(std::string name, short function);
-		~Event();
+		virtual ~Event();
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth);
 		void Export(std::ofstream& exportation) override;
@@ -69,7 +69,6 @@ namespace lc
 		* @brief Open a window to set event's interaction.
 		*/
 		void setHierarchieFunc();
-		std::vector<std::string> setContainer(std::shared_ptr<lc::GameObject> _scene);
 		void setCondition();
 	};
 }

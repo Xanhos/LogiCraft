@@ -46,7 +46,7 @@ namespace lc
 		Button();
 		Button(std::string _name, sf::Vector2f _position, sf::Vector2f _scale);
 		Button(std::string _name, sf::Vector2f _relative, short _function); // load constructor
-		~Button();
+		virtual ~Button();
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) override;
 		void SaveRenderer(sf::RenderTexture& texture, int _depth) override {};

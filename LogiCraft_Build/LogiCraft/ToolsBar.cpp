@@ -36,7 +36,7 @@ SOFTWARE.
 
 #include "ToolsBar.h"
 
-Layers ToolsBar::s_layers = { {8, "BackGround 7"},{7,"BackGround 6"},{ 6, "BackGround 5"},{5, "BackGround 4"},{4, "BackGround 3"},{ 3, "BackGround 2"},{2, "BackGround 1"},{1, "Player Plan"},{0, "Front Plan"} };
+Layers ToolsBar::s_layers = { {11, "BackGround 7"},{10,"BackGround 6"},{ 9, "BackGround 5"},{8, "BackGround 4"},{7, "BackGround 3"},{ 6, "BackGround 2"},{5, "BackGround 1"},{4, "Player Plan"},{3, "Front Plan 4"}, {2, "Front Plan 3"}, {1, "Front Plan 2"}, {0, "Front Plan 1"} };
 Layer ToolsBar::s_actualLayer = *ToolsBar::s_layers.begin();
 
 ToolsBar::ToolsBar()
@@ -209,10 +209,12 @@ void ToolsBar::ShowHelp()
 	ImGui::BulletText("LControl + Left Click on multiple objects => Multiple Selection.");
 	ImGui::BulletText("LControl + C => Copy all selected objects.");
 	ImGui::BulletText("LControl + V => Paste all selected objects.");
+	ImGui::BulletText("LShift + Left Click => Select object and all his child in hierarchy.");
 
 	ImGui::End();
 }
 
+//METTRE ANIMATION typename : Animation.
 void ToolsBar::Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _viewports, sf::RenderWindow& _window)
 {
 	Tools::s_filePool.clear();
@@ -228,7 +230,7 @@ void ToolsBar::Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _v
 		if (screen.isUsed())
 		{
 			render_texture.setView(sf::View(sf::Vector2f(screenSize.x / 2.f + (screenSize.x * screen.getScreenIndex().x), screenSize.y / 2.f + (screenSize.y * screen.getScreenIndex().y)), sf::Vector2f(screenSize.x, screenSize.y)));
-			for (int depth = 0; depth <= 8; depth++)
+			for (int depth = 0; depth <= s_layers.size(); depth++)
 			{
 				render_texture.clear(sf::Color::Transparent);
 				_game_object->SaveRenderer(render_texture, depth);
