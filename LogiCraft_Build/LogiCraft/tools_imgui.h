@@ -152,6 +152,8 @@ namespace Tools
 
 		void LoadRessourcesFromFile(std::string& path, const char* filter = "All\0*.*\0Text\0*.TXT\0");
 
+		void SaveRessourcesFromFile(std::string& path, const char* filter = "All\0*.*\0Text\0*.TXT\0");
+
 		bool MouseIsOnAboveWindow(ImGuiWindow* _window = ImGui::GetCurrentWindow());
 	}
 

@@ -155,12 +155,20 @@ void Tools::Renderer::UpdateMovement()
 void Tools::IG::LoadRessourcesFromFile(std::string& path, const char* filter)
 {
 	{
-		nfdchar_t* outPath = NULL;
-		nfdresult_t result = NFD_OpenDialog(filter, NULL, &outPath);
+		nfdchar_t* outPath = nullptr;
+		nfdresult_t result = NFD_OpenDialog(filter, nullptr, &outPath);
 		path = "";
 		if(outPath)
 			path = std::string(outPath);
 	}
+}
+
+void Tools::IG::SaveRessourcesFromFile(std::string& path, const char* filter)
+{
+	nfdchar_t* outPath = nullptr;
+	nfdresult_t result = NFD_SaveDialog(filter, nullptr, &outPath);
+	if (outPath)
+		path = std::string(outPath);
 }
 
 bool Tools::IG::MouseIsOnAboveWindow(ImGuiWindow* _window)

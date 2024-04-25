@@ -247,6 +247,11 @@ namespace lc
 				if (ImGui::Button("Open Animation Window Test"))
 					m_window_his_open_ = true;
 
+				if (ImGui::Button("Save Animation As A .anim"))
+				{
+					this->save_animation_file();
+				}
+
 				ImGui::InputText("Animation Name", m_name, 80);
 
 				if (m_name.empty())
@@ -435,6 +440,51 @@ namespace lc
 	void Animation::current_animation_is_reversed(const bool reversed)
 	{
 		m_animation_is_reversed_ = reversed;
+	}
+
+	void Animation::save_animation_file()
+	{
+		std::string tmp_path;
+		Tools::IG::SaveRessourcesFromFile(tmp_path, "anim");
+		if (!tmp_path.empty())
+		{
+			std::string tmp_file_name;
+
+			//This is to separate the path and name of the file.
+			{
+				const int tmp_off(static_cast<int>(tmp_path.find_last_of("\\")) + 1);
+				std::copy(std::next(tmp_path.begin(), tmp_off), tmp_path.end(), std::back_inserter(tmp_file_name));
+				tmp_path.erase(std::next(tmp_path.begin(), tmp_off), tmp_path.end());
+			}
+
+			//This is to erase the .anim if is in the tmp_file_name.
+			{
+				const auto tmp_off((tmp_file_name.find_last_of(".anim")));
+				if (tmp_off != std::string::npos)
+					if (tmp_file_name.begin() + static_cast<int>(tmp_off) + 1 == tmp_file_name.end())
+						tmp_file_name.erase(std::next(tmp_file_name.begin(), static_cast<int>(tmp_off) - 4), tmp_file_name.end());
+			}
+
+			//Then we write every information in the .anim file.
+			std::ofstream tmp_save_animation(tmp_path + tmp_file_name + ".anim", std::ios::out);
+			{
+				tmp_save_animation << m_name << '\n';
+				tmp_save_animation << m_texture_.lock()->getName() << '\n';
+				tmp_save_animation << static_cast<int>(m_animation_keys_.size()) << '\n';
+				for (const auto& animation_key_pair : m_animation_keys_)
+				{
+					tmp_save_animation << animation_key_pair.second->get_name() << '\n';
+					tmp_save_animation << animation_key_pair.second->get_base_int_rect() << '\n';
+					tmp_save_animation << animation_key_pair.second->get_max_frame() << '\n';
+					tmp_save_animation << animation_key_pair.second->get_frame_time() << '\n';
+					tmp_save_animation << animation_key_pair.second->get_total_frame() << '\n';
+				}
+			}
+			tmp_save_animation.close();
+
+			//And the image is register.
+			m_texture_.lock()->getTexture().copyToImage().saveToFile(tmp_path + tmp_file_name + ".png");
+		}
 	}
 
 	void Animation::texture_to_search()

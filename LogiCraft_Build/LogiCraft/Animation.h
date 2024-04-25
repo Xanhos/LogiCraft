@@ -100,6 +100,8 @@ namespace lc
 		void current_animation_is_paused(const bool paused = true);
 
 		void current_animation_is_reversed(const bool reversed = true);
+
+		void save_animation_file();
 	private:
 		void texture_to_search();
 
