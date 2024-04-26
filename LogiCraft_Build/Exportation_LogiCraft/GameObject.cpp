@@ -157,8 +157,6 @@ std::shared_ptr<lc::GameObject> lc::GameObject::LoadScene(std::string _SceneToLo
 	auto world = CreateGameObject("WORLD");
 	FileReader file(_SceneToLoad + "/export.lcg");
 
-	world->Load(file);
-	auto bg = world->addObject("BackGround"); //Just for test and seperate bg from the rest of the scene, NEED TO CHANGE AFTER
 	for (auto& dir_entry : fs::directory_iterator(_SceneToLoad))
 	{
 		if (dir_entry.path().extension() == ".png")
@@ -170,10 +168,11 @@ std::shared_ptr<lc::GameObject> lc::GameObject::LoadScene(std::string _SceneToLo
 			sf::Vector2f position(0,0);
 			iss >> pos_bg_x >> pos_bg_y >> garbage >> garbage >> depth;
 			position = sf::Vector2f(static_cast<float>(0 + (screenResolution.x * pos_bg_x)), static_cast<float>(0 + (screenResolution.y * pos_bg_y)));
-			bg->addObject("BACKGROUND",static_cast<unsigned char>(depth))->addComponent(std::make_shared<Texture>(dir_entry.path().filename().string(), dir_entry.path().string()))->setRelativePosition(position);
+			world->addObject("BACKGROUND",static_cast<unsigned char>(depth))->addComponent(std::make_shared<Texture>(dir_entry.path().filename().string(), dir_entry.path().string()))->setRelativePosition(position);
 		}
 	}
-
+	world->Load(file);
+	world->ClearGarbargeObjects();
 	return world;
 }
 
@@ -266,4 +265,9 @@ void lc::GameObject::Draw(sf::RenderTexture& _renderer, unsigned char _depth)
 	for (auto& component : m_components)
 		if (m_depth == _depth)
 			component->Draw(_renderer);
+}
+
+void lc::GameObject::ClearGarbargeObjects()
+{
+	m_objects.remove_if([](std::shared_ptr<lc::GameObject> object) {return object->m_components.empty(); });
 }

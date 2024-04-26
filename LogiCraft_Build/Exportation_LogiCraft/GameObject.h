@@ -61,6 +61,8 @@ namespace lc
 		virtual void Draw(WindowManager& _window);
 		virtual void Draw(sf::RenderTexture& _renderer);
 		virtual void Draw(sf::RenderTexture& _renderer, unsigned char _depth);
+
+		void ClearGarbargeObjects();
 #pragma region STATIC
 		/*
 		* @brief A function to create a GameObject.

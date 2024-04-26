@@ -163,7 +163,7 @@ void lc::Texture::Export(std::ofstream& exportation)
 		<< " " << m_relativePosition.y << std::endl;
 
 	if (const auto tmp = dynamic_cast<FileWriter*>(&exportation))
-		Tools::copyFile(m_texturePath, tmp->getPath().parent_path().string() + "/Ressources/" + m_textureName);
+		Tools::copyFile(m_texturePath, tmp->getPath().parent_path().string() + "/Ressources/" + Tools::replaceSpace(m_textureName, true));
 }
 
 void lc::Texture::UpdateEvent(sf::Event& _window)

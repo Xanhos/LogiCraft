@@ -87,6 +87,7 @@ void lc::Button::Update(WindowManager& _window)
     {
         if(MOUSE(Left))
         {
+            if(s_function_pool_[m_function])
         	s_function_pool_[m_function]();
 		}
 

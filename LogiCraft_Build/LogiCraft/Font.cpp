@@ -206,7 +206,7 @@ void lc::Font::Export(std::ofstream& exportation)
 		<< " " << m_relativePosition.y << std::endl;
 	
 	if (const auto tmp = dynamic_cast<FileWriter*>(&exportation))
-		Tools::copyFile(m_fontPath, tmp->getPath().parent_path().string() + "/Ressources/" + m_fontName);
+		Tools::copyFile(m_fontPath, tmp->getPath().parent_path().string() + "/Ressources/" + Tools::replaceSpace(m_fontName, true));
 }
 
 void lc::Font::Load(std::ifstream& load)

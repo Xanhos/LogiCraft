@@ -46,7 +46,7 @@ void BrowserContent::Update(std::shared_ptr<lc::GameObject> _object, WindowManag
 	ImGui::SetWindowSize(ImVec2(1920.f, 500.f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowPos(ImVec2(0.f, 580.f), ImGuiCond_FirstUseEver);
 	ImVec2 vec = ImVec2(75.f, 17.5f);
-	if(m_selectedFolder.empty())
+	if(!m_selectedFolder.empty())
 	{
 		if (ImGui::Button("New", ImVec2(40, 20)) and ImGui::IsWindowFocused()) m_creatingNewRessources = true;
 		SameLine(0, 10.f);
