@@ -45,15 +45,15 @@ SOFTWARE.
 
 
 lc::GameObject::GameObject()
-	: m_name(""), m_depth(0), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true)
+	: m_name(""), m_depth(0), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
 {}
 
 lc::GameObject::GameObject(std::string _name)
-	: m_name(""), m_depth(0), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true)
+	: m_name(""), m_depth(0), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
 {}
 
 lc::GameObject::GameObject(std::string _name, unsigned char _depth)
-	: m_name(_name), m_depth(_depth), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true)
+	: m_name(_name), m_depth(_depth), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
 {}
 
 lc::GameObject::~GameObject()
@@ -61,37 +61,48 @@ lc::GameObject::~GameObject()
 	m_components.clear();
 }
 
-void lc::GameObject::Save(std::ofstream& save, sf::RenderTexture& texture, int _depth)
+void lc::GameObject::Save(std::ofstream& save, std::ofstream& exportation,sf::RenderTexture& texture, int _depth)
 {
-	save << getName() << 
+	std::ostringstream oss;
+	oss << getName() <<
 		" " << getTransform().getPosition().x << " " << getTransform().getPosition().y << 
 		" " << getTransform().getScale().x << " " << getTransform().getScale().y << 
 		" " << getTransform().getSize().x << " " << getTransform().getSize().y << 
 		" " << getTransform().getRotation() << 
 		" " << getTransform().getOrigin().x << " " << getTransform().getOrigin().y << 
 		" " << static_cast<int>(getDepth()) << std::endl;
-	save << "Components" << std::endl << "{";
+	oss << "Components" << std::endl << "{";
+	save << oss.str();
+	exportation << oss.str();
 	for (auto& component : getComponents())
 	{
 		save << std::endl;
+		exportation << std::endl;
 		component->Save(save, texture, _depth);
+		if(getNeedToBeExported())
+			component->Export(exportation);
 	}
+	exportation << std::endl << "}" << std::endl;
 	save << std::endl << "}" << std::endl;
+	exportation << "Objects" << std::endl << "{";
 	save << "Objects" << std::endl << "{";
 	for (auto& object : getObjects())
 	{
 		save << std::endl;
-		object->Save(save, texture, _depth);
+		exportation << std::endl;
+		object->Save(save, exportation, texture, _depth);
 	}
 	save << std::endl << "}" << std::endl;
+	exportation << std::endl << "}" << std::endl;
 }
 
 void lc::GameObject::SaveRenderer(sf::RenderTexture& texture, int _depth)
 {
-	for (auto& components : m_components)
-	{
-		components->SaveRenderer(texture, _depth);
-	}
+	if(!getNeedToBeExported())
+		for (auto& components : m_components)
+		{
+				components->SaveRenderer(texture, _depth);
+		}
 	for (auto& objects : m_objects)
 	{
 		if (objects->getDepth() == _depth)
@@ -135,59 +146,40 @@ void lc::GameObject::Load(std::ifstream& load)
 		{
 
 		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::TEXTURE)
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::TEXTURE)
 		{
-			auto texture = std::make_shared<Texture>();
-			texture->Load(load);
-			addComponent(texture);
+			addComponent(std::make_shared<Texture>())->Load(load);
 		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::FONT)
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::FONT)
 		{
-			auto font = std::make_shared<Font>();
-			font->Load(load);
-			addComponent(font);
+			addComponent(std::make_shared<Font>())->Load(load);
 		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::IA)
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::IA)
 		{
-			auto ai = std::make_shared<AI>();
-			ai->Load(load);
-			addComponent(ai);
+			addComponent(std::make_shared<AI>())->Load(load);
 		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::RIGIDBODY)
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::RIGIDBODY)
 		{
-			auto rigidBody = std::make_shared<RigidBody>();
-			rigidBody->Load(load);
-			addComponent(rigidBody);
+			addComponent(std::make_shared<RigidBody>())->Load(load);
 		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::EVENT)
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::EVENT)
 		{
-			auto event = std::make_shared<Event>();
-			event->Load(load);
-			addComponent(event);
+			addComponent(std::make_shared<Event>())->Load(load);
 		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::BUTTON)
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::BUTTON)
 		{
-			auto button = std::make_shared<Button>();
-			button->Load(load);
-			addComponent(button);
+			addComponent(std::make_shared<lc::Button>())->Load(load);
 		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::PARTICULES)
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::PARTICULES)
 		{
-			auto particulesSystem = std::make_shared<lc::Particles>();
-			particulesSystem->Load(load);
-			addComponent(particulesSystem);
+			addComponent(std::make_shared<lc::Particles>())->Load(load);
 		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::CONVEX)
-		{
-			auto convex = std::make_shared<Convex>();
-			convex->Load(load);
-			addComponent(convex);
-		}
-		else if ((Ressource::TYPE)type == Ressource::TYPE::ANIMATION)
-		{
-			auto tmp_animation = std::make_shared<lc::Animation>();
-			tmp_animation->Load(load);
-			addComponent(tmp_animation);
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::ANIMATION)
+			addComponent(std::make_shared<lc::Animation>())->Load(load);
+
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::CONVEX)
+		{			
+			addComponent(std::make_shared<lc::Convex>())->Load(load);
 		}
 		check('}');
 	}
@@ -207,6 +199,49 @@ void lc::GameObject::Load(std::ifstream& load)
 
 
 }
+
+std::shared_ptr<lc::GameObject> lc::GameObject::GetRoot(std::shared_ptr<GameObject> object)
+{
+	while (object->getParent())
+		object = object->getParent();
+	return object;
+}
+
+void lc::GameObject::NeedToBeExported(std::list<std::string> ComponentToCheck)
+{
+	if(!m_needToBeExported)
+		for (auto& i : ComponentToCheck)
+		{
+			if (hasComponent(i))
+			{
+				if(i == "Event")
+				{
+					auto event = std::dynamic_pointer_cast<lc::Event>(getComponent<lc::Event>(i));
+					event->GetObjectAffiliated().first.lock()->m_needToBeExported = true;
+					event->GetObjectAffiliated().second.lock()->m_needToBeExported = true;
+				}
+
+				m_needToBeExported = true;
+				break;
+			}
+		}
+
+	for (auto& object : m_objects)
+	{
+		object->NeedToBeExported(ComponentToCheck);
+	}
+}
+
+void lc::GameObject::ResetExport()
+{
+	m_needToBeExported = false;
+	for (auto& object : m_objects)
+	{
+		object->ResetExport();
+	}
+}
+
+
 
 
 std::shared_ptr<lc::GameObject> lc::GameObject::CreateGameObject(std::string _name, unsigned char _depth)

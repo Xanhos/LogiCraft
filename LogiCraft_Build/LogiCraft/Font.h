@@ -52,6 +52,7 @@ namespace lc
 
 		virtual void setHierarchieFunc();
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) override;
+		virtual void Export(std::ofstream& exportation) override;
 		virtual void Load(std::ifstream& load) override;
 	private:
 		virtual void UpdateEvent(sf::Event& _window) override;
@@ -59,6 +60,8 @@ namespace lc
 		virtual void Draw(WindowManager& _window) override;
 		virtual void Draw(sf::RenderTexture& _window) override;
 		virtual std::shared_ptr<lc::GameComponent> Clone() override;
+
+		void UpdateText();
 
 		std::string m_fontName;
 		sf::Font m_font;

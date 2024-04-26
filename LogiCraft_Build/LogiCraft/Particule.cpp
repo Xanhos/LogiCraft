@@ -536,6 +536,35 @@ namespace lc
 			 << " " << (!m_particles_ressource_.expired() ? m_particles_ressource_.lock()->getName() : std::string("No_Ressource"));
 	}
 
+	void Particles::Export(std::ofstream& exportation)
+	{
+		exportation << static_cast<int>(m_type)
+			<< " " << static_cast<int>(m_particles_type_)
+			<< " " << static_cast<int>(m_spawn_color_.r)
+			<< " " << static_cast<int>(m_spawn_color_.g)
+			<< " " << static_cast<int>(m_spawn_color_.b)
+			<< " " << static_cast<int>(m_spawn_color_.a)
+			<< " " << m_texture_size_.x
+			<< " " << m_texture_size_.y
+			<< " " << m_particles_origin_.x
+			<< " " << m_particles_origin_.y
+			<< " " << m_spawn_point_extend_size_
+			<< " " << m_spawn_cooldown_
+			<< " " << m_despawn_cooldown_
+			<< " " << m_rotation_speed_
+			<< " " << m_spawn_rotation_
+			<< " " << m_spawn_spread_
+			<< " " << m_spawn_angle_
+			<< " " << m_spawn_speed_
+			<< " " << m_base_shape_radius_
+			<< " " << m_life_time_time_
+			<< " " << m_gravity_force_
+			<< " " << m_base_shape_point_count_
+			<< " " << m_spawn_count_
+			<< " " << m_has_gravity_
+			<< " " << (!m_particles_ressource_.expired() ? m_particles_ressource_.lock()->getName() : std::string("No_Ressource"));
+	}
+
 	void Particles::Load(std::ifstream& load)
 	{
 		int tmp_ParticlesSystemType(0);

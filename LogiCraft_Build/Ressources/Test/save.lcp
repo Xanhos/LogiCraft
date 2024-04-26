@@ -1,0 +1,78 @@
+WORLD 0 0 1 1 0 0 0 0 0 0
+Components
+{
+}
+Objects
+{
+200x200D 107.461 88.1912 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+200x200 749.697 101.985 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+Event 479.472 135.284 1 1 0 0 0 0 0 0
+Components
+{
+8 Event 1 0 200x200D 200x200D
+
+}
+Objects
+{
+}
+
+Starborn 449.665 422.787 1 1 301 38 0 0 0 0
+Components
+{
+3 Text ../ASSETS\Starborn.ttf 40 0 FullScreen 255 255 255 255 0 0 0 255 0 0
+
+2 Button 9
+}
+Objects
+{
+}
+
+L3 -52.7087 580.452 1 1 3840 2160 0 0 0 0
+Components
+{
+0 Texture 0 0 3840 2160 ../ASSETS\BG\L3.png 0 0
+
+7 RigidBody -52.7087 580.452 3840 2160 0 0 0 0 0 RigidBody
+
+}
+Objects
+{
+}
+
+200x2002ezgtr 1491.97 71.5187 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\BG\200x2002ezgtr.png 0 0
+
+7 RigidBody 1491.97 71.5187 200 200 0 0 0 0 1 RigidBody
+
+1 IA
+0 2
+8 0
+13 0 0.2
+
+
+}
+Objects
+{
+}
+
+}

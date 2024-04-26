@@ -46,7 +46,7 @@ void BrowserContent::Update(std::shared_ptr<lc::GameObject> _object, WindowManag
 	ImGui::SetWindowSize(ImVec2(1920.f, 500.f), ImGuiCond_FirstUseEver);
 	ImGui::SetWindowPos(ImVec2(0.f, 580.f), ImGuiCond_FirstUseEver);
 	ImVec2 vec = ImVec2(75.f, 17.5f);
-	if(m_selectedFolder != "")
+	if(m_selectedFolder.empty())
 	{
 		if (ImGui::Button("New", ImVec2(40, 20)) and ImGui::IsWindowFocused()) m_creatingNewRessources = true;
 		SameLine(0, 10.f);
@@ -97,7 +97,7 @@ void BrowserContent::Update(std::shared_ptr<lc::GameObject> _object, WindowManag
 			ImGui::SameLine();
 			ImGui::BeginChild("Content window", ImVec2(0, 0), 1);
 			ImGui::BeginGroup();
-			if(m_selectedFolder != "")
+			if(!m_selectedFolder.empty())
 			{
 				const std::filesystem::path path{ m_selectedFolder };
 				ImVec2 button_sz(BUTTON_SIZE, BUTTON_SIZE);
@@ -106,6 +106,7 @@ void BrowserContent::Update(std::shared_ptr<lc::GameObject> _object, WindowManag
 				//m_display.initialPosition = { ImGui::GetWindowPos().x + ImGui::GetCursorPos().x,  ImGui::GetWindowPos().y + ImGui::GetCursorPos().y };
 				//m_display.size = button_sz;
 				//m_display.spacing = { 7.5f, style.ItemSpacing.y };
+
 				for (auto const& dir_entry : m_mainFolder.getFolder(m_selectedFolder).getFolderRessources())
 				{
 					if (m_sortedRessources == dir_entry->m_type or m_sortedRessources == lc::Ressource::TYPE::NONE)
@@ -162,7 +163,7 @@ void BrowserContent::Update(std::shared_ptr<lc::GameObject> _object, WindowManag
 
 void BrowserContent::Draw(std::shared_ptr<lc::GameObject> _object, WindowManager& _window, Viewports& _viewport)
 {
-	if (m_selectedFolder != "")
+	if (!m_selectedFolder.empty())
 	{
 		if (m_slidingRessources)
 		{
@@ -221,7 +222,7 @@ void BrowserContent::CreateTexture()
 			auto t = sf::Texture();
 			t.loadFromFile(m_selectedRessources);
 			m_newTextureRect = sf::IntRect(0, 0, t.getSize().x, t.getSize().y);
-			m_RessourceName = std::filesystem::path(m_selectedRessources).filename().stem().string().c_str();
+			m_RessourceName = std::filesystem::path(m_selectedRessources).filename().stem().string();
 		}
 		ImGui::InputText("Texture Name", m_RessourceName, 100);
 		ImGui::InputInt4("Texture Rect", m_newTextureRect);
@@ -245,7 +246,7 @@ void BrowserContent::CreateFont()
 		if (Button("Load Font"))
 		{
 			Tools::IG::LoadRessourcesFromFile(m_selectedRessources, "ttf,otf");
-			m_RessourceName=  std::filesystem::path(m_selectedRessources).filename().stem().string().c_str();
+			m_RessourceName=  std::filesystem::path(m_selectedRessources).filename().stem().string();
 		}
 		ImGui::InputText("Font Name", m_RessourceName, 100);
 		if (ImGui::Button("Create") and m_RessourceName[0] != '\0' and m_selectedRessources[0] != '\0')

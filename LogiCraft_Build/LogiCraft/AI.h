@@ -48,6 +48,7 @@ namespace lc
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) override;
 		void SaveRenderer(sf::RenderTexture& texture, int _depth) override {};
 		virtual void Load(std::ifstream& load) override;
+		void Export(std::ofstream& exportation) override;
 	private:
 		std::string m_aiName;
 		PatronNode m_root;

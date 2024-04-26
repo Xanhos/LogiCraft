@@ -40,6 +40,7 @@ const float g = 400.f;
 lc::RigidBody::RigidBody()
 {
 	m_name = "RigidBody";
+	m_type = TYPE::RIGIDBODY;
 	m_typeName = "RigidBody";
 }
 
@@ -53,6 +54,7 @@ lc::RigidBody::RigidBody(sf::FloatRect _collider, sf::Vector2f _velocity, sf::Ve
 	m_posBeforeSimulate = posBeforeSimulate;
 	m_showCollider = showCollide;
 	m_isKinetic = kinetic;
+	m_type = TYPE::RIGIDBODY;
 }
 
 lc::RigidBody::~RigidBody()
@@ -64,7 +66,7 @@ void lc::RigidBody::Save(std::ofstream& save, sf::RenderTexture& texture, int _d
 	// texture.draw(m_renderer);
 	if (!getParent()->getIsSaved())
 	{
-		save << 7
+		save << (int)m_type
 			<< " " << Tools::replaceSpace(m_typeName, true)
 			<< " " << m_collider.left
 			<< " " << m_collider.top
@@ -74,9 +76,21 @@ void lc::RigidBody::Save(std::ofstream& save, sf::RenderTexture& texture, int _d
 			<< " " << m_velocity.y
 			<< " " << m_relativePosition.x
 			<< " " << m_relativePosition.y
-			<< " " << static_cast<int>(m_isKinetic)
+			<< " " << m_isKinetic
 			<< " " << Tools::replaceSpace(m_name, true) << std::endl;
 	}
+}
+
+void lc::RigidBody::Export(std::ofstream& exportation)
+{
+	exportation << (int)m_type
+		<< " " << m_collider.left
+		<< " " << m_collider.top
+		<< " " << m_collider.width
+		<< " " << m_collider.height
+		<< " " << m_relativePosition.x
+		<< " " << m_relativePosition.y
+		<< " " << m_isKinetic << std::endl;
 }
 
 void lc::RigidBody::Load(std::ifstream& load)
@@ -127,13 +141,16 @@ void lc::RigidBody::Update(WindowManager& _window)
 	}
 	else m_velocity = { 0.f,0.f };
 
-	if (m_isKinetic and m_simulate)
+	if (m_isKinetic)
 		if (getParent())
 		{
 			getParent()->getTransform().getPosition() += m_velocity * Tools::getDeltaTime();
-			m_collider.left = getParent()->getTransform().getPosition().x;
-			m_collider.top = getParent()->getTransform().getPosition().y;
 		}
+	if (getParent())
+	{
+		m_collider.left = getParent()->getTransform().getPosition().x + m_relativePosition.x;
+		m_collider.top = getParent()->getTransform().getPosition().y + m_relativePosition.y;
+	}
 }
 
 void lc::RigidBody::Draw(WindowManager& _window)

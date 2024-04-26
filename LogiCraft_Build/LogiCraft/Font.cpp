@@ -140,30 +140,24 @@ void lc::Font::setHierarchieFunc()
 	m_hierarchieInformation = [&] {
 		if (ImGui::InputTextMultiline("Texte", m_sentence, 300))
 		{
-			sf::RenderTexture rt;
-			sf::Text text(m_sentence, m_font, static_cast<unsigned>(m_characterSize));
-			text.setFillColor(m_insideColor);
-			text.setOutlineColor(m_outLineColor);
-			text.setOutlineThickness(static_cast<float>(m_outlineThickness));
-			text.setOrigin(text.getGlobalBounds().getSize() / 2.f);
-			auto t = sf::Vector2f(text.getGlobalBounds().getSize().x, text.getGlobalBounds().getSize().y + text.getFont()->getLineSpacing(m_characterSize));
-			rt.create(static_cast<unsigned>(t.x), static_cast<unsigned>(t.y));
-			text.setPosition(t / 2.f);
-			rt.clear(sf::Color(0, 0, 0, 0));
-			rt.draw(text);
-			rt.display();
-			m_rendererTexture = rt.getTexture();
-			m_renderer.setTexture(&m_rendererTexture, true);
-			m_renderer.setSize(text.getGlobalBounds().getSize() + sf::Vector2f(text.getLetterSpacing(), text.getLineSpacing()));
+			UpdateText();
 		}
-		ImGui::InputInt("Character size", &m_characterSize);
-		if (m_characterSize <= 0)
-			m_characterSize = 1;
-		ImGui::ColorEdit4("Text Color", m_insideColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_InputRGB);
+		if(ImGui::InputInt("Character size", &m_characterSize))
+		{
+			if (m_characterSize <= 0)
+				m_characterSize = 1;
+			UpdateText();
+		}
+		if(ImGui::ColorEdit4("Text Color", m_insideColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_InputRGB))
+			UpdateText();
 
-		ImGui::InputInt("Outline Thickness", &m_outlineThickness);
-		ImGui::ColorEdit4("Outline Color", m_outLineColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_InputRGB);
-		ImGui::DragFloat2("Relative position", m_relativePosition, 1.0f, 0.0f, 0.0f, "%.2f");
+		if(ImGui::InputInt("Outline Thickness", &m_outlineThickness))
+			UpdateText();
+		if(ImGui::ColorEdit4("Outline Color", m_outLineColor, ImGuiColorEditFlags_AlphaBar | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_InputRGB))
+			UpdateText();
+		if(ImGui::DragFloat2("Relative position", m_relativePosition, 1.0f, 0.0f, 0.0f, "%.2f"))
+			UpdateText();
+
 		};
 }
 
@@ -193,6 +187,28 @@ void lc::Font::Save(std::ofstream& save, sf::RenderTexture& texture, int _depth)
 	}
 }
 
+void lc::Font::Export(std::ofstream& exportation)
+{
+	exportation << static_cast<int>(m_type)
+		<< " " << Tools::replaceSpace(m_fontName, true)
+		<< " " << m_characterSize
+		<< " " << m_outlineThickness
+		<< " " << Tools::replaceSpace(m_sentence, true)
+		<< " " << static_cast<int>(m_insideColor.r)
+		<< " " << static_cast<int>(m_insideColor.g)
+		<< " " << static_cast<int>(m_insideColor.b)
+		<< " " << static_cast<int>(m_insideColor.a)
+		<< " " << static_cast<int>(m_outLineColor.r)
+		<< " " << static_cast<int>(m_outLineColor.g)
+		<< " " << static_cast<int>(m_outLineColor.b)
+		<< " " << static_cast<int>(m_outLineColor.a)
+		<< " " << m_relativePosition.x
+		<< " " << m_relativePosition.y << std::endl;
+	
+	if (const auto tmp = dynamic_cast<FileWriter*>(&exportation))
+		Tools::copyFile(m_fontPath, tmp->getPath().parent_path().string() + "/Ressources/" + m_fontName);
+}
+
 void lc::Font::Load(std::ifstream& load)
 {
 	int tmp[8];
@@ -207,8 +223,10 @@ void lc::Font::Load(std::ifstream& load)
 	std::filesystem::path p = m_fontPath;
 	m_fontName = p.filename().string();
 	m_name = p.filename().stem().string();
+	Tools::replaceSpace(m_sentence);
 
 	m_font.loadFromFile(m_fontPath);
+	UpdateText();
 
 }
 
@@ -254,4 +272,25 @@ void lc::Font::Draw(sf::RenderTexture& _window)
 std::shared_ptr<lc::GameComponent> lc::Font::Clone()
 {
 	return std::make_shared<lc::Font>(*this);
+}
+
+
+void lc::Font::UpdateText()
+{
+	sf::RenderTexture rt;
+	sf::Text text(m_sentence, m_font, static_cast<unsigned>(m_characterSize));
+	text.setFillColor(m_insideColor);
+	text.setOutlineColor(m_outLineColor);
+	text.setOutlineThickness(static_cast<float>(m_outlineThickness));
+	text.setOrigin(text.getGlobalBounds().getSize() / 2.f);
+	const auto render_texture_size = sf::Vector2f(text.getGlobalBounds().getSize().x, text.getGlobalBounds().getSize().y + text.getFont()->getLineSpacing(m_characterSize));
+	rt.create(static_cast<unsigned>(render_texture_size.x), static_cast<unsigned>(render_texture_size.y));
+	text.setPosition(render_texture_size / 2.f);
+	rt.clear(sf::Color(0, 0, 0, 0));
+	rt.draw(text);
+	rt.display();
+	m_rendererTexture = rt.getTexture();
+	m_renderer.setTexture(&m_rendererTexture, true);
+	m_renderer.setSize(text.getGlobalBounds().getSize() + sf::Vector2f(text.getLetterSpacing(), text.getLineSpacing()));
+	m_renderer.setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
 }

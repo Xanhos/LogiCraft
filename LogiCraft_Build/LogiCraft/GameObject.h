@@ -52,10 +52,12 @@ namespace lc
 		GameObject(std::string _name);
 		~GameObject();
 
-		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth);
+		virtual void Save(std::ofstream& save, std::ofstream& exportation,sf::RenderTexture& texture, int _depth);
 		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth);
 		virtual void Load(std::ifstream& load);
 		
+		void NeedToBeExported(std::list<std::string> ComponentToCheck);
+		void ResetExport();
 
 		virtual void UpdateEvent(sf::Event& _event);
 		virtual void Update(WindowManager& _window);
@@ -71,6 +73,8 @@ namespace lc
 		* @return Return the shared_ptr of the GameObject.
 		*/
 		static std::shared_ptr<GameObject> CreateGameObject(std::string _name, unsigned char _depth = 0);
+
+		static std::shared_ptr<GameObject> GetRoot(std::shared_ptr<GameObject> object);
 #pragma endregion
 
 #pragma region TEMPLATE
@@ -187,8 +191,24 @@ namespace lc
 		*/
 		bool hasComponent(std::string _name)
 		{
+			auto toLower = [](std::string str)->std::string {std::transform(str.begin(), str.end(), str.begin(), tolower); return str; };
 			for (auto& component : m_components)
-				if (component->getName() == _name)
+				if (toLower(component->getName()) == toLower(_name) or toLower(component->getTypeName()) == toLower(_name))
+					return true;
+
+			return false;
+		}
+
+		/*
+		* @brief Just a function to return if the object has the wanted Object.
+		*
+		* @return return true if Object exist.
+		*/
+		bool hasObject(std::string _name)
+		{
+			auto toLower = [](std::string str)->std::string {std::transform(str.begin(), str.end(), str.begin(), tolower); return str; };
+			for (auto& object : m_objects)
+				if (toLower(object->getName()) == toLower(_name))
 					return true;
 
 			return false;
@@ -318,6 +338,7 @@ namespace lc
 		static unsigned int& getGeneralID() { return m_generalID; }
 		void CheckMaxSize();
 
+		bool& getNeedToBeExported() { return m_needToBeExported; }
 #pragma endregion
 	private:
 
@@ -331,6 +352,7 @@ namespace lc
 		bool m_isLock;
 		bool m_isVisible;
 		bool m_Saved = false;
+		bool m_needToBeExported;
 		
 		std::list<std::shared_ptr<GameComponent>> m_components;
 		std::list<std::shared_ptr<GameObject>> m_objects;

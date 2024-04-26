@@ -109,6 +109,7 @@ namespace lc
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int depth) override;
 		virtual void SaveRenderer(sf::RenderTexture& texture, int depth) override {};
+		void Export(std::ofstream& exportation) override;
 		virtual void Load(std::ifstream& load) override;
 
 		void save_animation_file(const bool open_file_browser = true, std::string path = "") const;

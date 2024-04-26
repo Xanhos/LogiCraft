@@ -46,10 +46,25 @@ SOFTWARE.
 #include <commdlg.h>
 #include <mutex>
 #include <sstream>
+#include <fstream>
 
 #undef CreateWindow
 
 using namespace ImGui;
+namespace fs = std::filesystem;
+
+
+class FileWriter : public std::ofstream
+{
+	fs::path m_path;
+
+public:
+	FileWriter(fs::path path);
+
+	fs::path getPath() const;
+};
+
+
 
 namespace lc
 {
@@ -156,6 +171,13 @@ namespace Tools
 
 		bool MouseIsOnAboveWindow(ImGuiWindow* _window = ImGui::GetCurrentWindow());
 	}
+
+
+
+	bool sameFile(const std::string& sourceFile, const std::string& destFile);
+	void copyFile(const fs::path& sourceFile, const fs::path& destFile);
+
+	static std::list<std::string> s_filePool;
 
 	namespace Collisions
 	{

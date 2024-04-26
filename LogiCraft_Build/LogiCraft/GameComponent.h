@@ -145,7 +145,7 @@ namespace lc
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) = 0;
 		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth) = 0;
 		virtual void Load(std::ifstream& load) = 0;
-
+		virtual void Export(std::ofstream& exportation) {};
 		/*
 		*@brief This function is used to set the function that will be called when the component is drawn in the hierarchy.
 		* 

@@ -217,9 +217,12 @@ void ToolsBar::ShowHelp()
 //METTRE ANIMATION typename : Animation.
 void ToolsBar::Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _viewports, sf::RenderWindow& _window)
 {
+	Tools::s_filePool.clear();
 	std::ofstream save("../Ressources/" + std::string(m_path) + "/save.lcp");
+	FileWriter exportation("../Ressources/" + std::string(m_path) + "/export.lcg");
 	sf::RenderTexture render_texture;
-	_game_object->Save(save, render_texture, s_actualLayer.first);
+	_game_object->NeedToBeExported({"AI", "RigidBody", "Particles", "Animation", "Event", "Button"});
+	_game_object->Save(save, exportation, render_texture, s_actualLayer.first);
 
 	render_texture.create(screenSize.x, screenSize.y);
 	for (auto& screen : _viewports.getAllScreenzone())
@@ -238,6 +241,7 @@ void ToolsBar::Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _v
 			}
 		}
 	}
+	_game_object->ResetExport();
 }
 
 void ToolsBar::Exit( WindowManager& _window)

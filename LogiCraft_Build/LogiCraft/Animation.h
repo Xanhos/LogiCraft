@@ -91,6 +91,7 @@ namespace lc
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int depth) override;
 		virtual void SaveRenderer(sf::RenderTexture& texture, int depth) override {}
+		void Export(std::ofstream& exportation) override;
 		virtual void Load(std::ifstream& load) override;
 
 		virtual std::shared_ptr<lc::GameComponent> Clone() override;

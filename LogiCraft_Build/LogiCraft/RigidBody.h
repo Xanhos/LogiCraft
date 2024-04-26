@@ -46,6 +46,7 @@ namespace lc
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) override;
 		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth) override {};
+		virtual void Export(std::ofstream& exportation);
 		virtual void Load(std::ifstream& load) override;
 		
 		virtual void UpdateEvent(sf::Event& _window) override;

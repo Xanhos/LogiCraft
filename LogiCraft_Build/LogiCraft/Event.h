@@ -56,6 +56,7 @@ namespace lc
 		virtual ~Event();
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth);
+		void Export(std::ofstream& exportation) override;
 		void SaveRenderer(sf::RenderTexture& texture, int _depth) override {};
 		virtual void Load(std::ifstream& load);
 
@@ -69,6 +70,8 @@ namespace lc
 		*/
 		void setHierarchieFunc();
 		void setCondition();
+
+		std::pair<std::weak_ptr<lc::GameObject>, std::weak_ptr<lc::GameObject>> GetObjectAffiliated() { return { m_objectA, m_objectB }; }
 	};
 }
 
