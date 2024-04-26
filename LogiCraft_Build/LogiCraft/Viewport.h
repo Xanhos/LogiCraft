@@ -253,6 +253,8 @@ private:
 	* @brief This function resize the selection rect.
 	*/
 	void ResizeRectSelection(ObjWeakPtrList& _object, std::shared_ptr<lc::GameObject> _scene);
+
+	void CreateConvex(std::shared_ptr<lc::GameObject> _scene, sf::Vector2f mousePosition);
 #pragma endregion
 private:
 	std::list<std::shared_ptr<Viewport>> m_viewports;
@@ -266,6 +268,10 @@ private:
 
 	sf::Vector2f m_maxSelectedObjectPosition;
 	sf::Vector2f m_maxSelectedObjectSize;
+
+	std::vector<sf::Vector2f> container;
+	float timer = 0.f;
+	std::vector<sf::RectangleShape> points_convex;
 
 	unsigned int m_actualSelectedObjectNumber;
 
