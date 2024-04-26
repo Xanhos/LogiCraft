@@ -278,6 +278,17 @@ void lc::AI::CopyTreeNode(std::shared_ptr<lc::GameObject> _game_object)
         if (m_copiedNode.second)//if the copied node is not null we proceed to the copy
         {
             m_root = m_copiedNode.second->Clone();
+            std::function<void(PatronNode*)> reparenting = [&](PatronNode* node)
+            {
+            	for (auto& i : node->getChildrens())
+            	{
+                    i->SetParent(node);
+					reparenting(i);
+				}
+			};
+            
+            reparenting(&m_root);
+
 		}
         m_copiedNode = {};
 		m_wantToCopyATreeNode = false;

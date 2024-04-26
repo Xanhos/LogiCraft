@@ -156,6 +156,8 @@ public:
 
 	PatronNode* getParent() { return m_parent; }
 
+	void SetParent(PatronNode* parent) { m_parent = parent; }
+
 	void removeChild(PatronNode* node);
 
 	void removeChild(int node_id);
