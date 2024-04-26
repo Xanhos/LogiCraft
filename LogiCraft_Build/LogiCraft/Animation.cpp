@@ -84,6 +84,33 @@ namespace lc
 		}
 	}
 
+	void AnimationKey::update_animation_key(const std::shared_ptr<lc::Texture>& texture, 
+		const bool& animation_is_paused, const bool& animation_is_reversed, const bool& is_used_by_a_component)
+	{
+		if (!animation_is_paused)
+		{
+			m_frame_timer_ += Tools::getDeltaTime();
+			if (m_frame_timer_ >= m_frame_time_)
+			{
+				animation_is_reversed ? m_actual_frame_-- : m_actual_frame_++;
+
+				if (m_actual_frame_ < 0 && animation_is_reversed)
+					m_actual_frame_ = m_total_frame_ - 1;
+				else if (m_actual_frame_ > m_total_frame_ - 1 && !animation_is_reversed)
+					m_actual_frame_ = 0;
+
+				m_frame_timer_ = 0.f;
+			}
+
+			if (!m_frames_rects_.empty())
+			{
+				texture->getShape().setTextureRect(m_frames_rects_[m_actual_frame_]);
+				if (!is_used_by_a_component)
+					texture->getShape().setSize(sf::Vector2f(m_frames_rects_[m_actual_frame_].getSize()));
+			}
+		}
+	}
+
 	Animation::Animation()
 		: m_base_total_frame_(0), m_base_frame_time_(0.f),
 		m_window_his_open_(false), m_animation_is_paused_(false), m_animation_is_reversed_(false)
@@ -107,21 +134,11 @@ namespace lc
 		this->texture_to_search();
 
 		this->update_renderer_window();
-	}
-
-	void Animation::Draw(WindowManager& window)
-	{
-	}
-
-	void Animation::Draw(sf::RenderTexture& window)
-	{
-		m_renderer_.Clear();
 
 		if (const auto tmp_texture = m_texture_.lock())
-		{
 			if (const auto tmp_animation_key = m_actual_animation_key_.lock())
-			{
-				if (!m_animation_is_paused_)
+				tmp_animation_key->update_animation_key(tmp_texture, m_animation_is_paused_, m_animation_is_reversed_, m_isUsedByAComponent);
+				/*if (!m_animation_is_paused_)
 				{
 					tmp_animation_key->get_frame_timer() += Tools::getDeltaTime();
 					if (tmp_animation_key->get_frame_timer() >= tmp_animation_key->get_frame_time())
@@ -142,22 +159,18 @@ namespace lc
 						if (!m_isUsedByAComponent)
 							tmp_texture->getShape().setSize(sf::Vector2f(tmp_animation_key->get_frames_rects()[tmp_animation_key->get_actual_frame()].getSize()));
 					}
-				}
-			}
+				}*/
+	}
 
-			if (!m_isUsedByAComponent)
-			{
-				tmp_texture->getShape().setOrigin(getParent()->getTransform().getOrigin());
-				tmp_texture->getShape().setScale(getParent()->getTransform().getScale());
-				tmp_texture->getShape().setRotation(getParent()->getTransform().getRotation());
+	void Animation::Draw(WindowManager& window)
+	{
+	}
 
-				tmp_texture->getShape().setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
-				window.draw(tmp_texture->getShape());
-			}
+	void Animation::Draw(sf::RenderTexture& window)
+	{
+		m_renderer_.Clear();
 
-			tmp_texture->getShape().setPosition(m_renderer_.get_size() / 2.f);
-			m_renderer_.Draw(tmp_texture->getShape());
-		}
+		this->draw_animation(window);
 
 		m_renderer_.Display();
 	}
@@ -251,8 +264,9 @@ namespace lc
 				if (ImGui::Button("Open Animation Window Test"))
 					m_window_his_open_ = true;
 
-				if (ImGui::Button("Save Animation As A .anim") && !m_texture_.expired())
-					this->save_animation_file();
+				if (!m_texture_.expired())
+					if (ImGui::Button("Save Animation As A .anim"))
+						this->save_animation_file();
 
 				ImGui::DragFloat2("Relative Position", m_relativePosition);
 
@@ -441,12 +455,12 @@ namespace lc
 		}
 	}
 
-	void Animation::current_animation_is_paused(const bool paused)
+	void Animation::current_animation_is_paused(const bool& paused)
 	{
 		m_animation_is_paused_ = paused;
 	}
 
-	void Animation::current_animation_is_reversed(const bool reversed)
+	void Animation::current_animation_is_reversed(const bool& reversed)
 	{
 		m_animation_is_reversed_ = reversed;
 	}
@@ -498,7 +512,7 @@ namespace lc
 		{
 			for (auto& component : getParent()->getComponents())
 			{
-				if (auto tmp_texture = std::dynamic_pointer_cast<lc::Texture>(component))
+				if (const auto tmp_texture = std::dynamic_pointer_cast<lc::Texture>(component))
 				{
 					if (m_texture_to_search_.second == tmp_texture->getName())
 					{
@@ -522,6 +536,25 @@ namespace lc
 			m_renderer_.Update();
 
 			ImGui::End();
+		}
+	}
+
+	void Animation::draw_animation(sf::RenderTexture& window)
+	{
+		if (const auto tmp_texture = m_texture_.lock())
+		{
+			if (!m_isUsedByAComponent)
+			{
+				tmp_texture->getShape().setOrigin(getParent()->getTransform().getOrigin());
+				tmp_texture->getShape().setScale(getParent()->getTransform().getScale());
+				tmp_texture->getShape().setRotation(getParent()->getTransform().getRotation());
+
+				tmp_texture->getShape().setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
+				window.draw(tmp_texture->getShape());
+			}
+
+			tmp_texture->getShape().setPosition(m_renderer_.get_size() / 2.f);
+			m_renderer_.Draw(tmp_texture->getShape());
 		}
 	}
 }
