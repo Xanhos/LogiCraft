@@ -35,7 +35,6 @@ SOFTWARE.
 #include "Viewport.h"
 #include "Convex.h"
 #include "ToolsBar.h"
-
 Viewport::Viewport() :
 	m_name(""), //STRING
 	m_zoom(1.f), m_movementSpeed(300.f), //FLOAT
@@ -167,6 +166,10 @@ void Viewports::Draw(ObjWeakPtrList& _object, std::shared_ptr<lc::GameObject> _s
 		{
 			_scene->Draw(viewport->getRenderTexture(), depth);
 		}
+		for (auto& it : points_convex)
+		{
+			viewport->getRenderTexture().draw(it);
+		}
 		if (!_object.empty())
 		{
 			//Find if the only selected object is the world then we not display the rect.
@@ -248,8 +251,6 @@ bool& Viewports::isOptionOpen()
 
 void Viewports::UpdateViewports(ObjWeakPtrList& _selectedObject, std::shared_ptr<lc::GameObject> _scene, WindowManager& _window)
 {
-	static std::vector<sf::Vector2f> container;
-	static float timer = 0.f;
 	for (auto& viewport : m_viewports)
 	{
 		m_acutualUpdatedViewport = viewport;
@@ -264,21 +265,8 @@ void Viewports::UpdateViewports(ObjWeakPtrList& _selectedObject, std::shared_ptr
 
 			if (viewport->hasWindowFocus())
 			{
-				// put convexshape, need other method
-				timer += Tools::getDeltaTime();
-				if (KEY(Tab) && MOUSE(Left) && timer > 0.25f)
-				{
-					container.push_back(mousePositionWithView);
-					timer = 0.f;
-				}
-				if (KEY(Space) && timer > 0.5f)
-				{
-					auto convex = lc::Convex(container);
-					auto object = _scene->addObject(convex.getName(), ToolsBar::GetActualLayer().first);
-					object->getTransform().getPosition() = convex.getPosition();
-					object->addComponent<lc::Convex>(convex);
-					timer = 0.f;
-				}
+				this->CreateConvex(_scene, mousePositionWithView);
+				
 				m_actualFocusViewport = viewport;
 
 				this->UpdateScreenZones(viewport, _window);
@@ -665,5 +653,29 @@ void Viewports::ResizeRectSelection(ObjWeakPtrList& _object, std::shared_ptr<lc:
 					m_maxSelectedObjectSize.y = ((selectedObject.lock()->getTransform().getPosition().y - selectedObject.lock()->getTransform().getOrigin().y) + selectedObject.lock()->getTransform().getSize().y) - m_maxSelectedObjectPosition.y;
 			}
 		}
+	}
+}
+
+void Viewports::CreateConvex(std::shared_ptr<lc::GameObject> _scene, sf::Vector2f mousePosition)
+{
+	timer += Tools::getDeltaTime();
+	if (KEY(Tab) && MOUSE(Left) && timer > 0.25f)
+	{
+		container.push_back(mousePosition);
+		sf::RectangleShape tmp({ 12.5f, 12.5f });
+		tmp.setFillColor(sf::Color::Red);
+		tmp.setOrigin(6.25f, 6.25f);
+		tmp.setPosition(mousePosition);
+		points_convex.push_back(tmp);
+		timer = 0.f;
+	}
+	if (KEY(Space) && timer > 0.5f)
+	{
+		points_convex.clear();
+		auto convex = lc::Convex(container);
+		auto object = _scene->addObject(convex.getName(), ToolsBar::GetActualLayer().first);
+		object->getTransform().getPosition() = convex.getPosition();
+		object->addComponent<lc::Convex>(convex);
+		timer = 0.f;
 	}
 }

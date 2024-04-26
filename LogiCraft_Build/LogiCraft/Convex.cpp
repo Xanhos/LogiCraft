@@ -102,12 +102,5 @@ std::shared_ptr<lc::GameComponent> lc::Convex::Clone()
 
 void lc::Convex::setHierarchieFunc()
 {
-	m_hierarchieInformation = [this]()
-		{
-			for (size_t i = 0; i < getConvex().getPointCount(); i++)
-			{
-				ImGui::Text(std::to_string(getConvex().getPoint(i).x).c_str());
-				ImGui::Text(std::to_string(getConvex().getPoint(i).y).c_str());
-			}
-		};
+	
 }
