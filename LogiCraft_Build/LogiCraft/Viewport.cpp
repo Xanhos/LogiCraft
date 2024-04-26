@@ -33,8 +33,8 @@ SOFTWARE.
 ---------------------------------------------------------------------------------*/
 
 #include "Viewport.h"
+#include "Convex.h"
 #include "ToolsBar.h"
-
 Viewport::Viewport() :
 	m_name(""), //STRING
 	m_zoom(1.f), m_movementSpeed(300.f), //FLOAT
@@ -162,9 +162,13 @@ void Viewports::Draw(ObjWeakPtrList& _object, std::shared_ptr<lc::GameObject> _s
 		viewport->getRenderTexture().setView(viewport->getView());
 		viewport->getRenderTexture().draw(viewport->getBackgroundShape());
 		this->DisplayScreenZones(viewport->getRenderTexture());
-		for (int depth = 8; depth >= 0; depth--)
+		for (int depth = ToolsBar::GetLayers().size(); depth >= 0; depth--)
 		{
 			_scene->Draw(viewport->getRenderTexture(), depth);
+		}
+		for (auto& it : points_convex)
+		{
+			viewport->getRenderTexture().draw(it);
 		}
 		if (!_object.empty())
 		{
@@ -261,6 +265,8 @@ void Viewports::UpdateViewports(ObjWeakPtrList& _selectedObject, std::shared_ptr
 
 			if (viewport->hasWindowFocus())
 			{
+				this->CreateConvex(_scene, mousePositionWithView);
+				
 				m_actualFocusViewport = viewport;
 
 				this->UpdateScreenZones(viewport, _window);
@@ -647,5 +653,29 @@ void Viewports::ResizeRectSelection(ObjWeakPtrList& _object, std::shared_ptr<lc:
 					m_maxSelectedObjectSize.y = ((selectedObject.lock()->getTransform().getPosition().y - selectedObject.lock()->getTransform().getOrigin().y) + selectedObject.lock()->getTransform().getSize().y) - m_maxSelectedObjectPosition.y;
 			}
 		}
+	}
+}
+
+void Viewports::CreateConvex(std::shared_ptr<lc::GameObject> _scene, sf::Vector2f mousePosition)
+{
+	timer += Tools::getDeltaTime();
+	if (KEY(Tab) && MOUSE(Left) && timer > 0.25f)
+	{
+		container.push_back(mousePosition);
+		sf::RectangleShape tmp({ 12.5f, 12.5f });
+		tmp.setFillColor(sf::Color::Red);
+		tmp.setOrigin(6.25f, 6.25f);
+		tmp.setPosition(mousePosition);
+		points_convex.push_back(tmp);
+		timer = 0.f;
+	}
+	if (KEY(Space) && timer > 0.5f)
+	{
+		points_convex.clear();
+		auto convex = lc::Convex(container);
+		auto object = _scene->addObject(convex.getName(), ToolsBar::GetActualLayer().first);
+		object->getTransform().getPosition() = convex.getPosition();
+		object->addComponent<lc::Convex>(convex);
+		timer = 0.f;
 	}
 }

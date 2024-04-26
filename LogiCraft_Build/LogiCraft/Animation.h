@@ -59,6 +59,9 @@ namespace lc
 		float& get_frame_time();
 
 		void create_frames_rect();
+
+		void update_animation_key(const std::shared_ptr<lc::Texture>& texture, 
+			const bool& animation_is_paused, const bool& animation_is_reversed, const bool& is_used_by_a_component);
 	private:
 		std::string m_name_;
 
@@ -96,15 +99,21 @@ namespace lc
 
 		virtual sf::RectangleShape& getShape() override;
 
+		std::shared_ptr<lc::Texture> get_texture() const;
+
 		void select_animation_key(const std::string& name, const bool reset_last_anim_key = false);
 
-		void current_animation_is_paused(const bool paused = true);
+		void current_animation_is_paused(const bool& paused = true);
 
-		void current_animation_is_reversed(const bool reversed = true);
+		void current_animation_is_reversed(const bool& reversed = true);
+
+		void save_animation_file(const bool open_file_browser = true, std::string path = "") const;
 	private:
 		void texture_to_search();
 
 		void update_renderer_window();
+
+		void draw_animation(sf::RenderTexture& window);
 	private:
 		int m_base_total_frame_;
 		float m_base_frame_time_;

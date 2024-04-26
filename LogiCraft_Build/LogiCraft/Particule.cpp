@@ -133,7 +133,7 @@ namespace lc
 		: m_spawn_color_(sf::Color::White),
 		  m_spawn_point_extend_size_(0.f),
 		  m_spawn_cooldown_(0.1f),
-		  m_spawn_time_(0.f),
+		  m_spawn_timer_(0.f),
 		  m_despawn_cooldown_(1.f),
 		  m_rotation_speed_(10.f),
 		  m_spawn_rotation_(0.f),
@@ -179,7 +179,7 @@ namespace lc
 		: m_spawn_color_(sf::Color::White),
 		  m_spawn_point_extend_size_(0.f),
 		  m_spawn_cooldown_(0.1f),
-		  m_spawn_time_(0.f),
+		  m_spawn_timer_(0.f),
 		  m_despawn_cooldown_(1.f),
 		  m_rotation_speed_(10.f),
 		  m_spawn_rotation_(0.f),
@@ -312,6 +312,9 @@ namespace lc
 
 			if (ImGui::Button("Open Renderer Window"))
 				m_is_window_test_is_open_ = true;
+
+			if (ImGui::Button("Save Animation As A .ptcl"))
+				this->save_animation_file();
 
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
 
@@ -566,14 +569,14 @@ namespace lc
 	{
 		int tmp_ParticlesSystemType(0);
 		std::string tmp_textureName;
-		int tmp_Color[4]{ 0, 0, 0, 0 };
+		int tmp_color[4]{ 0, 0, 0, 0 };
 
 		load >> m_typeName
 			 >> tmp_ParticlesSystemType
-			 >> tmp_Color[0]
-			 >> tmp_Color[1]
-			 >> tmp_Color[2]
-			 >> tmp_Color[3]
+			 >> tmp_color[0]
+			 >> tmp_color[1]
+			 >> tmp_color[2]
+			 >> tmp_color[3]
 			 >> m_texture_size_.x
 			 >> m_texture_size_.y
 			 >> m_particles_origin_.x
@@ -598,7 +601,70 @@ namespace lc
 			ressource_to_search_ = std::make_pair(true, tmp_textureName);
 		
 		m_particles_type_ = static_cast<ParticlesSystemType>(tmp_ParticlesSystemType);
-		m_spawn_color_ = sf::Color(tmp_Color[0], tmp_Color[1], tmp_Color[2], tmp_Color[3]);
+		m_spawn_color_ = sf::Color(static_cast<sf::Uint8>(tmp_color[0]), static_cast<sf::Uint8>(tmp_color[1]),
+			static_cast<sf::Uint8>(tmp_color[2]), static_cast<sf::Uint8>(tmp_color[3]));
+	}
+
+	void Particles::save_animation_file(const bool open_file_browser, std::string path) const
+	{
+		std::string tmp_extention_name("ptcl");
+
+		if (open_file_browser)
+			Tools::IG::SaveRessourcesFromFile(path, tmp_extention_name.c_str());
+
+		if (!path.empty())
+		{
+			//This is to separate the path and name of the file.
+			std::string tmp_file_name(Tools::split_path_and_file_name(path));
+
+			//This is to erase the .anim if is in the tmp_file_name.
+			Tools::remove_extention(tmp_file_name, tmp_extention_name);
+
+			if (!fs::exists(path + tmp_file_name))
+				fs::create_directory(path + tmp_file_name);
+
+			//Then we write every information in the .anim file.
+			std::ofstream tmp_save_particles(path + '\\' + tmp_file_name + '\\' + tmp_file_name + "." + tmp_extention_name, std::ios::out);
+			{
+				tmp_save_particles << m_typeName << '\n';
+				tmp_save_particles << m_spawn_color_ << '\n';
+				tmp_save_particles << m_texture_size_ << '\n';
+				tmp_save_particles << m_particles_origin_ << '\n';
+				tmp_save_particles << m_has_gravity_ << '\n';
+				tmp_save_particles << m_spawn_angle_ << '\n';
+				tmp_save_particles << m_spawn_timer_ << '\n';
+				tmp_save_particles << m_spawn_speed_ << '\n';
+				tmp_save_particles << m_spawn_spread_ << '\n';
+				tmp_save_particles << m_gravity_force_ << '\n';
+				tmp_save_particles << m_spawn_cooldown_ << '\n';
+				tmp_save_particles << m_rotation_speed_ << '\n';
+				tmp_save_particles << m_life_time_time_ << '\n';
+				tmp_save_particles << m_spawn_rotation_ << '\n';
+				tmp_save_particles << m_despawn_cooldown_ << '\n';
+				tmp_save_particles << m_base_shape_radius_ << '\n';
+				tmp_save_particles << m_spawn_point_extend_size_ << '\n';
+				tmp_save_particles << m_spawn_count_ << '\n';
+				tmp_save_particles << m_base_shape_point_count_ << '\n';
+				tmp_save_particles << (m_particles_ressource_.expired() ? "No_Ressource" : m_particles_ressource_.lock()->getName()) << '\n';
+			}
+			tmp_save_particles.close();
+
+			//And the image is register.
+			if (!m_particles_ressource_.expired())
+			{
+				if (auto tmp_animation = std::dynamic_pointer_cast<lc::Animation>(m_particles_ressource_.lock()))
+				{
+					tmp_animation->save_animation_file(false, path + tmp_file_name);
+
+					if (tmp_animation->get_texture())
+						tmp_animation->get_texture()->getTexture().copyToImage().saveToFile(path + '\\' + tmp_file_name + '\\' + tmp_file_name + ".png");
+				}
+				else if (auto tmp_texture = std::dynamic_pointer_cast<lc::Texture>(m_particles_ressource_.lock()))
+				{
+					tmp_texture->getTexture().copyToImage().saveToFile(path + '\\' + tmp_file_name + '\\' + tmp_file_name + ".png");
+				}
+			}
+		}
 	}
 
 	void Particles::texture_to_search()
@@ -633,7 +699,7 @@ namespace lc
 
 		m_particles_spawn_center_ = (getParent()->getTransform().getPosition() + m_relativePosition);
 
-		m_spawn_time_ += Tools::getDeltaTime();
+		m_spawn_timer_ += Tools::getDeltaTime();
 	}
 
 	void Particles::update_renderer_window()
@@ -651,7 +717,7 @@ namespace lc
 	void Particles::spawn_particles()
 	{
 		//Spawn of the particles with all the type of particles spawner.
-		if (m_spawn_time_ > m_spawn_cooldown_ && 
+		if (m_spawn_timer_ > m_spawn_cooldown_ && 
 		(m_particles_type_ == ParticlesSystemType::NORMAL || 
 		(m_particles_type_ == ParticlesSystemType::LIFE_TIME && m_life_time_timer_ < m_life_time_time_) ||
 		(m_particles_type_ == ParticlesSystemType::ONE_TIME && !m_has_product_his_particles_)))
@@ -697,7 +763,7 @@ namespace lc
 					Particles::s_thread_particles_.push_back(tmp_particle);
 				}
 
-			m_spawn_time_ = 0.f;
+			m_spawn_timer_ = 0.f;
 		}
 	}
 
@@ -790,7 +856,7 @@ namespace lc
 		}
 	}
 
-	sf::Vector2f Particles::get_extend_spawn_point(sf::Vector2f center_position) const
+	sf::Vector2f Particles::get_extend_spawn_point(const sf::Vector2f& center_position) const
 	{
 		if (m_spawn_point_extend_size_ > 0.f)
 		{

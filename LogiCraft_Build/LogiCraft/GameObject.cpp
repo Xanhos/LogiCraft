@@ -38,6 +38,7 @@ SOFTWARE.
 #include "Button.h"
 #include "Font.h"
 #include "RigidBody.h"
+#include "Convex.h"
 #include "Event.h"
 #include "Particule.h"
 #include "Animation.h"
@@ -174,8 +175,11 @@ void lc::GameObject::Load(std::ifstream& load)
 			addComponent(std::make_shared<lc::Particles>())->Load(load);
 		}
 		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::ANIMATION)
-		{
 			addComponent(std::make_shared<lc::Animation>())->Load(load);
+
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::CONVEX)
+		{			
+			addComponent(std::make_shared<lc::Convex>())->Load(load);
 		}
 		check('}');
 	}
