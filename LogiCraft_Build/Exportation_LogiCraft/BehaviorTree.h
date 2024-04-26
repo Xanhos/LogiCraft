@@ -111,6 +111,7 @@ namespace bt
 		{
 		protected:
 			NodeList m_childList;
+			std::weak_ptr<Node> m_wait_node_;
 		public:
 			CompositeNode() :m_childList() ,Node() {}
 
@@ -121,9 +122,7 @@ namespace bt
 				m_childList.push_back(child);
 				return std::dynamic_pointer_cast<T>(m_childList.back()); }
 
-
-			template <typename T>
-			std::shared_ptr<Node>* addChild_INTERNAL_USE(std::shared_ptr<T> child) { m_childList.push_back(child); return &m_childList.back(); }
+			std::weak_ptr<Node>& GetWaitingNode() { return m_wait_node_; }
 		};
 
 		class Selector : public CompositeNode
@@ -131,6 +130,11 @@ namespace bt
 		public:
 			Selector() : CompositeNode() {}
 			virtual bool tick() {
+				if(m_wait_node_.lock())
+				{					
+					return m_wait_node_.lock()->tick();
+				}
+
 				for (auto& child : m_childList)
 				{
 					if (child->tick())
@@ -147,6 +151,10 @@ namespace bt
 			Sequence() : CompositeNode() {}
 			bool tick() override
 			{
+				if (m_wait_node_.lock())
+				{
+					return m_wait_node_.lock()->tick();
+				}
 				for (auto& child : m_childList)
 				{
 					if (!child->tick())
@@ -173,7 +181,6 @@ namespace bt
 			Decorator(NodePtr task) { m_task = task; }
 
 			NodePtr setTask(NodePtr task) { m_task = task; return m_task; }
-			NodePtr* setTask_INTERNAL_USE(NodePtr task) { m_task = task; return &m_task; }
 		};
 
 		class Inverser : public Decorator
@@ -291,6 +298,19 @@ namespace bt
 			Wander(const std::shared_ptr<lc::GameObject>& agent_);
 			void Setup(NodePtr node);
 			bool tick() override;
+		};
+
+		class Wait : public Node
+		{
+			float m_timer_;
+			float m_time_;
+			std::weak_ptr<Node> m_root_;
+			std::weak_ptr<Node> m_node_;
+		public:
+			Wait() : Node(), m_timer_(0.f), m_time_(0.f) {}
+			void Setup(NodePtr node, NodePtr root);
+			void setTimer(float timer) { m_time_ = timer; }
+			bool tick();
 		};
 
 	}

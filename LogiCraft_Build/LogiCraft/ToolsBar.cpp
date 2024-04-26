@@ -221,7 +221,7 @@ void ToolsBar::Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _v
 	std::ofstream save("../Ressources/" + std::string(m_path) + "/save.lcp");
 	FileWriter exportation("../Ressources/" + std::string(m_path) + "/export.lcg");
 	sf::RenderTexture render_texture;
-	_game_object->NeedToBeExported({"AI", "RigidBody", "Particles", "Animation"});
+	_game_object->NeedToBeExported({"AI", "RigidBody", "Particles", "Animation", "Event", "Button"});
 	_game_object->Save(save, exportation, render_texture, s_actualLayer.first);
 
 	render_texture.create(screenSize.x, screenSize.y);
@@ -241,6 +241,7 @@ void ToolsBar::Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _v
 			}
 		}
 	}
+	_game_object->ResetExport();
 }
 
 void ToolsBar::Exit( WindowManager& _window)

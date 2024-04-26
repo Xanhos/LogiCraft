@@ -72,6 +72,8 @@ namespace lc
 		static std::shared_ptr<GameObject> CreateGameObject(std::string _name, unsigned char _depth = 0);
 
 		static std::shared_ptr<GameObject> LoadScene(std::string _SceneToLoad);
+
+		static std::shared_ptr<GameObject> GetRoot(std::shared_ptr<GameObject> object);
 #pragma endregion
 
 #pragma region TEMPLATE

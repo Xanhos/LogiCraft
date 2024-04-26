@@ -36,13 +36,13 @@ SOFTWARE.
 
 lc::Event::Event()
 {
-
+	m_name = "Event";
 }
 
 lc::Event::Event(std::string name, short function)
 {
 	m_displayThumbnail = false;
-	m_name = name;
+	m_name = "Event";
 	m_typeName = "Event";
 	m_type = TYPE::EVENT;
 
@@ -85,9 +85,9 @@ void lc::Event::Save(std::ofstream& save, sf::RenderTexture& texture, int _depth
 void lc::Event::Export(std::ofstream& exportation)
 {
 	exportation << static_cast<int>(m_type)
-	<< m_condition << static_cast<int>(m_isReverse)
-	<< Tools::replaceSpace(m_objectA.lock()->getName(), true)
-	<< Tools::replaceSpace(m_objectB.lock()->getName(), true);
+		<< " " << m_condition << " " << static_cast<int>(m_isReverse)
+		<< " " << Tools::replaceSpace(m_objectA.lock()->getName(), true)
+		<< " " << Tools::replaceSpace(m_objectB.lock()->getName(), true);
 
 }
 
@@ -123,6 +123,14 @@ void lc::Event::Update(WindowManager& _window)
 		m_rendererTexture = rt.getTexture();
 		m_renderer.setTexture(&m_rendererTexture, true);
 		m_renderer.setSize(text.getGlobalBounds().getSize() + sf::Vector2f(text.getLetterSpacing(), text.getLineSpacing()));
+	}
+	if (m_objectA.expired() and lc::GameObject::GetRoot(getParent())->hasObject(m_objectA_name))
+	{
+		m_objectA = lc::GameObject::GetRoot(getParent())->getObject(m_objectA_name);
+	}
+	if (m_objectB.expired() and lc::GameObject::GetRoot(getParent())->hasObject(m_objectB_name))
+	{
+		m_objectB = lc::GameObject::GetRoot(getParent())->getObject(m_objectA_name);
 	}
 }
 
@@ -232,7 +240,7 @@ void lc::Event::setHierarchieFunc()
 						ImNodes::EndNodeTitleBar();
 						ImGui::Text(std::string("position x: " + std::to_string(objects->getTransform().getPosition().x)).c_str());
 						ImGui::Text(std::string("position y: " + std::to_string(objects->getTransform().getPosition().y)).c_str());
-						if (objects->getName() == "EVENT")
+						if (objects->getName() == "Event")
 						{
 							ImNodes::BeginInputAttribute(objects->getID());
 							ImGui::Text("=> Receive information");

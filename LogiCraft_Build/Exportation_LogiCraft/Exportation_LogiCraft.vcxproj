@@ -139,6 +139,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="BehaviorTree.cpp" />
     <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Event.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="GameComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -155,6 +156,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="BehaviorTree.h" />
     <ClInclude Include="Button.h" />
+    <ClInclude Include="Event.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="GameObject.h" />

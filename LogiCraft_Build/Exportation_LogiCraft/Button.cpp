@@ -65,7 +65,7 @@ void lc::Button::Load(std::ifstream& load)
 
 void lc::Button::SetupFunctionPool(WindowManager& window)
 {
-    s_function_pool_[0] = [&window] { window.toggleFullscreen(); };
+    s_function_pool_[9] = [&window] { window.toggleFullscreen(); };
 }
 
 void lc::Button::UpdateEvent(sf::Event& _window)

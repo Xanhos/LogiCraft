@@ -34,8 +34,6 @@ SOFTWARE.
 
 #pragma once
 #include "Ressource.h"
-#include "imnodes.h"
-#include "imnodes_internal.h"
 
 namespace lc
 {
@@ -55,9 +53,6 @@ namespace lc
 		Event(std::string name, short function);
 		virtual ~Event();
 
-		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth);
-		void Export(std::ofstream& exportation) override;
-		void SaveRenderer(sf::RenderTexture& texture, int _depth) override {};
 		virtual void Load(std::ifstream& load);
 
 		virtual void UpdateEvent(sf::Event& _window);
@@ -68,10 +63,7 @@ namespace lc
 		/*
 		* @brief Open a window to set event's interaction.
 		*/
-		void setHierarchieFunc();
 		void setCondition();
-
-		std::pair<std::weak_ptr<lc::GameObject>, std::weak_ptr<lc::GameObject>> GetObjectAffiliated() { return { m_objectA, m_objectB }; }
 	};
 }
 

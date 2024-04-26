@@ -39,6 +39,7 @@ SOFTWARE.
 #include "AI.h"
 #include "Animation.h"
 #include "Button.h"
+#include "Event.h"
 #include "Particule.h"
 
 lc::GameObject::GameObject()
@@ -110,6 +111,7 @@ void lc::GameObject::Load(std::ifstream& load)
 		}
 		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::EVENT)
 		{
+			addComponent(std::make_shared<lc::Event>())->Load(load);
 		}
 		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::BUTTON)
 		{
@@ -173,6 +175,13 @@ std::shared_ptr<lc::GameObject> lc::GameObject::LoadScene(std::string _SceneToLo
 	}
 
 	return world;
+}
+
+std::shared_ptr<lc::GameObject> lc::GameObject::GetRoot(std::shared_ptr<GameObject> object)
+{
+	while(object->getParent())
+		object = object->getParent();
+	return object;
 }
 
 void lc::GameObject::CheckMaxSize()

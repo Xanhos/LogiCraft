@@ -70,12 +70,12 @@ void lc::AI::Load(std::ifstream& load)
             node = bt::Node::New(bt::ActionNode::MoveTo(getParent(),scene->getObject(target),100.f));
             std::dynamic_pointer_cast<bt::ActionNode::MoveTo>(node)->Setup(node);
 		}
-        if(type_cast == bt::node_type::WANDER)
+        else if(type_cast == bt::node_type::WANDER)
         {
             node = bt::Node::New(bt::ActionNode::Wander(getParent()));
             std::dynamic_pointer_cast<bt::ActionNode::Wander>(node)->Setup(node);
         }
-        if(type_cast == bt::node_type::COOLDOWN)
+        else if(type_cast == bt::node_type::COOLDOWN)
         {
         	float time;
 			load >> time;
@@ -87,7 +87,7 @@ void lc::AI::Load(std::ifstream& load)
                 load_node_and_child(task);;
 			}
         }
-        if (type_cast == bt::node_type::LOOP)
+        else if (type_cast == bt::node_type::LOOP)
         {
             int loop;
             load >> loop;
@@ -99,7 +99,15 @@ void lc::AI::Load(std::ifstream& load)
                 load_node_and_child(task);
             }
         }
-        if (type_cast == bt::node_type::INVERSER or type_cast == bt::node_type::FORCE_SUCCESS)
+        else if (type_cast == bt::node_type::WAIT)
+        {
+            float timer;
+            load >> timer;
+            node = bt::Node::New(bt::ActionNode::Wait());
+            std::dynamic_pointer_cast<bt::ActionNode::Wait>(node)->setTimer(timer);
+            std::dynamic_pointer_cast<bt::ActionNode::Wait>(node)->Setup(std::dynamic_pointer_cast<bt::ActionNode::Wait>(node), m_root_);
+        }
+        else if (type_cast == bt::node_type::INVERSER or type_cast == bt::node_type::FORCE_SUCCESS)
         {
             if (child_size)
             {
@@ -107,7 +115,7 @@ void lc::AI::Load(std::ifstream& load)
                 load_node_and_child(task);
             }
         }
-        if (type_cast < bt::node_type::INVERSER)
+        else if (type_cast < bt::node_type::INVERSER)
         {
         	for (int i = 0; i < child_size; i++)
 			{

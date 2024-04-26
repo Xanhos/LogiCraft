@@ -61,6 +61,8 @@ namespace lc
 		virtual void Draw(sf::RenderTexture& _window) override;
 		virtual std::shared_ptr<lc::GameComponent> Clone() override;
 
+		void UpdateText();
+
 		std::string m_fontName;
 		sf::Font m_font;
 		int m_characterSize;

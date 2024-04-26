@@ -51,9 +51,10 @@ void bt::ActionNode::MoveTo::Setup(NodePtr node)
 				auto node_cast = std::dynamic_pointer_cast<MoveTo>(node);
 				if (node_cast->m_bool_go_to_)
 				{
-					rigid_body->getVelocity() = Tools::Vector::normalize(node_cast->m_target_.lock()->getTransform().getPosition() - node_cast->m_agent_.lock()->getTransform().getPosition()) * node_cast->m_speed_;
+					rigid_body->getVelocity().x = Tools::Vector::normalize(node_cast->m_target_.lock()->getTransform().getPosition() - node_cast->m_agent_.lock()->getTransform().getPosition()).x * node_cast->m_speed_;
 					node_cast->m_bool_go_to_ = false;
 				}
+				else rigid_body->getVelocity().x = 0.f;
 			});
 	}
 }
@@ -101,11 +102,11 @@ void bt::ActionNode::Wander::Setup(NodePtr node)
 							auto rb = game_object->getComponent<lc::RigidBody>("RigidBody");
 							auto rect = rb->getCollider();
 							auto side_collision = !node_cast->m_bool_direction_ ?
-								sf::FloatRect{ {rigid_body->getCollider().getPosition()}, {rigid_body->getCollider().getPosition() + sf::Vector2f{0,rigid_body->getCollider().height}}} :
-								sf::FloatRect{ {rigid_body->getCollider().getPosition() + sf::Vector2f{rigid_body->getCollider().width,0.f}},{rigid_body->getCollider().getPosition() + rigid_body->getCollider().getSize()} } ;
+								sf::FloatRect{ {rigid_body->getCollider().getPosition()}, {rigid_body->getCollider().getPosition() + sf::Vector2f{0,rigid_body->getCollider().height}} } :
+								sf::FloatRect{ {rigid_body->getCollider().getPosition() + sf::Vector2f{rigid_body->getCollider().width,0.f}},{rigid_body->getCollider().getPosition() + rigid_body->getCollider().getSize()} };
 							side_collision.left += rigid_body->getVelocity().x * Tools::getDeltaTime();
 							side_collision.width += rigid_body->getVelocity().x * Tools::getDeltaTime();
-							
+
 							side_collision.height += -0.1f;
 							if (Tools::Collisions::lineRect(side_collision, rect))
 							{
@@ -162,7 +163,7 @@ void bt::ActionNode::Wander::Setup(NodePtr node)
 					node_cast->m_bool_direction_ = !node_cast->m_bool_direction_;
 				}
 			}
-
+			else rigid_body->getVelocity().x = 0.f;
 
 		});
 	}
@@ -217,9 +218,36 @@ bt::NodePtr bt::Factory(const node_type& type)
 	case node_type::ROTATE_TO:
 		break;
 	case node_type::WAIT:
+		return Node::New(ActionNode::Wait());
 		break;
 	default:
 		return Node::New(Composite::Sequence());
 	}
 	
+}
+
+void bt::ActionNode::Wait::Setup(NodePtr node, NodePtr root)
+{
+	m_root_ = root;
+	m_node_ = node;
+}
+
+bool bt::ActionNode::Wait::tick()
+{
+	auto root = std::dynamic_pointer_cast<Composite::CompositeNode>(m_root_.lock());
+	if (root->GetWaitingNode().expired())
+	{
+		root->GetWaitingNode() = m_node_;
+		m_timer_ = 0.f;
+		return false;
+	}
+	m_timer_ += Tools::getDeltaTime();
+	if(m_timer_ >= m_time_)
+	{		
+		root->GetWaitingNode().reset();
+		m_timer_ = 0.f;
+		return true;
+	}
+
+	return false;
 }
