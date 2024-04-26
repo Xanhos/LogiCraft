@@ -264,8 +264,9 @@ namespace lc
 				if (ImGui::Button("Open Animation Window Test"))
 					m_window_his_open_ = true;
 
-				if (ImGui::Button("Save Animation As A .anim") && !m_texture_.expired())
-					this->save_animation_file();
+				if (!m_texture_.expired())
+					if (ImGui::Button("Save Animation As A .anim"))
+						this->save_animation_file();
 
 				ImGui::DragFloat2("Relative Position", m_relativePosition);
 
