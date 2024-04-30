@@ -72,6 +72,7 @@ private:
 
 	void VerifyThePasteObject(std::shared_ptr<lc::GameObject>& _object);
 
+	void MultipleSelection(std::shared_ptr<lc::GameObject>& _object);
 	/*
 	* @brief A function to display arrow to move up or down the object.
 	* @brief To change the diplay order.
@@ -121,6 +122,7 @@ private:
 
 	bool m_hasMoveAnObject;
 	bool m_wantToCreateAGameObject;
-
+	bool m_isDraging;
+	
 	float m_copyPasteTimer;
 };

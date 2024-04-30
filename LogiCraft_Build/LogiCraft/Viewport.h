@@ -270,12 +270,14 @@ private:
 	sf::Vector2f m_maxSelectedObjectSize;
 
 	std::vector<sf::Vector2f> container;
-	float timer = 0.f;
 	std::vector<sf::RectangleShape> points_convex;
 
+	sf::FloatRect m_selection_rect_;
+	
 	unsigned int m_actualSelectedObjectNumber;
 
 	float m_selectedTimer;
+	float timer = 0.f;
 
 	short m_screenZoneUnused;
 

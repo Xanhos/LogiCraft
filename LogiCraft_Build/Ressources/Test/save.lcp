@@ -14,10 +14,13 @@ Objects
 {
 }
 
-200x200 749.697 101.985 1 1 200 200 0 0 0 0
+200x200 749.697 101.985 1 1 20 20 0 0 0 0
 Components
 {
 0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+6 Animation Animation 200x200D Walk 1
+Walk 0 0 20 20 0 0 0.1 10
 
 }
 Objects
