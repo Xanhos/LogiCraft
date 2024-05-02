@@ -40,6 +40,8 @@ SOFTWARE.
 #include "GameObject.h"
 #include "Viewport.h"
 
+constexpr unsigned short return_limit = 20;
+
 class Hierarchie
 {
 public:
@@ -118,11 +120,12 @@ private:
 	ObjWeakPtrList m_selectedGameObjects;
 	ObjSharedPtrList m_copyPasteObjects;
 
-	std::weak_ptr<lc::GameObject> m_clickedObject;
-
+	std::weak_ptr<lc::GameObject> m_clicked_object_;
+	
 	bool m_hasMoveAnObject;
 	bool m_wantToCreateAGameObject;
 	bool m_isDraging;
+	bool m_isClicking;
 	
 	float m_copyPasteTimer;
 };
