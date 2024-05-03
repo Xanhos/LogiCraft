@@ -168,7 +168,7 @@ std::shared_ptr<lc::GameObject> lc::GameObject::LoadScene(std::string _SceneToLo
 			sf::Vector2f position(0,0);
 			iss >> pos_bg_x >> pos_bg_y >> garbage >> garbage >> depth;
 			position = sf::Vector2f(static_cast<float>(0 + (screenResolution.x * pos_bg_x)), static_cast<float>(0 + (screenResolution.y * pos_bg_y)));
-			world->addObject("BACKGROUND",static_cast<unsigned char>(depth))->addComponent(std::make_shared<Texture>(dir_entry.path().filename().string(), dir_entry.path().string()))->setRelativePosition(position);
+			world->addObject("BACKGROUND " + std::to_string(static_cast<unsigned char>(depth)),static_cast<unsigned char>(depth))->addComponent(std::make_shared<Texture>(dir_entry.path().filename().string(), dir_entry.path().string()))->setRelativePosition(position);
 		}
 	}
 	world->Load(file);

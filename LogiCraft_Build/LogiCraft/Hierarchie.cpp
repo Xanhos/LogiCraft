@@ -41,7 +41,7 @@ SOFTWARE.
 #include "Animation.h"
 
 Hierarchie::Hierarchie()
-	: m_hasMoveAnObject(false), m_wantToCreateAGameObject(false), m_copyPasteTimer(0.f)
+	: m_hasMoveAnObject(false), m_wantToCreateAGameObject(false), m_copyPasteTimer(0.f), m_isDraging(false)
 {
 }
 
@@ -86,9 +86,9 @@ void Hierarchie::GameObjectsDisplay(std::shared_ptr<lc::GameObject> _gameObject,
 
 	if (ImGui::TreeNodeEx(std::string(_gameObject->getName() + "##<ID:" + std::to_string(_gameObject->getID()) + ">").c_str(), flags))
 	{
-		this->SelectionBehavior(_gameObject);
-
 		this->DragAndDropBehavior(_gameObject, _scene);
+		
+		this->SelectionBehavior(_gameObject);
 
 		this->MoveDownUpBehavior(_gameObject, _gameObjectList);
 
@@ -103,9 +103,9 @@ void Hierarchie::GameObjectsDisplay(std::shared_ptr<lc::GameObject> _gameObject,
 	}
 	else
 	{
-		this->SelectionBehavior(_gameObject);
-
 		this->DragAndDropBehavior(_gameObject, _scene);
+		
+		this->SelectionBehavior(_gameObject);
 
 		this->MoveDownUpBehavior(_gameObject, _gameObjectList);
 	}
@@ -262,8 +262,8 @@ void Hierarchie::CreateNewObjectBehavior()
 			ImGui::PushItemWidth(200.f);
 			if (ImGui::Button("Create GameObject"))
 			{
-				if (!m_clickedObject.expired())
-					m_clickedObject.lock()->addObject(lc::GameObject::CreateGameObject(tmp_NewGameObjectName, tmp_DepthName.first));
+				if (!m_clicked_object_.expired())
+					m_clicked_object_.lock()->addObject(lc::GameObject::CreateGameObject(tmp_NewGameObjectName, tmp_DepthName.first));
 
 				m_wantToCreateAGameObject = false;
 			}
@@ -331,6 +331,7 @@ void Hierarchie::VerifyThePasteObject(std::shared_ptr<lc::GameObject>& _object)
 	}
 }
 
+
 void Hierarchie::MoveDownUpBehavior(std::shared_ptr<lc::GameObject> _gameObject, ObjSharedPtrList* _gameObjectList)
 {
 	if (_gameObjectList != nullptr)
@@ -376,76 +377,150 @@ void Hierarchie::MoveDownUpBehavior(std::shared_ptr<lc::GameObject> _gameObject,
 
 void Hierarchie::DragAndDropBehavior(std::shared_ptr<lc::GameObject> _gameObject, std::shared_ptr<lc::GameObject> _scene)
 {
-	if (ImGui::BeginDragDropSource() && _scene != _gameObject)
+	if(!m_selectedGameObjects.empty())
 	{
-		ImGui::SetDragDropPayload("Game Object Drag", &*_gameObject, sizeof(*_gameObject));
-		ImGui::Text(std::string(_gameObject->getName() + "<ID:" + std::to_string(_gameObject->getID()) + "> is begin dragged").c_str());
-		ImGui::EndDragDropSource();
-	}
+		if (ImGui::BeginDragDropSource() && _scene != _gameObject)
+		{
+			auto tmp = this;
+			ImGui::SetDragDropPayload("Game Object Drag", &tmp, sizeof(this));
+			ImGui::Text(std::string(_gameObject->getName() + "<ID:" + std::to_string(_gameObject->getID()) + "> is begin dragged").c_str());
+			ImGui::EndDragDropSource();
+			m_isDraging =true;
+		}
 
-	if (BeginDragDropTarget())
-	{
-		if (auto tmp_playLoad = ImGui::AcceptDragDropPayload("Game Object Drag"))
-			if (auto tmp_gameObject = reinterpret_cast<lc::GameObject*>(tmp_playLoad->Data))
-			{
-				//Get the parent of the Object that need to be move.
-				auto tmp_objectParent = tmp_gameObject->getParent();
-				//So if the user decide to move a parent in is child or grand-child...
-				//First he need to be verify to see if the Object that as been move got moved in his child with the objectIsParent function.
-				if (tmp_gameObject->objectIsParent(_gameObject->getName(), _gameObject->getID()))
+		if (BeginDragDropTarget())
+		{
+			if (auto tmp_playLoad = ImGui::AcceptDragDropPayload("Game Object Drag"))
+				if (auto tmp_gameObject = reinterpret_cast<Hierarchie*>(tmp_playLoad->Data))
 				{
-					//Then we set his child to be the child of his parent
-					/*	+------------------------+
-						|                        |
-						|        His Parent>-----+
-						|            X           |
-						|            X           |
-						|        GameObject      |-- Push into his New Parent
-						|            |           |
-						|            v           |
-						|        His Child<----- +
-						| _______________________| */
-					for (auto& gameObject : tmp_gameObject->getObjects())
-						tmp_objectParent->addObject(gameObject);
+					auto replace = [&](std::shared_ptr<lc::GameObject> tmp_gameObject)
+					{
+						auto tmp_objectParent = tmp_gameObject->getParent();
+						if (tmp_gameObject->objectIsParent(_gameObject->getName(), _gameObject->getID()))
+						{
+							//Then we set his child to be the child of his parent
+							/*	+------------------------+
+								|                        |
+								|        His Parent>-----+
+								|            X           |
+								|            X           |
+								|        GameObject      |-- Push into his New Parent
+								|            |           |
+								|            v           |
+								|        His Child<----- +
+								| _______________________| */
+							for (auto& gameObject : tmp_gameObject->getObjects())
+								tmp_objectParent->addObject(gameObject);
 
-					//And then we take clear his child because they got moved in his parent.
-					tmp_objectParent->getObject(tmp_gameObject->getName(), tmp_gameObject->getID())->getObjects().clear();
-				}
-				//And then if the Object that the user want to move his the child of the Object where he need to be move nothing happend.
-				if (tmp_objectParent != _gameObject)
-				{
-					//Then we push the Object into his new parent. 
-					_gameObject->addObject(tmp_objectParent->getObject(tmp_gameObject->getName(), tmp_gameObject->getID()));
-					//And we remove it from his old parent.
-					tmp_objectParent->removeObject(tmp_gameObject->getName(), tmp_gameObject->getID());
-				}
+							//And then we take clear his child because they got moved in his parent.
+							tmp_objectParent->getObject(tmp_gameObject->getName(), tmp_gameObject->getID())->getObjects().clear();
+						}
+						//And then if the Object that the user want to move his the child of the Object where he need to be move nothing happend.
+						if (tmp_objectParent != _gameObject)
+						{
+							//Then we push the Object into his new parent. 
+							_gameObject->addObject(tmp_objectParent->getObject(tmp_gameObject->getName(), tmp_gameObject->getID()));
+							//And we remove it from his old parent.
+							tmp_objectParent->removeObject(tmp_gameObject->getName(), tmp_gameObject->getID());
+						}
+					
+					};
+					for(auto& obj : m_selectedGameObjects)
+						replace(obj.lock());
 
-				m_hasMoveAnObject = true;
-			}
-		ImGui::EndDragDropTarget();
+					m_hasMoveAnObject = true;
+				}
+			m_isDraging =false;
+
+			ImGui::EndDragDropTarget();
+		}
 	}
 }
 
 void Hierarchie::SelectionBehavior(std::shared_ptr<lc::GameObject> _gameObject)
 {
-	if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
+	if(!m_isDraging)
 	{
-		if (!KEY(LControl))
-			m_selectedGameObjects.clear();
+		if (ImGui::IsItemClicked(ImGuiMouseButton_Left) and _gameObject->getParent())
+		{
+			m_isClicking = true;
+		}
+		
+		if(m_isClicking)
+		{
+			if(ImGui::IsItemHovered() and !MOUSE(Left))
+			{				
+				if (!KEY(LControl))
+					m_selectedGameObjects.clear();
+				this->SelectionVerifyBehavior(_gameObject);
+				m_isClicking = false;
+			}
 
-		this->SelectionVerifyBehavior(_gameObject);
-	}
+		}
 
-	if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
-	{
-		m_clickedObject = _gameObject;
-		m_wantToCreateAGameObject = true;
+		if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+		{
+			m_clicked_object_ = _gameObject;
+			m_wantToCreateAGameObject = true;
+		}
 	}
 }
 
 void Hierarchie::SelectionVerifyBehavior(std::shared_ptr<lc::GameObject> _gameObject)
 {
-	if (KEY(LShift))
+	if (KEY(LShift) and KEY(LControl) and !m_selectedGameObjects.empty())
+	{
+		if(!m_selectedGameObjects.back().expired())
+			if(m_selectedGameObjects.back().lock()->getParent())
+				if(m_selectedGameObjects.back().lock()->getParent() == _gameObject->getParent())
+				{
+					auto container = m_selectedGameObjects.back().lock()->getParent();
+					auto start = m_selectedGameObjects.back().lock();
+					auto end = _gameObject;
+
+					for(auto& i : container->getObjects())
+					{
+						if(i == start)
+							break;
+						if (i == end)
+						{
+							end = start;
+							start = _gameObject;
+							break;
+						}
+					}
+					std::function<void(std::shared_ptr<lc::GameObject>& obj)> add = [&](std::shared_ptr<lc::GameObject>& obj)
+					{
+						if (std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&_gameObject](std::weak_ptr<lc::GameObject> _wptrObject)
+						{
+							if (!_wptrObject.expired())
+								if (_gameObject == _wptrObject.lock())
+									return true;
+
+							return false;
+						}) == m_selectedGameObjects.end())
+							m_selectedGameObjects.push_back(_gameObject);
+							this->m_selectedGameObjects.push_back(obj);
+							for(auto& child : obj->getObjects())
+								add(child);
+					};
+
+
+					auto it = container->getObjects().begin();
+					for(;*it != start;it++)
+					{}
+					
+					for(;*it != end; it++)
+					{
+						add(*it);
+					}			
+					add(end);
+				}
+		
+
+		
+	}	
+	else if (KEY(LShift))
 	{
 		if (std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&_gameObject](std::weak_ptr<lc::GameObject> _wptrObject)
 			{

@@ -40,6 +40,8 @@ SOFTWARE.
 #include "GameObject.h"
 #include "Viewport.h"
 
+constexpr unsigned short return_limit = 20;
+
 class Hierarchie
 {
 public:
@@ -72,6 +74,7 @@ private:
 
 	void VerifyThePasteObject(std::shared_ptr<lc::GameObject>& _object);
 
+	void MultipleSelection(std::shared_ptr<lc::GameObject>& _object);
 	/*
 	* @brief A function to display arrow to move up or down the object.
 	* @brief To change the diplay order.
@@ -117,10 +120,12 @@ private:
 	ObjWeakPtrList m_selectedGameObjects;
 	ObjSharedPtrList m_copyPasteObjects;
 
-	std::weak_ptr<lc::GameObject> m_clickedObject;
-
+	std::weak_ptr<lc::GameObject> m_clicked_object_;
+	
 	bool m_hasMoveAnObject;
 	bool m_wantToCreateAGameObject;
-
+	bool m_isDraging;
+	bool m_isClicking;
+	
 	float m_copyPasteTimer;
 };
