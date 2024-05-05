@@ -73,26 +73,35 @@ void lc::GameObject::Save(std::ofstream& save, std::ofstream& exportation,sf::Re
 		" " << static_cast<int>(getDepth()) << std::endl;
 	oss << "Components" << std::endl << "{";
 	save << oss.str();
-	exportation << oss.str();
+	if(getNeedToBeExported() or !getParent())
+		exportation << oss.str();
 	for (auto& component : getComponents())
 	{
 		save << std::endl;
+		if(getNeedToBeExported() or !getParent())
 		exportation << std::endl;
 		component->Save(save, texture, _depth);
-		if(getNeedToBeExported())
+		if(getNeedToBeExported() or !getParent())
 			component->Export(exportation);
 	}
+	if(getNeedToBeExported() or !getParent())
 	exportation << std::endl << "}" << std::endl;
+	
 	save << std::endl << "}" << std::endl;
+	
+	if(getNeedToBeExported() or !getParent())
 	exportation << "Objects" << std::endl << "{";
+	
 	save << "Objects" << std::endl << "{";
 	for (auto& object : getObjects())
 	{
 		save << std::endl;
-		exportation << std::endl;
+		if(getNeedToBeExported() or !getParent())
+			exportation << std::endl;
 		object->Save(save, exportation, texture, _depth);
 	}
 	save << std::endl << "}" << std::endl;
+	if(getNeedToBeExported() or !getParent())
 	exportation << std::endl << "}" << std::endl;
 }
 
