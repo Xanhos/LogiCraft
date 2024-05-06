@@ -57,7 +57,6 @@ pushNode("ROTATE TO");
 pushNode("WAIT");*/
 
 
-
 namespace bt
 {
 	enum class node_type{
@@ -86,7 +85,8 @@ namespace bt
 		unsigned int m_id;
 		Node() : m_id(m_idCounter++) {}
 		virtual ~Node() = default;
-
+		std::weak_ptr<Node> m_parent;
+		
 		template<typename T>
 		std::shared_ptr<T> getNode() { std::make_shared<T>(*this); }
 	public:
@@ -107,6 +107,7 @@ namespace bt
 #pragma region COMPOSITE
 	namespace Composite
 	{
+		
 		class CompositeNode : public Node
 		{
 		protected:
@@ -117,6 +118,24 @@ namespace bt
 
 			NodeList& getChilds() { return m_childList; }
 
+			NodePtr getChild(int id)
+			{
+				for(auto& child : m_childList)
+					if(child->getID() == id)
+						return child;
+
+				auto tmp = NodePtr();
+				for(auto& child : m_childList)
+					if(auto composite = std::dynamic_pointer_cast<CompositeNode>(child))
+					{
+						tmp = composite->getChild(id);
+						if(tmp)
+							return tmp;
+					}
+
+				return tmp;
+			}
+			
 			template <typename T>
 			std::shared_ptr<T> addChild(std::shared_ptr<T> child) {
 				m_childList.push_back(child);
@@ -129,19 +148,7 @@ namespace bt
 		{
 		public:
 			Selector() : CompositeNode() {}
-			virtual bool tick() {
-				if(m_wait_node_.lock())
-				{					
-					return m_wait_node_.lock()->tick();
-				}
-
-				for (auto& child : m_childList)
-				{
-					if (child->tick())
-						return true;
-				}
-				return false;
-			}
+			virtual bool tick();
 
 		};
 
@@ -149,19 +156,7 @@ namespace bt
 		{
 		public:
 			Sequence() : CompositeNode() {}
-			bool tick() override
-			{
-				if (m_wait_node_.lock())
-				{
-					return m_wait_node_.lock()->tick();
-				}
-				for (auto& child : m_childList)
-				{
-					if (!child->tick())
-						return false;
-				}
-				return true;
-			}
+			bool tick() override;
 		};
 	}
 
@@ -306,11 +301,14 @@ namespace bt
 			float m_time_;
 			std::weak_ptr<Node> m_root_;
 			std::weak_ptr<Node> m_node_;
+			std::weak_ptr<Node> m_parent_;
 		public:
 			Wait() : Node(), m_timer_(0.f), m_time_(0.f) {}
-			void Setup(NodePtr node, NodePtr root);
+			void Setup(NodePtr node, NodePtr parent, NodePtr root);
 			void setTimer(float timer) { m_time_ = timer; }
 			bool tick();
+
+			std::weak_ptr<Node> getParent() {return m_parent_;};
 		};
 
 	}

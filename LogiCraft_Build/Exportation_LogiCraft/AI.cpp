@@ -52,7 +52,7 @@ void lc::AI::Load(std::ifstream& load)
     int child_size;
     int type;
     load >> type >> child_size;
-    std::function<void(bt::NodePtr&)> load_node_and_child = [&](bt::NodePtr& node)
+    std::function<void(bt::NodePtr&,const bt::NodePtr&)> load_node_and_child = [&](bt::NodePtr& node,const bt::NodePtr& parent)
     {
         load >> type >> child_size;
 		const auto type_cast = static_cast<bt::node_type>(type);
@@ -84,7 +84,7 @@ void lc::AI::Load(std::ifstream& load)
             if(child_size)
             {
                 auto task = std::dynamic_pointer_cast<bt::Decorator::Cooldown>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
-                load_node_and_child(task);;
+                load_node_and_child(task, parent);
 			}
         }
         else if (type_cast == bt::node_type::LOOP)
@@ -96,7 +96,7 @@ void lc::AI::Load(std::ifstream& load)
             if (child_size)
             {
                 auto task = std::dynamic_pointer_cast<bt::Decorator::Loop>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
-                load_node_and_child(task);
+                load_node_and_child(task, parent);
             }
         }
         else if (type_cast == bt::node_type::WAIT)
@@ -105,14 +105,14 @@ void lc::AI::Load(std::ifstream& load)
             load >> timer;
             node = bt::Node::New(bt::ActionNode::Wait());
             std::dynamic_pointer_cast<bt::ActionNode::Wait>(node)->setTimer(timer);
-            std::dynamic_pointer_cast<bt::ActionNode::Wait>(node)->Setup(std::dynamic_pointer_cast<bt::ActionNode::Wait>(node), m_root_);
+            std::dynamic_pointer_cast<bt::ActionNode::Wait>(node)->Setup(std::dynamic_pointer_cast<bt::ActionNode::Wait>(node), parent, m_root_);
         }
         else if (type_cast == bt::node_type::INVERSER or type_cast == bt::node_type::FORCE_SUCCESS)
         {
             if (child_size)
             {
                 auto task = std::dynamic_pointer_cast<bt::Decorator::Loop>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
-                load_node_and_child(task);
+                load_node_and_child(task, parent);
             }
         }
         else if (type_cast < bt::node_type::INVERSER)
@@ -123,7 +123,7 @@ void lc::AI::Load(std::ifstream& load)
 			}
             for (auto& i : dynamic_cast<bt::Composite::CompositeNode*>(node.get())->getChilds())
             {
-                load_node_and_child(i);
+                load_node_and_child(i, parent);
             }
         }
 	};
@@ -134,7 +134,7 @@ void lc::AI::Load(std::ifstream& load)
     }
     for (auto& i : m_root_->getChilds())
     {
-        load_node_and_child(i);
+        load_node_and_child(i, m_root_);
     }
 }
 

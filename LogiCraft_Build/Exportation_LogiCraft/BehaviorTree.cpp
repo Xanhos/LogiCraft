@@ -93,7 +93,7 @@ void bt::ActionNode::Wander::Setup(NodePtr node)
 				{
 					scene = scene->getParent();
 				}
-				bool is_on_a_platform = false;
+				bool is_on_a_platform = rigid_body->getIsFlying();
 				bool has_hit_a_wall = false;
 				std::function<bool(std::shared_ptr<lc::GameObject>&)> CheckSideCollision = [&](std::shared_ptr<lc::GameObject>& game_object) ->bool
 					{
@@ -226,10 +226,75 @@ bt::NodePtr bt::Factory(const node_type& type)
 	
 }
 
-void bt::ActionNode::Wait::Setup(NodePtr node, NodePtr root)
+bool bt::Composite::Selector::tick()
+{	
+	if(m_wait_node_.lock())
+	{
+		auto parent = std::dynamic_pointer_cast<ActionNode::Wait>(m_wait_node_.lock())->getParent();
+		if(!m_wait_node_.lock()->tick())
+			return false;
+		bool next_is_found = false;
+		for(auto& i : std::dynamic_pointer_cast<CompositeNode>(parent.lock())->getChilds())
+		{
+			if(!next_is_found)
+				if(m_id == i->getID())
+				{
+					next_is_found = true;
+					continue;
+				}
+			if(i->tick())
+				return true;			
+		}
+		return false;				
+	}
+
+	for (auto& child : m_childList)
+	{
+		if (child->tick())
+			return true;
+	}
+	return false;	
+}
+
+bool bt::Composite::Sequence::tick()
+{
+	if(m_wait_node_.lock())
+	{
+		auto parent = std::dynamic_pointer_cast<ActionNode::Wait>(m_wait_node_.lock())->getParent();
+		auto wait_node_id = m_wait_node_.lock()->getID();
+		if(!m_wait_node_.lock()->tick())
+			return false;
+		bool next_is_found = false;
+		for(auto& i : std::dynamic_pointer_cast<CompositeNode>(parent.lock())->getChilds())
+		{
+			if(!next_is_found)
+			{
+				if(wait_node_id == i->getID())
+				{
+					next_is_found = true;					
+				}
+			}
+			else
+			if (!i->tick())
+				return false;
+						
+		}
+		return true;				
+	}
+	
+	for (auto& child : m_childList)
+	{
+		if (!child->tick())
+			return false;
+	}
+	return true;
+}
+
+void bt::ActionNode::Wait::Setup(NodePtr node, NodePtr parent, NodePtr root)
 {
 	m_root_ = root;
 	m_node_ = node;
+	m_parent_ = parent;
 }
 
 bool bt::ActionNode::Wait::tick()
