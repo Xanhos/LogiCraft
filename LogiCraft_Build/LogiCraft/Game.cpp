@@ -87,7 +87,9 @@ void Game::update()
             }
         }
         else if (m_state.front().get()->getIsReady())
-            //if (m_windowManager.getWindow().hasFocus())
+#ifdef NDEBUG
+            if (m_windowManager.getWindow().hasFocus())
+#endif                
                 m_state.front().get()->update();
 
         if (static_cast<int>(m_state.size()) > 1)
