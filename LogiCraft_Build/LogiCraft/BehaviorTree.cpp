@@ -34,6 +34,9 @@ SOFTWARE.
 
 #include "BehaviorTree.h"
 
+#include <tuple>
+#include <tuple>
+
 std::unordered_map<std::string, int> PatronNode::s_NodeContainer = {};
 std::unordered_map<std::string, int> PatronNode::s_ConditionContainer = {};
 DecoratorSaveMethod PatronNode::s_DecoratorSaveMethod = {};
@@ -62,6 +65,7 @@ void PatronNode::SetupAllNode()
 	pushNode("PLAY SOUND");
 	pushNode("ROTATE TO");
 	pushNode("WAIT");
+	pushNode("ATTACK");
 
 	s_decoratorNodeStart = s_NodeContainer["INVERSER"];//Were the decorator node start
 	s_actionNodeStart = s_NodeContainer["WANDER"];//Were the action node start and were the decorator node stop (leaf node)
@@ -234,25 +238,28 @@ void PatronNode::SetupAllNode()
 	//PLAY_SOUND
 	{
 		s_DecoratorInitMethod["PLAY SOUND"] = [](PatronNode* node) {
-			node->m_decoratorData = std::string();
+			node->m_decoratorData = std::tuple<std::string,bool,float,float>();
 			};
 		s_DecoratorCopyMethod["PLAY SOUND"] = [](PatronNode* node, PatronNode* node_copied) {
-				node->m_decoratorData = std::any_cast<std::string>(node_copied->m_decoratorData);
+				node->m_decoratorData = std::any_cast<std::tuple<std::string,bool,float,float>>(node_copied->m_decoratorData);
 				};
 		s_DecoratorUpdateMethod["PLAY SOUND"] = [](PatronNode* node) {
-			auto TAG = std::any_cast<std::string>(node->m_decoratorData);
-			ImGui::InputText("TAG", TAG, 100);
-			node->m_decoratorData = TAG;
+			auto tuple = std::any_cast<std::tuple<std::string,bool,float,float>>(node->m_decoratorData);
+			ImGui::InputText("Sound Name", std::get<0>(tuple), 100);
+			ImGui::Checkbox("Start New Sound", &std::get<1>(tuple));
+			ImGui::DragFloat("Attenuation", &std::get<2>(tuple));
+			ImGui::DragFloat("Minimum Distance", &std::get<3>(tuple));
+			node->m_decoratorData = tuple;
 			};
 		s_DecoratorSaveMethod["PLAY SOUND"] = [](PatronNode* node, std::ofstream& file) {
-			auto tag = std::any_cast<std::string>(node->m_decoratorData);
-			file << tag;
+			auto tuple = std::any_cast<std::tuple<std::string,bool,float,float>>(node->m_decoratorData);
+			file << std::get<0>(tuple) << " " << std::get<1>(tuple) << " " << std::get<2>(tuple) << " " << std::get<3>(tuple);
 
 			};
 		s_DecoratorLoadMethod["PLAY SOUND"] = [](PatronNode* node, std::ifstream& file) {
-			std::string tag;
-			file >> tag;
-			node->m_decoratorData = tag;
+			std::tuple<std::string,bool,float,float> tuple;
+			file >> std::get<0>(tuple) >> std::get<1>(tuple) >> std::get<2>(tuple) >> std::get<3>(tuple);
+			node->m_decoratorData = tuple;
 			};
 	}
 
@@ -300,6 +307,54 @@ void PatronNode::SetupAllNode()
 			file >> timer;
 			node->m_decoratorData = timer;
 			};
+	}
+
+	//ATTACK
+	{
+		s_DecoratorInitMethod["ATTACK"] = [](PatronNode* node) {
+			node->m_decoratorData = std::string();
+		};
+		s_DecoratorCopyMethod["ATTACK"] = [](PatronNode* node, PatronNode* nodeCopied){
+			node->m_decoratorData = std::any_cast<std::string>(nodeCopied->m_decoratorData);
+		};
+		s_DecoratorUpdateMethod["ATTACK"] = [](PatronNode* node) {
+			std::string attack_name = std::any_cast<std::string>(node->m_decoratorData);
+			ImGui::InputText("Attack Name", attack_name, 150);
+			node->m_decoratorData = attack_name;
+		};
+		s_DecoratorSaveMethod["ATTACK"] = [](PatronNode* node, std::ofstream& file) {
+			std::string	attack_name = std::any_cast<std::string>(node->m_decoratorData);
+			file << attack_name << std::endl;
+		};
+		s_DecoratorLoadMethod["ATTACK"] = [](PatronNode* node, std::ifstream& file) {
+			std::string attack_name;
+			file >> attack_name;
+			node->m_decoratorData = attack_name;
+		};
+	}
+
+	//SHOT
+	{
+		s_DecoratorInitMethod["SHOT"] = [](PatronNode* node) {
+			node->m_decoratorData = std::string();
+		};
+		s_DecoratorCopyMethod["SHOT"] = [](PatronNode* node, PatronNode* nodeCopied){
+			node->m_decoratorData = std::any_cast<std::string>(nodeCopied->m_decoratorData);
+		};
+		s_DecoratorUpdateMethod["SHOT"] = [](PatronNode* node) {
+			std::string attack_name = std::any_cast<std::string>(node->m_decoratorData);
+			ImGui::InputText("Attack Name", attack_name, 150);
+			node->m_decoratorData = attack_name;
+		};
+		s_DecoratorSaveMethod["SHOT"] = [](PatronNode* node, std::ofstream& file) {
+			std::string	attack_name = std::any_cast<std::string>(node->m_decoratorData);
+			file << attack_name << std::endl;
+		};
+		s_DecoratorLoadMethod["SHOT"] = [](PatronNode* node, std::ifstream& file) {
+			std::string attack_name;
+			file >> attack_name;
+			node->m_decoratorData = attack_name;
+		};
 	}
 }
 

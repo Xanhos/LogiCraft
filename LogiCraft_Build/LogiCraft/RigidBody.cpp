@@ -77,6 +77,7 @@ void lc::RigidBody::Save(std::ofstream& save, sf::RenderTexture& texture, int _d
 			<< " " << m_relativePosition.x
 			<< " " << m_relativePosition.y
 			<< " " << m_isKinetic
+			<< " " << m_is_flying_
 			<< " " << Tools::replaceSpace(m_name, true) << std::endl;
 	}
 }
@@ -90,7 +91,9 @@ void lc::RigidBody::Export(std::ofstream& exportation)
 		<< " " << m_collider.height
 		<< " " << m_relativePosition.x
 		<< " " << m_relativePosition.y
-		<< " " << m_isKinetic << std::endl;
+		<< " " << m_isKinetic
+	    << " " << m_is_flying_
+		<< std::endl;
 }
 
 void lc::RigidBody::Load(std::ifstream& load)
@@ -105,6 +108,7 @@ void lc::RigidBody::Load(std::ifstream& load)
 		>> m_relativePosition.x
 		>> m_relativePosition.y
 		>> m_isKinetic
+		>> m_is_flying_
 		>> m_name;
 	Tools::replaceSpace(m_typeName, false);
 	Tools::replaceSpace(m_name, false);
@@ -136,7 +140,8 @@ void lc::RigidBody::Update(WindowManager& _window)
 
 	if(m_isKinetic and m_simulate)
 	{
-		m_velocity.y += (g)*Tools::getDeltaTime();
+		if(!m_is_flying_)
+			m_velocity.y += (g)*Tools::getDeltaTime();
 		CheckAllObject(scene);
 	}
 	else m_velocity = { 0.f,0.f };
@@ -193,6 +198,8 @@ void lc::RigidBody::setHierarchieFunc()
 		ImGui::Checkbox("Kinetic", &m_isKinetic);
 		if (m_isKinetic)
 		{
+			ImGui::Checkbox("Flying", &m_is_flying_);
+			
 			if (ImGui::Checkbox("Simulate Gravity", &m_simulate))
 			{
 				if (m_simulate)

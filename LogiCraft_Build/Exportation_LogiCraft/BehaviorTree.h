@@ -57,7 +57,6 @@ pushNode("ROTATE TO");
 pushNode("WAIT");*/
 
 
-
 namespace bt
 {
 	enum class node_type{
@@ -86,7 +85,8 @@ namespace bt
 		unsigned int m_id;
 		Node() : m_id(m_idCounter++) {}
 		virtual ~Node() = default;
-
+		std::weak_ptr<Node> m_parent;
+		
 		template<typename T>
 		std::shared_ptr<T> getNode() { std::make_shared<T>(*this); }
 	public:
@@ -107,6 +107,7 @@ namespace bt
 #pragma region COMPOSITE
 	namespace Composite
 	{
+		
 		class CompositeNode : public Node
 		{
 		protected:
@@ -117,6 +118,24 @@ namespace bt
 
 			NodeList& getChilds() { return m_childList; }
 
+			NodePtr getChild(int id)
+			{
+				for(auto& child : m_childList)
+					if(child->getID() == id)
+						return child;
+
+				auto tmp = NodePtr();
+				for(auto& child : m_childList)
+					if(auto composite = std::dynamic_pointer_cast<CompositeNode>(child))
+					{
+						tmp = composite->getChild(id);
+						if(tmp)
+							return tmp;
+					}
+
+				return tmp;
+			}
+			
 			template <typename T>
 			std::shared_ptr<T> addChild(std::shared_ptr<T> child) {
 				m_childList.push_back(child);
@@ -129,19 +148,7 @@ namespace bt
 		{
 		public:
 			Selector() : CompositeNode() {}
-			virtual bool tick() {
-				if(m_wait_node_.lock())
-				{					
-					return m_wait_node_.lock()->tick();
-				}
-
-				for (auto& child : m_childList)
-				{
-					if (child->tick())
-						return true;
-				}
-				return false;
-			}
+			virtual bool tick();
 
 		};
 
@@ -149,19 +156,7 @@ namespace bt
 		{
 		public:
 			Sequence() : CompositeNode() {}
-			bool tick() override
-			{
-				if (m_wait_node_.lock())
-				{
-					return m_wait_node_.lock()->tick();
-				}
-				for (auto& child : m_childList)
-				{
-					if (!child->tick())
-						return false;
-				}
-				return true;
-			}
+			bool tick() override;
 		};
 	}
 
@@ -181,6 +176,7 @@ namespace bt
 			Decorator(NodePtr task) { m_task = task; }
 
 			NodePtr setTask(NodePtr task) { m_task = task; return m_task; }
+			NodePtr& getTask() {return m_task;}
 		};
 
 		class Inverser : public Decorator
@@ -231,6 +227,7 @@ namespace bt
 					m_timer = 0.f;
 					return SECURE_TASK(m_task);
 				}
+				m_timer += Tools::getDeltaTime();
 				return false;
 			}
 		};
@@ -250,6 +247,7 @@ namespace bt
 			Condition() : Decorator() {}
 			Condition(NodePtr task, std::function<bool()> condition) : Decorator(task) { m_condition = condition; }
 
+			void setCondition( std::function<bool()> condition) {m_condition = condition;}
 			virtual bool tick() {
 				if (m_condition)
 					if (m_condition())
@@ -306,13 +304,30 @@ namespace bt
 			float m_time_;
 			std::weak_ptr<Node> m_root_;
 			std::weak_ptr<Node> m_node_;
+			std::weak_ptr<Node> m_parent_;
 		public:
 			Wait() : Node(), m_timer_(0.f), m_time_(0.f) {}
-			void Setup(NodePtr node, NodePtr root);
+			void Setup(NodePtr node, NodePtr parent, NodePtr root);
 			void setTimer(float timer) { m_time_ = timer; }
 			bool tick();
+
+			std::weak_ptr<Node> getParent() {return m_parent_;};
 		};
 
+		class Play_Sound : public Node
+		{
+			std::string m_sound_name_;
+			bool m_start_new_sound_;
+			inline static unsigned int s_general_sound_id_ = 50000u;
+			unsigned int m_sound_id_;
+			std::weak_ptr<lc::GameObject> m_owner;
+			float m_attenuation_, m_min_distance_;
+		public:
+			Play_Sound() : m_start_new_sound_(false), m_sound_id_(s_general_sound_id_++), m_attenuation_(0.f), m_min_distance_(0.f){}
+			Play_Sound(std::string sound, bool new_sound, std::weak_ptr<lc::GameObject> owner, float attenuation = 0.f, float min_distance = 0.f);
+			void Setup(NodePtr node);
+			bool tick();
+		};
 	}
 
 

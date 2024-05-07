@@ -70,7 +70,8 @@ void lc::RigidBody::Load(std::ifstream& load)
 		>> m_collider.height
 		>> m_relativePosition.x
 		>> m_relativePosition.y
-		>> m_isKinetic;
+		>> m_isKinetic
+		>> m_is_flying;
 }
 
 void lc::RigidBody::UpdateEvent(sf::Event& _window)
@@ -92,7 +93,8 @@ void lc::RigidBody::Update(WindowManager& _window)
 	}
 	if (m_isKinetic)
 	{
-		m_velocity.y += (g)*Tools::getDeltaTime();
+		if(!m_is_flying)
+			m_velocity.y += (g)*Tools::getDeltaTime();
 		for (auto& i : m_inputFunc)
 		{
 			if (i)

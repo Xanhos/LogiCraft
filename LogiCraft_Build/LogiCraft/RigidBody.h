@@ -69,6 +69,7 @@ namespace lc
 		bool m_showCollider = false;
 		bool m_simulate = false;
 		bool m_isKinetic = false;
+		bool m_is_flying_ = false;
 		std::list<std::function<void(lc::RigidBody*)>> m_inputFunc;
 	};
 
