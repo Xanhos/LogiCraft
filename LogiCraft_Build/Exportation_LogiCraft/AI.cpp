@@ -89,11 +89,19 @@ void lc::AI::Load(std::ifstream& load)
             }
             else if (attack_name == "pickHit")
             {
-                std::cout << "CrazyHit loaded" << std::endl;
+                std::cout << "pickHit loaded" << std::endl;
             }
             else if (attack_name == "protect")
             {
                 std::cout << "protect loaded" << std::endl;
+            }
+            else if (attack_name == "hit")
+            {
+                std::cout << "hit loaded" << std::endl;
+            }
+            else if (attack_name == "lanceSpawn")
+            {
+                std::cout << "lanceSpawn loaded" << std::endl;
             }
             else
             {
