@@ -102,6 +102,18 @@ void lc::AI::Load(std::ifstream& load)
 
 
         }
+        else if (type_cast == bt::node_type::SHOT)
+        {
+            std::string garbage;
+            load >> garbage;
+        }
+        else if (type_cast == bt::node_type::JUMP)
+        {
+            float jump_height;
+            load >> jump_height;
+            node = bt::Node::New(bt::ActionNode::Jump(jump_height,getParent()));
+            std::dynamic_pointer_cast<bt::ActionNode::Jump>(node)->Setup(node);            
+        }
         else if (type_cast == bt::node_type::PLAY_SOUND)
         {
             std::string sound_name;
@@ -129,8 +141,6 @@ void lc::AI::Load(std::ifstream& load)
                 while(scene->getParent())
                     scene = scene->getParent();
                 std::weak_ptr<GameObject> player = scene->getObject("slug"), agent = getParent();
-                
-                
                 std::dynamic_pointer_cast<bt::Decorator::Condition>(node)->setCondition([player, agent, detection_range]
                 {
                     if(!player.expired() and !agent.expired())
@@ -167,8 +177,8 @@ void lc::AI::Load(std::ifstream& load)
             std::dynamic_pointer_cast<bt::Decorator::Loop>(node)->setLoop(loop);
             if (child_size)
             {
-                auto task = std::dynamic_pointer_cast<bt::Decorator::Loop>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
-                load_node_and_child(task, parent);
+                std::dynamic_pointer_cast<bt::Decorator::Loop>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
+                load_node_and_child(std::dynamic_pointer_cast<bt::Decorator::Loop>(node)->getTask(), parent);
             }
         }
         else if (type_cast == bt::node_type::WAIT)
@@ -183,8 +193,8 @@ void lc::AI::Load(std::ifstream& load)
         {
             if (child_size)
             {
-                auto task = std::dynamic_pointer_cast<bt::Decorator::Loop>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
-                load_node_and_child(task, parent);
+                type_cast == bt::node_type::INVERSER ? std::dynamic_pointer_cast<bt::Decorator::Inverser>(node)->setTask(bt::Node::New(bt::Composite::Sequence())) : std::dynamic_pointer_cast<bt::Decorator::ForceSuccess>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
+                load_node_and_child(type_cast == bt::node_type::INVERSER ? std::dynamic_pointer_cast<bt::Decorator::Inverser>(node)->getTask() : std::dynamic_pointer_cast<bt::Decorator::ForceSuccess>(node)->getTask(), parent);
             }
         }
         else if (type_cast < bt::node_type::INVERSER)

@@ -74,7 +74,9 @@ namespace bt
 		PLAY_SOUND,
 		ROTATE_TO,
 		WAIT,
-		ATTACK
+		ATTACK,
+		SHOT,
+		JUMP
 	};
 
 
@@ -328,6 +330,19 @@ namespace bt
 			Play_Sound(std::string sound, bool new_sound, std::weak_ptr<lc::GameObject> owner, float attenuation = 0.f, float min_distance = 0.f);
 			void Setup(NodePtr node);
 			bool tick();
+		};
+
+		class Jump : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_owner_;
+			float m_jump_height_;
+			bool m_need_to_jump_;
+		public:
+			Jump() : m_jump_height_(0.f), m_need_to_jump_(0.f){}
+			Jump(float jump_height, std::weak_ptr<lc::GameObject> owner);
+			void Setup(NodePtr node);
+			bool tick();
+			
 		};
 	}
 
