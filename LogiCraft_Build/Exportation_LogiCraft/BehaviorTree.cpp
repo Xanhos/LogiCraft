@@ -350,3 +350,33 @@ bool bt::ActionNode::Play_Sound::tick()
 	return true;
 }
 
+bt::ActionNode::Jump::Jump(float jump_height, std::weak_ptr<lc::GameObject> owner) : m_jump_height_(jump_height), m_owner_(owner), m_need_to_jump_(0.f)
+{
+}
+
+void bt::ActionNode::Jump::Setup(NodePtr node)
+{
+	if(m_owner_.lock()->hasComponent("RigidBody"))
+	{
+		auto rb = m_owner_.lock()->getComponent<lc::RigidBody>("RigidBody");
+		rb->AddInputFunction([node](lc::RigidBody* rigid_body)
+		{
+			if(auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::Jump>(node))
+				if(node_cast->m_need_to_jump_ and rigid_body->getVelocity().y == 0.f)
+				{
+					rigid_body->getVelocity().y -= node_cast->m_jump_height_;
+					node_cast->m_need_to_jump_ = false;
+				}
+		});
+	}
+}
+
+bool bt::ActionNode::Jump::tick()
+{
+	if(!m_need_to_jump_)
+	{
+		m_need_to_jump_ = true;
+	}
+	return m_need_to_jump_;
+}
+

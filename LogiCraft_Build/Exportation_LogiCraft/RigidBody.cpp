@@ -93,13 +93,13 @@ void lc::RigidBody::Update(WindowManager& _window)
 	}
 	if (m_isKinetic)
 	{
-		if(!m_is_flying)
-			m_velocity.y += (g)*Tools::getDeltaTime();
 		for (auto& i : m_inputFunc)
 		{
 			if (i)
 				i(this);
 		}
+		if(!m_is_flying)
+			m_velocity.y += (g)*Tools::getDeltaTime();
 		CheckAllObject(scene);
 	} 
 
