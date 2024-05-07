@@ -21,6 +21,11 @@ int main()
 	WindowManager window(1920, 1080, "test", false);
 	lc::Button::SetupFunctionPool(window);
 
+	sf::Listener::setPosition(0,10,0);
+	sf::Listener::setDirection(0,0,-1);
+	sf::Listener::setUpVector(0,1,0);
+	sf::Listener::setGlobalVolume(90);
+		
 	auto world = load();
 	auto player = lc::GameObject::CreateGameObject("Player", 8);
 	const sf::Vector2f viewSize(1920 * 2, 1080 * 2);

@@ -1,0 +1,26 @@
+WORLD 0 0 1 1 0 0 0 0 0 0
+Components
+{
+}
+Objects
+{
+Calque_1_copie_10 138.69 34.0831 1 1 120 120 0 0 0 0
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Calque_1_copie_10.png 0 0
+
+7 RigidBody 138.69 34.0831 120 120 0 0 0 0 1 1 RigidBody
+
+1 IA
+0 2
+8 0
+5 1 10
+
+11 0 Test 0 200 600
+
+}
+Objects
+{
+}
+
+}

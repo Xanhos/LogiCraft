@@ -70,10 +70,55 @@ void lc::AI::Load(std::ifstream& load)
             node = bt::Node::New(bt::ActionNode::MoveTo(getParent(),scene->getObject(target),100.f));
             std::dynamic_pointer_cast<bt::ActionNode::MoveTo>(node)->Setup(node);
 		}
+        else if (static_cast<int>(type_cast) == 14)
+        {
+            std::string garbage;
+            load >> garbage;
+        }
+        else if (type_cast == bt::node_type::PLAY_SOUND)
+        {
+            std::string sound_name;
+            bool new_sound = false;
+            float attenuation(0.f), minDistance(0.f);
+            load >> sound_name >> new_sound >> attenuation >> minDistance;
+            
+            node = bt::Node::New(bt::ActionNode::Play_Sound(sound_name,new_sound,getParent(),attenuation,minDistance));
+            std::dynamic_pointer_cast<bt::ActionNode::Play_Sound>(node)->Setup(node);
+        }
         else if(type_cast == bt::node_type::WANDER)
         {
             node = bt::Node::New(bt::ActionNode::Wander(getParent()));
             std::dynamic_pointer_cast<bt::ActionNode::Wander>(node)->Setup(node);
+        }
+        else if(type_cast == bt::node_type::CONDITION)
+        {
+            int condition_type;
+            load >> condition_type;
+            if(condition_type == 0)
+            {
+                float detection_range;
+                load >> detection_range;
+                auto scene = getParent();
+                while(scene->getParent())
+                    scene = scene->getParent();
+                std::weak_ptr<GameObject> player = scene->getObject("slug"), agent = getParent();
+                
+                
+                std::dynamic_pointer_cast<bt::Decorator::Condition>(node)->setCondition([player, agent, detection_range]
+                {
+                    if(!player.expired() and !agent.expired())
+                    {
+                        return Tools::Vector::getDistance(player.lock()->getTransform().getPosition(),agent.lock()->getTransform().getPosition()) < detection_range;
+                    }
+                    return false;
+                });
+                if(child_size)
+                {
+                    std::dynamic_pointer_cast<bt::Decorator::Condition>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
+                    load_node_and_child(std::dynamic_pointer_cast<bt::Decorator::Condition>(node)->getTask(), parent);
+                }
+            }
+            
         }
         else if(type_cast == bt::node_type::COOLDOWN)
         {
@@ -83,8 +128,8 @@ void lc::AI::Load(std::ifstream& load)
             std::dynamic_pointer_cast<bt::Decorator::Cooldown>(node)->setTimer(time);
             if(child_size)
             {
-                auto task = std::dynamic_pointer_cast<bt::Decorator::Cooldown>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
-                load_node_and_child(task, parent);
+                std::dynamic_pointer_cast<bt::Decorator::Cooldown>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
+                load_node_and_child(std::dynamic_pointer_cast<bt::Decorator::Cooldown>(node)->getTask(), parent);
 			}
         }
         else if (type_cast == bt::node_type::LOOP)

@@ -214,6 +214,7 @@ bt::NodePtr bt::Factory(const node_type& type)
 	case node_type::PLAY_ANIMATION:
 		break;
 	case node_type::PLAY_SOUND:
+		return Node::New(ActionNode::Play_Sound());
 		break;
 	case node_type::ROTATE_TO:
 		break;
@@ -316,3 +317,36 @@ bool bt::ActionNode::Wait::tick()
 
 	return false;
 }
+
+bt::ActionNode::Play_Sound::Play_Sound(std::string sound, bool new_sound, std::weak_ptr<lc::GameObject> owner,float attenuation, float min_distance)
+{
+	m_sound_name_ = sound;
+	m_start_new_sound_ = new_sound;
+	m_sound_id_ = s_general_sound_id_;
+	m_owner = owner;
+	m_attenuation_ = attenuation;
+	m_min_distance_ = min_distance;
+
+	
+}
+
+void bt::ActionNode::Play_Sound::Setup(NodePtr node)
+{
+	if(m_owner.lock()->hasComponent("RigidBody"))
+	{
+		auto rb = m_owner.lock()->getComponent<lc::RigidBody>("RigidBody");
+		rb->AddInputFunction([node](lc::RigidBody* rigid_body)
+		{
+			auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::Play_Sound>(node);
+			auto pos = rigid_body->getParent()->getTransform().getPosition();
+			GET_MANAGER->updateSoundPosition(node_cast->m_sound_name_,node_cast->m_sound_id_,sf::Vector3f(pos.x,pos.y,10.f));
+		});
+	}
+}
+
+bool bt::ActionNode::Play_Sound::tick()
+{
+	GET_MANAGER->playSound(m_sound_name_,m_sound_id_,m_start_new_sound_, false, m_attenuation_, m_min_distance_);	
+	return true;
+}
+

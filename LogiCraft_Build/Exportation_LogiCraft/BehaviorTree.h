@@ -176,6 +176,7 @@ namespace bt
 			Decorator(NodePtr task) { m_task = task; }
 
 			NodePtr setTask(NodePtr task) { m_task = task; return m_task; }
+			NodePtr& getTask() {return m_task;}
 		};
 
 		class Inverser : public Decorator
@@ -226,6 +227,7 @@ namespace bt
 					m_timer = 0.f;
 					return SECURE_TASK(m_task);
 				}
+				m_timer += Tools::getDeltaTime();
 				return false;
 			}
 		};
@@ -245,6 +247,7 @@ namespace bt
 			Condition() : Decorator() {}
 			Condition(NodePtr task, std::function<bool()> condition) : Decorator(task) { m_condition = condition; }
 
+			void setCondition( std::function<bool()> condition) {m_condition = condition;}
 			virtual bool tick() {
 				if (m_condition)
 					if (m_condition())
@@ -311,6 +314,20 @@ namespace bt
 			std::weak_ptr<Node> getParent() {return m_parent_;};
 		};
 
+		class Play_Sound : public Node
+		{
+			std::string m_sound_name_;
+			bool m_start_new_sound_;
+			inline static unsigned int s_general_sound_id_ = 50000u;
+			unsigned int m_sound_id_;
+			std::weak_ptr<lc::GameObject> m_owner;
+			float m_attenuation_, m_min_distance_;
+		public:
+			Play_Sound() : m_start_new_sound_(false), m_sound_id_(s_general_sound_id_++), m_attenuation_(0.f), m_min_distance_(0.f){}
+			Play_Sound(std::string sound, bool new_sound, std::weak_ptr<lc::GameObject> owner, float attenuation = 0.f, float min_distance = 0.f);
+			void Setup(NodePtr node);
+			bool tick();
+		};
 	}
 
 
