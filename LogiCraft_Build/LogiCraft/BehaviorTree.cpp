@@ -161,26 +161,28 @@ void PatronNode::SetupAllNode()
 			};
 	}
 
-	//IN_RANGE_OF_PLAYER
+	//MOVE TO
 	{
-		s_DecoratorInitMethod["IN_RANGE_OF_PLAYER"] = [](PatronNode* node) {
-			node->m_decoratorData = 100;
-			};
-		s_DecoratorUpdateMethod["IN_RANGE_OF_PLAYER"] = [](PatronNode* node) {
-			int range = std::any_cast<int>(node->m_decoratorData);
-			ImGui::SliderInt("Range", &range, 100, 1500);
-			node->m_decoratorData = range;
-			};
-		s_DecoratorSaveMethod["IN_RANGE_OF_PLAYER"] = [](PatronNode* node, std::ofstream& file) {
-			int range = std::any_cast<int>(node->m_decoratorData);
-			file << range;
-
-			};
-		s_DecoratorLoadMethod["IN_RANGE_OF_PLAYER"] = [](PatronNode* node, std::ifstream& file) {
-			int range;
-			file >> range;
-			node->m_decoratorData = range;
-			};
+		s_DecoratorInitMethod["MOVE TO"] = [](PatronNode* node) {
+			node->m_decoratorData = std::string();
+		};
+		s_DecoratorCopyMethod["MOVE TO"] = [](PatronNode* node, PatronNode* node_copied) {
+			node->m_decoratorData = std::any_cast<std::string>(node_copied->m_decoratorData);
+		};
+		s_DecoratorUpdateMethod["MOVE TO"] = [](PatronNode* node) {
+			auto TAG = std::any_cast<std::string>(node->m_decoratorData);
+			ImGui::InputText("TAG", TAG, 100);
+			node->m_decoratorData = TAG;
+		};
+		s_DecoratorSaveMethod["MOVE TO"] = [](PatronNode* node, std::ofstream& file) {
+			auto tag = std::any_cast<std::string>(node->m_decoratorData);
+			file << tag;
+		};
+		s_DecoratorLoadMethod["MOVE TO"] = [](PatronNode* node, std::ifstream& file){
+			std::string tag;
+			file >> tag;
+			node->m_decoratorData = tag;
+		};
 	}
 
 	//MOVE_TO
