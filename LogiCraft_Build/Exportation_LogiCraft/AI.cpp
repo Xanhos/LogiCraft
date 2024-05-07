@@ -70,10 +70,37 @@ void lc::AI::Load(std::ifstream& load)
             node = bt::Node::New(bt::ActionNode::MoveTo(getParent(),scene->getObject(target),100.f));
             std::dynamic_pointer_cast<bt::ActionNode::MoveTo>(node)->Setup(node);
 		}
-        else if (static_cast<int>(type_cast) == 14)
+        else if (type_cast == bt::node_type::ATTACK)
         {
-            std::string garbage;
-            load >> garbage;
+            std::string attack_name;
+            load >> attack_name;
+
+            if (attack_name == "damageBox")
+            {
+                std::cout << "damageBox loaded" << std::endl;
+            }
+            else if (attack_name == "lanceHit")
+            {
+                std::cout << "lanceHit loaded" << std::endl;
+            }
+            else if (attack_name == "CrazyHit")
+            {
+                std::cout << "CrazyHit loaded" << std::endl;
+            }
+            else if (attack_name == "pickHit")
+            {
+                std::cout << "CrazyHit loaded" << std::endl;
+            }
+            else if (attack_name == "protect")
+            {
+                std::cout << "protect loaded" << std::endl;
+            }
+            else
+            {
+                std::cout << "no attack of this name exist" << std::endl;
+            }
+
+
         }
         else if (type_cast == bt::node_type::PLAY_SOUND)
         {

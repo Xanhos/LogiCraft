@@ -73,7 +73,8 @@ namespace bt
 		PLAY_ANIMATION,
 		PLAY_SOUND,
 		ROTATE_TO,
-		WAIT
+		WAIT,
+		ATTACK
 	};
 
 
@@ -291,7 +292,7 @@ namespace bt
 			bool m_bool_wander_;
 			bool m_bool_direction_; //false mean left, true mean right;
 			float m_speed_;
-			public:
+		public:
 			Wander() : m_agent_(), m_bool_wander_(false), m_bool_direction_(false), m_speed_(0.f) {}
 			Wander(const std::shared_ptr<lc::GameObject>& agent_);
 			void Setup(NodePtr node);

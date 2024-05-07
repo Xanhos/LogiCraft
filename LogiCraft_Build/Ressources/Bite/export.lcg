@@ -4,27 +4,6 @@ Components
 }
 Objects
 {
-
-slug 683.332 1204.28 1 1 221 157 0 0 0 0
-Components
-{
-0 0 0 1105 157 walk_slug_1_221x157.png 0 0
-
-6 Animation walk_slug_1_221x157 Walking 1
-Walking 0 0 221 157 0 5 0.156 5
-
-7 683.332 1204.28 221 157 0 0 1 0
-
-1 
-0 1
-8 0
-
-}
-Objects
-{
-}
-
-
 conscrit 37.1665 98.2429 1 1 200 200 0 0 0 0
 Components
 {
@@ -40,7 +19,7 @@ Components
 3 1 0 100
 14 0 lanceHit
 
-9 0 slug
+9 0 PLAYER
 8 0
 
 }
@@ -63,10 +42,10 @@ Components
 3 1 0 995
 1 2
 3 1 0 100
-14 0 OUHOUH
+14 0 LA_LANCE
 
-9 0 slug
-9 0 slug
+9 0 MON_VIER
+9 0 MON_VIER
 8 0
 
 }
@@ -114,7 +93,7 @@ Components
 
 14 0 protect
 
-9 0 slug
+9 0 PLAYER
 8 0
 
 }
@@ -137,7 +116,7 @@ Components
 3 1 0 298
 14 0 lanceSpawn
 
-9 0 slug
+9 0 PLAYER
 8 0
 
 }
@@ -145,7 +124,24 @@ Objects
 {
 }
 
+slug 683.332 1204.28 1 1 221 157 0 0 0 0
+Components
+{
+0 0 0 1105 157 walk_slug_1_221x157.png 0 0
 
+6 Animation walk_slug_1_221x157 Walking 1
+Walking 0 0 221 157 0 5 0.156 5
+
+7 683.332 1204.28 221 157 0 0 1 0
+
+1 
+0 1
+8 0
+
+}
+Objects
+{
+}
 
 fish 1374.34 868.116 1 1 358 156 0 0 0 0
 Components
@@ -187,7 +183,7 @@ Idle 0 0 1617 1029 0 7 0.15 4
 
 14 0 pickHit
 
-9 0 slug
+9 0 PLAYER
 
 }
 Objects
