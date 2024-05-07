@@ -59,7 +59,7 @@ class PatronNode
 	bool m_isOpen = false;
 	bool m_newNodeIsAdded = false;
 	std::any m_decoratorData;
-	
+	std::weak_ptr<lc::GameObject> m_game_object_;
 
 	static DecoratorSaveMethod s_DecoratorSaveMethod;
 	static DecoratorLoadMethod s_DecoratorLoadMethod;
@@ -188,5 +188,5 @@ public:
 	 * \param executionOrder Execution order of the node, 0 mean its the root node
 	 * \return 
 	 */
-	ImRect Display(PatronNode** selectedNode, int executionOrder = 0);
+	ImRect Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObject> game_object,int executionOrder = 0);
 };

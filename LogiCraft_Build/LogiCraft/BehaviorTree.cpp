@@ -36,6 +36,9 @@ SOFTWARE.
 
 #include <tuple>
 #include <tuple>
+#include <tuple>
+
+#include "Animation.h"
 
 std::unordered_map<std::string, int> PatronNode::s_NodeContainer = {};
 std::unordered_map<std::string, int> PatronNode::s_ConditionContainer = {};
@@ -68,6 +71,7 @@ void PatronNode::SetupAllNode()
 	pushNode("ATTACK");
 	pushNode("SHOT");
 	pushNode("JUMP");
+	
 
 	s_decoratorNodeStart = s_NodeContainer["INVERSER"];//Were the decorator node start
 	s_actionNodeStart = s_NodeContainer["WANDER"];//Were the action node start and were the decorator node stop (leaf node)
@@ -235,13 +239,46 @@ void PatronNode::SetupAllNode()
 	//PLAY_ANIMATION
 	{
 		s_DecoratorInitMethod["PLAY ANIMATION"] = [](PatronNode* node) {
-			node->m_decoratorData = std::string();
+			node->m_decoratorData = std::tuple<std::weak_ptr<lc::Animation>,std::string>();
 			};
 		s_DecoratorCopyMethod["PLAY ANIMATION"] = [](PatronNode* node, PatronNode* node_copied) {
-			node->m_decoratorData = std::any_cast<std::string>(node_copied->m_decoratorData);
+			node->m_decoratorData = std::tuple<std::weak_ptr<lc::Animation>,std::string>();
 			};
-		s_DecoratorUpdateMethod["PLAY ANIMATION"] = [](PatronNode* node) {
-			auto TAG = std::any_cast<std::string>(node->m_decoratorData);
+		s_DecoratorUpdateMethod["PLAY ANIMATION"] = [](PatronNode* node) {			
+			auto tuple = std::any_cast<std::tuple<std::weak_ptr<lc::Animation>,std::string>>(node->m_decoratorData);
+			if(!node->m_game_object_.expired())
+			{
+				auto object = node->m_game_object_.lock();
+				if(ImGui::BeginCombo("Animation Chosen", std::get<0>(tuple).expired() ? "Select Animation" : std::get<0>(tuple).lock()->getName().c_str()))
+				{
+					bool is_selected = false;
+					for (const auto& component : object->getComponents())
+					{
+						if(auto anim = std::dynamic_pointer_cast<lc::Animation>(component))
+						{
+							if(ImGui::Selectable(anim->getName().c_str(),&is_selected,ImGuiSelectableFlags_SelectOnClick))
+							{
+								std::get<0>(tuple) = anim;
+							}
+						}					
+					}
+					ImGui::EndCombo();
+				}
+
+				if(!std::get<0>(tuple).expired())
+				{
+					
+
+					
+				}
+				
+				
+				
+			}
+
+
+
+			
 			ImGui::InputText("TAG", TAG, 100);
 			node->m_decoratorData = TAG;
 			};
@@ -541,8 +578,12 @@ void PatronNode::Load(std::ifstream& load)
 	}
 }
 
-ImRect PatronNode::Display(PatronNode** selectedNode, int executionOrder)
+ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObject> game_object,int executionOrder)
 {
+	if(m_game_object_.expired())
+	{
+		m_game_object_ = game_object;		
+	}
 	if (*selectedNode == this)//If the node is selected, change the color of the node
 	{
 		ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(31 / 255.f, 57 / 255.f, 88.f / 255.f, 1.f));
@@ -631,7 +672,7 @@ ImRect PatronNode::Display(PatronNode** selectedNode, int executionOrder)
 		for (auto child : m_child)
 		{
 			const float HorizontalTreeLineSize = 10.0f; //chosen arbitrarily
-			const ImRect childRect = child->Display(selectedNode, index);
+			const ImRect childRect = child->Display(selectedNode, game_object,index);
 			const float midpoint = (childRect.Min.y + childRect.Max.y) / 2.0f - 1.f;
 			drawList->AddLine(ImVec2(verticalLineStart.x, midpoint), ImVec2(verticalLineStart.x + HorizontalTreeLineSize, midpoint), TreeLineColor);
 			verticalLineEnd.y = midpoint;
