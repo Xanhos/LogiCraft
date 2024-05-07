@@ -66,6 +66,8 @@ void PatronNode::SetupAllNode()
 	pushNode("ROTATE TO");
 	pushNode("WAIT");
 	pushNode("ATTACK");
+	pushNode("SHOT");
+	pushNode("JUMP");
 
 	s_decoratorNodeStart = s_NodeContainer["INVERSER"];//Were the decorator node start
 	s_actionNodeStart = s_NodeContainer["WANDER"];//Were the action node start and were the decorator node stop (leaf node)
@@ -183,29 +185,47 @@ void PatronNode::SetupAllNode()
 			};
 	}
 
-	//MOVE_TO
+	//IN_RANGE_OF_PLAYER
+    	{
+    		s_DecoratorInitMethod["IN_RANGE_OF_PLAYER"] = [](PatronNode* node) {
+    			node->m_decoratorData = 100;
+    			};
+    		s_DecoratorUpdateMethod["IN_RANGE_OF_PLAYER"] = [](PatronNode* node) {
+    			int range = std::any_cast<int>(node->m_decoratorData);
+    			ImGui::SliderInt("Range", &range, 100, 1500);
+    			node->m_decoratorData = range;
+    			};
+    		s_DecoratorSaveMethod["IN_RANGE_OF_PLAYER"] = [](PatronNode* node, std::ofstream& file) {
+    			int range = std::any_cast<int>(node->m_decoratorData);
+    			file << range;
+    
+    			};
+    		s_DecoratorLoadMethod["IN_RANGE_OF_PLAYER"] = [](PatronNode* node, std::ifstream& file) {
+    			int range;
+    			file >> range;
+    			node->m_decoratorData = range;
+    			};
+    	}
+
+	//JUMP
 	{
-		s_DecoratorInitMethod["MOVE TO"] = [](PatronNode* node) {
-			node->m_decoratorData = std::string();
+		s_DecoratorInitMethod["JUMP"] = [](PatronNode* node) {
+			node->m_decoratorData = 100.f;
 			};
-		s_DecoratorCopyMethod["MOVE TO"] = [](PatronNode* node, PatronNode* node_copied) {
-			node->m_decoratorData = std::any_cast<std::string>(node_copied->m_decoratorData);
+		s_DecoratorUpdateMethod["JUMP"] = [](PatronNode* node) {
+			auto jump_height = std::any_cast<float>(node->m_decoratorData);
+			ImGui::DragFloat("Jump Height", &jump_height);
+			node->m_decoratorData = jump_height;
 			};
-		s_DecoratorUpdateMethod["MOVE TO"] = [](PatronNode* node) {
-			auto TAG = std::any_cast<std::string>(node->m_decoratorData);
-			ImGui::InputText("TAG", TAG, 100);
-			node->m_decoratorData = TAG;
-			};
-		s_DecoratorSaveMethod["MOVE TO"] = [](PatronNode* node, std::ofstream& file) {
-			auto tag = std::any_cast<std::string>(node->m_decoratorData);
-			file << tag;
+		s_DecoratorSaveMethod["JUMP"] = [](PatronNode* node, std::ofstream& file) {
+			auto jump_height = std::any_cast<float>(node->m_decoratorData);
+			file << jump_height;
 
 			};
-		s_DecoratorLoadMethod["MOVE TO"] = [](PatronNode* node, std::ifstream& file) {
-			std::string tag;
-			file >> tag;
-			node->m_decoratorData = tag;
-			auto t = std::any_cast<std::string>(node->m_decoratorData);
+		s_DecoratorLoadMethod["JUMP"] = [](PatronNode* node, std::ifstream& file) {
+			float jump_height;
+			file >> jump_height;
+			node->m_decoratorData = jump_height;
 			};
 	}
 
