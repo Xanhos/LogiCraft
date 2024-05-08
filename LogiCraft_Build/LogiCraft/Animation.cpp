@@ -339,7 +339,7 @@ namespace lc
 					const bool tmp_is_selected(false);
 
 					if (!m_actual_animation_key_.expired())
-						if (ImGui::Selectable("No Animation Key", tmp_is_selected))
+						if (ImGui::Selectable("No Animation Key", tmp_is_selected, ImGuiCol_ButtonHovered))
 						{
 							if (!m_texture_.expired())
 							{
@@ -393,7 +393,7 @@ namespace lc
 						}
 					}
 
-					ImGui::BeginChild(std::string("All Key" + std::to_string(m_ID)).c_str(), sf::Vector2f(ImGui::GetContentRegionAvail().x, 100.f), ImGuiChildFlags_Border);
+					ImGui::BeginChild(std::string("All Key" + std::to_string(m_ID)).c_str(), sf::Vector2f(ImGui::GetContentRegionAvail().x, 200.f), ImGuiChildFlags_Border);
 					{
 						for (auto animation_key_pair = m_animation_keys_.begin(); animation_key_pair != m_animation_keys_.end();)
 						{

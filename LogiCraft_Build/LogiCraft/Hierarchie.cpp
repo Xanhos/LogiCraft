@@ -41,8 +41,12 @@ SOFTWARE.
 #include "Animation.h"
 
 Hierarchie::Hierarchie()
-	: m_hasMoveAnObject(false), m_wantToCreateAGameObject(false), m_copyPasteTimer(0.f), m_isDraging(false)
+	: m_hasMoveAnObject(false), m_wantToCreateAGameObject(false), m_isDragging(false), m_isClicking(false),
+	  m_copyPasteTimer(0.f)
 {
+	m_want_to_add_a_component_ = std::make_pair<bool, std::weak_ptr<lc::GameObject>>(false, std::weak_ptr<lc::GameObject>());
+
+	this->setup_components_function();
 }
 
 Hierarchie::~Hierarchie()
@@ -68,6 +72,9 @@ void Hierarchie::Update(std::shared_ptr<lc::GameObject> _scene, WindowManager& _
 	this->SelectedObjectsDisplay(_scene, _viewports);
 	ImGui::End();
 
+	if (m_want_to_add_a_component_.first)
+		this->add_component_to_object_window_display();
+
 	this->CopyPaste(_scene, _viewports);
 }
 
@@ -79,7 +86,7 @@ ObjWeakPtrList& Hierarchie::getSelectedGameObject()
 void Hierarchie::GameObjectsDisplay(std::shared_ptr<lc::GameObject> _gameObject, std::shared_ptr<lc::GameObject> _scene, std::list<std::shared_ptr<lc::GameObject>>* _gameObjectList)
 {
 	ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_Selected;
-	_gameObject->getObjects().size() == 0 ? flags |= ImGuiTreeNodeFlags_Leaf : flags |= (ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick);
+	_gameObject->getObjects().empty() ? flags |= ImGuiTreeNodeFlags_Leaf : flags |= (ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick);
 
 	std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&](std::weak_ptr<lc::GameObject>& obj) {return _gameObject == obj.lock(); })
 		!= m_selectedGameObjects.end() ? ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.25882f, 0.5882f, 1.f, 1.f)) : ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1215f, 0.22352f, 0.3450f, 1.f));
@@ -110,7 +117,8 @@ void Hierarchie::GameObjectsDisplay(std::shared_ptr<lc::GameObject> _gameObject,
 		this->MoveDownUpBehavior(_gameObject, _gameObjectList);
 	}
 	ImGui::PopStyleColor();
-	if (_gameObject->getName() == "")
+	
+	if (_gameObject->getName().empty())
 		_gameObject->getName() = "No_Name";
 	else
 		Tools::ReplaceCharacter(_gameObject->getName(), ' ', '_');
@@ -142,7 +150,7 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
 					bool isSelected(false);
 					for (auto& layer : ToolsBar::GetLayers())
 					{
-						if (ImGui::Selectable(layer.second.c_str(), &layer))
+						if (ImGui::Selectable(layer.second.c_str(), &isSelected))
 						{
 							tmp_object->setDepth(layer.first);
 						}
@@ -154,32 +162,11 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
 
 				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
 
-				if (ImGui::Button("Add Button"))
+				if (ImGui::Button("Add Component"))
 				{
-					bool isButton = false;
-					for (auto& components : tmp_object->getComponents())
-					{
-						if (components->getTypeName() == "Button")
-						{
-							isButton = true;
-						}
-					}
-					if (!isButton)
-						tmp_object->addComponent<lc::Button>();
+					m_want_to_add_a_component_.first = true;	
+					m_want_to_add_a_component_.second = tmp_object;	
 				}
-
-				if (ImGui::Button("Add Particules System"))
-					tmp_object->addComponent<lc::Particles>();
-
-				if (ImGui::Button("Add Animation"))
-					tmp_object->addComponent<lc::Animation>();
-
-				if (ImGui::Button("Add RigidBody"))
-					tmp_object->addComponent<lc::RigidBody>();
-
-				if (tmp_object->hasComponent("RigidBody") and !tmp_object->hasComponent("AI"))
-					if (ImGui::Button("Add AI"))
-						tmp_object->addComponent<lc::AI>();
 
 				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
 
@@ -227,6 +214,41 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
 			}
 		}
 	}
+}
+
+void Hierarchie::add_component_to_object_window_display()
+{
+	static std::string tmp_component_name;
+	ImGui::Begin("Add a component", &m_want_to_add_a_component_.first);
+	{
+		ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+		ImGui::InputText("##Search Component Name", tmp_component_name, 150);
+		ImGui::PopItemWidth();
+		if (ImGui::BeginChild("Component Selection", ImGui::GetContentRegionAvail(), ImGuiChildFlags_Border))
+		{
+			bool tmp_selected(false);
+			for (const auto& component : m_components_map_)
+			{
+				if (component.first.find(tmp_component_name) != std::string::npos)
+					if (ImGui::Selectable(component.first.c_str(), tmp_selected))
+						component.second();
+
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5.f);
+			}
+				
+			ImGui::EndChild();
+		}
+	}
+	ImGui::End();
+
+	//If the object that the user open the add component window with and the object get unselected then the window close itself.
+	if (std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&](const auto& game_object)
+		{ return (m_want_to_add_a_component_.second.lock() == game_object.lock());}) == m_selectedGameObjects.end())
+		m_want_to_add_a_component_.first = false;
+
+	//If the window closed then the tmp_component_name is cleared.
+	if (!m_want_to_add_a_component_.first)
+		tmp_component_name.clear();
 }
 
 void Hierarchie::CreateNewObjectBehavior()
@@ -381,56 +403,73 @@ void Hierarchie::DragAndDropBehavior(std::shared_ptr<lc::GameObject> _gameObject
 	{
 		if (ImGui::BeginDragDropSource() && _scene != _gameObject)
 		{
-			auto tmp = this;
-			ImGui::SetDragDropPayload("Game Object Drag", &tmp, sizeof(this));
-			ImGui::Text(std::string(_gameObject->getName() + "<ID:" + std::to_string(_gameObject->getID()) + "> is begin dragged").c_str());
+			ImGui::SetDragDropPayload("Game Object Drag", &m_selectedGameObjects, sizeof(m_selectedGameObjects));
+			{
+				if (static_cast<int>(m_selectedGameObjects.size()) > 1)
+					ImGui::Text(std::string(m_selectedGameObjects.back().lock()->getName() + " is begin dragged with other object").c_str());	
+				else
+					ImGui::Text(std::string(m_selectedGameObjects.back().lock()->getName()+ " is begin dragged").c_str());
+			}
+			
 			ImGui::EndDragDropSource();
-			m_isDraging =true;
+			
+			m_isDragging = true;
 		}
 
-		if (BeginDragDropTarget())
+		if (ImGui::BeginDragDropTarget())
 		{
-			if (auto tmp_playLoad = ImGui::AcceptDragDropPayload("Game Object Drag"))
-				if (auto tmp_gameObject = reinterpret_cast<Hierarchie*>(tmp_playLoad->Data))
+			if (auto tmp_play_load = ImGui::AcceptDragDropPayload("Game Object Drag"))
+			{
+				if (auto tmp_selected_obj_list = reinterpret_cast<ObjWeakPtrList*>(tmp_play_load->Data))
 				{
-					auto replace = [&](std::shared_ptr<lc::GameObject> tmp_gameObject)
+					//Lambda to move object where the user decide to move it.
+					auto move_object = [&](std::shared_ptr<lc::GameObject>& tmp_gameObject)
 					{
-						auto tmp_objectParent = tmp_gameObject->getParent();
-						if (tmp_gameObject->objectIsParent(_gameObject->getName(), _gameObject->getID()))
+						if (auto tmp_objectParent = tmp_gameObject->getParent()) //If he has no parent that mean it's the world, so you can't move it.
 						{
-							//Then we set his child to be the child of his parent
-							/*	+------------------------+
-								|                        |
-								|        His Parent>-----+
-								|            X           |
-								|            X           |
-								|        GameObject      |-- Push into his New Parent
-								|            |           |
-								|            v           |
-								|        His Child<----- +
-								| _______________________| */
-							for (auto& gameObject : tmp_gameObject->getObjects())
-								tmp_objectParent->addObject(gameObject);
-
-							//And then we take clear his child because they got moved in his parent.
-							tmp_objectParent->getObject(tmp_gameObject->getName(), tmp_gameObject->getID())->getObjects().clear();
+							if (tmp_gameObject->objectIsParent(_gameObject->getName(), _gameObject->getID()))
+							{
+								//Then we set his child to be the child of his parent
+								/*	+------------------------+
+									|                        |
+									|        His Parent>-----+
+									|            X           |
+									|            X           |
+									|        GameObject      |-- Push into his New Parent
+									|            |           |
+									|            v           |
+									|        His Child<----- +
+									| _______________________| */
+								for (auto& gameObject : tmp_gameObject->getObjects())
+									tmp_objectParent->addObject(gameObject);
+				
+								//And then we take clear his child because they got moved in his parent.
+								tmp_objectParent->getObject(tmp_gameObject->getName(), tmp_gameObject->getID())->getObjects().clear();
+							}
+							//And then if the Object that the user want to move his the child of the Object where he need to be move nothing happend.
+							if (tmp_objectParent != _gameObject)
+							{
+								//Then we push the Object into his new parent. 
+								_gameObject->addObject(tmp_objectParent->getObject(tmp_gameObject->getName(), tmp_gameObject->getID()));
+								//And we remove it from his old parent.
+								tmp_objectParent->removeObject(tmp_gameObject->getName(), tmp_gameObject->getID());
+							}	
 						}
-						//And then if the Object that the user want to move his the child of the Object where he need to be move nothing happend.
-						if (tmp_objectParent != _gameObject)
-						{
-							//Then we push the Object into his new parent. 
-							_gameObject->addObject(tmp_objectParent->getObject(tmp_gameObject->getName(), tmp_gameObject->getID()));
-							//And we remove it from his old parent.
-							tmp_objectParent->removeObject(tmp_gameObject->getName(), tmp_gameObject->getID());
-						}
-					
 					};
-					for(auto& obj : m_selectedGameObjects)
-						replace(obj.lock());
+					
+					//Drag and drop successful.
+					for (auto& selected_obj : *tmp_selected_obj_list)
+						if (!selected_obj.expired())
+						{
+							auto tmp_obj = selected_obj.lock();
+							move_object(tmp_obj);
+						}
 
 					m_hasMoveAnObject = true;
+
+					m_isDragging = false;
 				}
-			m_isDraging =false;
+			}
 
 			ImGui::EndDragDropTarget();
 		}
@@ -439,7 +478,7 @@ void Hierarchie::DragAndDropBehavior(std::shared_ptr<lc::GameObject> _gameObject
 
 void Hierarchie::SelectionBehavior(std::shared_ptr<lc::GameObject> _gameObject)
 {
-	if(!m_isDraging)
+	if(!m_isDragging)
 	{
 		if (ImGui::IsItemClicked(ImGuiMouseButton_Left) and _gameObject->getParent())
 		{
@@ -452,6 +491,7 @@ void Hierarchie::SelectionBehavior(std::shared_ptr<lc::GameObject> _gameObject)
 			{				
 				if (!KEY(LControl))
 					m_selectedGameObjects.clear();
+				
 				this->SelectionVerifyBehavior(_gameObject);
 				m_isClicking = false;
 			}
@@ -468,88 +508,89 @@ void Hierarchie::SelectionBehavior(std::shared_ptr<lc::GameObject> _gameObject)
 
 void Hierarchie::SelectionVerifyBehavior(std::shared_ptr<lc::GameObject> _gameObject)
 {
-	if (KEY(LShift) and KEY(LControl) and !m_selectedGameObjects.empty())
+	if (_gameObject->getParent())
 	{
-		if(!m_selectedGameObjects.back().expired())
-			if(m_selectedGameObjects.back().lock()->getParent())
-				if(m_selectedGameObjects.back().lock()->getParent() == _gameObject->getParent())
-				{
-					auto container = m_selectedGameObjects.back().lock()->getParent();
-					auto start = m_selectedGameObjects.back().lock();
-					auto end = _gameObject;
-
-					for(auto& i : container->getObjects())
+		if (KEY(LShift) and KEY(LControl) and !m_selectedGameObjects.empty())
+		{
+			if(!m_selectedGameObjects.back().expired())
+				if(m_selectedGameObjects.back().lock()->getParent())
+					if(m_selectedGameObjects.back().lock()->getParent() == _gameObject->getParent())
 					{
-						if(i == start)
-							break;
-						if (i == end)
+						auto container = m_selectedGameObjects.back().lock()->getParent();
+						auto start = m_selectedGameObjects.back().lock();
+						auto end = _gameObject;
+
+						for(auto& i : container->getObjects())
 						{
-							end = start;
-							start = _gameObject;
-							break;
+							if(i == start)
+								break;
+							if (i == end)
+							{
+								end = start;
+								start = _gameObject;
+								break;
+							}
 						}
-					}
-					std::function<void(std::shared_ptr<lc::GameObject>& obj)> add = [&](std::shared_ptr<lc::GameObject>& obj)
-					{
-						if (std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&_gameObject](std::weak_ptr<lc::GameObject> _wptrObject)
+						std::function<void(std::shared_ptr<lc::GameObject>& obj)> add = [&](std::shared_ptr<lc::GameObject>& obj)
 						{
-							if (!_wptrObject.expired())
-								if (_gameObject == _wptrObject.lock())
-									return true;
+							if (std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&_gameObject](std::weak_ptr<lc::GameObject> _wptrObject)
+							{
+								if (!_wptrObject.expired())
+									if (_gameObject == _wptrObject.lock())
+										return true;
 
-							return false;
-						}) == m_selectedGameObjects.end())
-							m_selectedGameObjects.push_back(_gameObject);
-							this->m_selectedGameObjects.push_back(obj);
-							for(auto& child : obj->getObjects())
-								add(child);
-					};
+								return false;
+							}) == m_selectedGameObjects.end())
+								m_selectedGameObjects.push_back(_gameObject);
+							
+								this->m_selectedGameObjects.push_back(obj);
+								for(auto& child : obj->getObjects())
+									add(child);
+						};
 
 
-					auto it = container->getObjects().begin();
-					for(;*it != start;it++)
-					{}
-					
-					for(;*it != end; it++)
-					{
-						add(*it);
-					}			
-					add(end);
-				}
-		
+						auto it = container->getObjects().begin();
+						for(;*it != start;it++)
+						{}
+						
+						for(;*it != end; it++)
+						{
+							add(*it);
+						}			
+						add(end);
+					}
+		}	
+		else if (KEY(LShift))
+		{
+			if (std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&_gameObject](std::weak_ptr<lc::GameObject> _wptrObject)
+				{
+					if (!_wptrObject.expired())
+						if (_gameObject == _wptrObject.lock())
+							return true;
 
-		
-	}	
-	else if (KEY(LShift))
-	{
-		if (std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&_gameObject](std::weak_ptr<lc::GameObject> _wptrObject)
-			{
-				if (!_wptrObject.expired())
-					if (_gameObject == _wptrObject.lock())
-						return true;
+					return false;
+				}) == m_selectedGameObjects.end())
+				m_selectedGameObjects.push_back(_gameObject);
 
-				return false;
-			}) == m_selectedGameObjects.end())
-			m_selectedGameObjects.push_back(_gameObject);
-
-		for (auto& object : _gameObject->getObjects())
-			this->SelectionVerifyBehavior(object);
-	}
-	else
-	{
-		auto tmp_selected = std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&_gameObject](std::weak_ptr<lc::GameObject> _wptrObject)
-			{
-				if (!_wptrObject.expired())
-					if (_gameObject == _wptrObject.lock())
-						return true;
-
-				return false;
-			});
-
-		if (tmp_selected == m_selectedGameObjects.end())
-			m_selectedGameObjects.push_back(_gameObject);
+			for (auto& object : _gameObject->getObjects())
+				this->SelectionVerifyBehavior(object);
+		}
 		else
-			m_selectedGameObjects.erase(tmp_selected);
+		{
+			auto tmp_selected = std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&_gameObject](std::weak_ptr<lc::GameObject> _wptrObject)
+				{
+					if (!_wptrObject.expired())
+						if (_gameObject == _wptrObject.lock())
+							return true;
+
+					return false;
+				});
+
+			if (tmp_selected == m_selectedGameObjects.end())
+				m_selectedGameObjects.push_back(_gameObject);
+			else
+				m_selectedGameObjects.erase(tmp_selected);
+		}	
 	}
 }
 
@@ -568,4 +609,38 @@ bool Hierarchie::IsAChldOfASltObj(std::shared_ptr<lc::GameObject> _gameObject, s
 		return true;
 
 	return false;
+}
+
+void Hierarchie::setup_components_function()
+{
+	m_components_map_.emplace("Particles System",
+	[&]() { m_want_to_add_a_component_.second.lock()->addComponent<lc::Particles>(); });
+
+	m_components_map_.emplace("Animation System",
+	[&]() { m_want_to_add_a_component_.second.lock()->addComponent<lc::Animation>(); });
+
+	m_components_map_.emplace("RigidBody",
+	[&]() { m_want_to_add_a_component_.second.lock()->addComponent<lc::RigidBody>(); });
+
+	m_components_map_.emplace("AI System",
+	[&]()
+	{
+		const auto tmp_object = m_want_to_add_a_component_.second.lock();
+		
+		if (tmp_object->hasComponent("RigidBody") and !tmp_object->hasComponent("AI"))
+			tmp_object->addComponent<lc::AI>();
+	});
+
+	m_components_map_.emplace("Button",
+	[&]()
+	{
+		const auto tmp_object = m_want_to_add_a_component_.second.lock();
+
+		if (std::find_if(tmp_object->getComponents().begin(), tmp_object->getComponents().end(),
+						[](const auto& components)
+						{
+							return components->getTypeName() == "Button";
+						}) == tmp_object->getComponents().end())
+			tmp_object->addComponent<lc::Button>();
+	});
 }
