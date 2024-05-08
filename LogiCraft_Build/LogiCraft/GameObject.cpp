@@ -45,15 +45,15 @@ SOFTWARE.
 
 
 lc::GameObject::GameObject()
-	: m_name(""), m_depth(0), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
+	: m_ID(m_generalID++), m_depth(0), m_needToBeRemove(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
 {}
 
 lc::GameObject::GameObject(std::string _name)
-	: m_name(""), m_depth(0), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
+	: m_ID(m_generalID++), m_depth(0), m_needToBeRemove(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
 {}
 
 lc::GameObject::GameObject(std::string _name, unsigned char _depth)
-	: m_name(_name), m_depth(_depth), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
+	: m_name(_name), m_ID(m_generalID++), m_depth(_depth), m_needToBeRemove(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
 {}
 
 lc::GameObject::~GameObject()

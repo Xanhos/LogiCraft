@@ -39,6 +39,7 @@ SOFTWARE.
 #include "Button.h"
 #include "Texture.h"
 #include "Animation.h"
+#include "HeatShader.h"
 
 Hierarchie::Hierarchie()
 	: m_hasMoveAnObject(false), m_wantToCreateAGameObject(false), m_isDragging(false), m_isClicking(false),
@@ -642,5 +643,11 @@ void Hierarchie::setup_components_function()
 							return components->getTypeName() == "Button";
 						}) == tmp_object->getComponents().end())
 			tmp_object->addComponent<lc::Button>();
+	});
+
+	m_components_map_.emplace("Heat Shader",
+	[&]()
+	{
+		m_want_to_add_a_component_.second.lock()->addComponent<lc::shader::heat_shader>();
 	});
 }

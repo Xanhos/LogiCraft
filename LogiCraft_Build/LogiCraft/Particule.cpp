@@ -318,7 +318,7 @@ namespace lc
 
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
 
-			//Lock of the selected ressource (or not if there not selected ressource)
+			//Lock of the selected ressource (or not if there selected ressource)
 			const auto tmp_ressource = m_particles_ressource_.lock();
 
 			if (ImGui::BeginCombo("Selected Ressource", tmp_ressource ? tmp_ressource->getName().c_str() : "No Ressource Selected"))
@@ -352,7 +352,7 @@ namespace lc
 						{
 							if (ImGui::Selectable(std::string(tmp_ressource_component->getName() + "##" + std::to_string(tmp_ressource_component->getID())).c_str(), tmp_is_selected))
 							{
-								//If there were already a component used on the particles we set it to un use,
+								//If there were already a component used on the particles, we set it to un use,
 								//to replace by the new one.
 								if (tmp_ressource)
 									tmp_ressource->isUsedByAComponent() = false;
