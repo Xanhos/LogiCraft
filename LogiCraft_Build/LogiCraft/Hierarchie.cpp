@@ -241,7 +241,7 @@ void Hierarchie::add_component_to_object_window_display()
 	}
 	ImGui::End();
 
-	//If the object that the user open the add component window with and the object get unselected then the window close itself.
+	//If the object that the user open the add component window with and this object get unselected then the window close itself.
 	if (std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&](const auto& game_object)
 		{ return (m_want_to_add_a_component_.second.lock() == game_object.lock());}) == m_selectedGameObjects.end())
 		m_want_to_add_a_component_.first = false;
