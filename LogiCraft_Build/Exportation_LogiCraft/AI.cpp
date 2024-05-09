@@ -183,7 +183,7 @@ void lc::AI::Load(std::ifstream& load)
                 std::weak_ptr<GameObject> player = scene->getObject("cible"), agent = getParent();
                 std::dynamic_pointer_cast<bt::Decorator::Condition>(node)->setCondition([player, agent, detection_range]
                 {
-                    if(!player.expired() and !agent.expired())
+                    if(!player.expired() and !agent.expired() and player.lock() != nullptr and agent.lock() != nullptr)
                     {
                         return Tools::Vector::getDistance(player.lock()->getTransform().getPosition(),agent.lock()->getTransform().getPosition()) < detection_range;
                     }

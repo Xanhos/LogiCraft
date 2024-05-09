@@ -213,19 +213,24 @@ Objects
 {
 }
 
-snail -1329.85 1162.33 1 1 232 168 0 0 0 0
+snail -2103.3 298.008 1 1 232 168 0 0 0 0
 Components
 {
 0 0 0 1584 1006 spritesheet_slug.png 0 0
 
-6 Animation spritesheet_slug walking 1
+6 Animation spritesheet_slug walking 2
 walking 0 314 232 168 0 5 0.15 5
+hiding 0 828 232 168 0 6 0.082 6
 
-7 -1329.85 1162.33 232 168 0 0 1 0
+7 -2103.3 298.008 232 168 0 0 1 0
 
 1 
 0 1
-1 1
+1 2
+3 1 0 204
+10 0 Animation hiding
+0 2
+10 0 Animation walking
 8 0
 
 }

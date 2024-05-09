@@ -51,7 +51,10 @@ void bt::ActionNode::MoveTo::Setup(NodePtr node)
 				auto node_cast = std::dynamic_pointer_cast<MoveTo>(node);
 				if (node_cast->m_bool_go_to_)
 				{
-					rigid_body->getVelocity().x = Tools::Vector::normalize(node_cast->m_target_.lock()->getTransform().getPosition() - node_cast->m_agent_.lock()->getTransform().getPosition()).x * node_cast->m_speed_;
+					if (!node_cast->m_target_.expired())
+					{
+						rigid_body->getVelocity().x = Tools::Vector::normalize(node_cast->m_target_.lock()->getTransform().getPosition() - node_cast->m_agent_.lock()->getTransform().getPosition()).x * node_cast->m_speed_;
+					}
 					node_cast->m_bool_go_to_ = false;
 				}
 				else rigid_body->getVelocity().x = 0.f;
