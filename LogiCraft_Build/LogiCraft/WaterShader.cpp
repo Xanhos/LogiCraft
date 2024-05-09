@@ -59,6 +59,8 @@ void lc::shader::water_shader::Draw(sf::RenderTexture& window)
         sf::Vector2f(m_water_ressource_.lock()->getShape().getTextureRect().getSize())));
     m_shader_->setUniform("u_texture_rect_position", (m_water_ressource_.expired() ? sf::Vector2f(0.f, 0.f) :
         sf::Vector2f(m_water_ressource_.lock()->getShape().getTextureRect().getPosition())));
+    m_shader_->setUniform("u_texture_size", (m_water_ressource_.expired() ? sf::Vector2f(0.f, 0.f) :
+        sf::Vector2f(m_water_ressource_.lock()->getShape().getTexture()->getSize())));
 
     if (!m_water_ressource_.expired())
         window.draw(m_water_ressource_.lock()->getShape(), m_shader_states_);
@@ -148,41 +150,38 @@ void lc::shader::water_shader::setup_shader_script_string()
 uniform sampler2D u_current_texture;
 uniform sampler2D u_distortion_map_texture;
 uniform vec2 u_texture_rect_size;
+uniform vec2 u_texture_size;
 uniform vec2 u_texture_rect_position;
 uniform float u_time;
 uniform float u_level;
 
 void main()
 {
-    vec2 frag_coord = gl_TexCoord[0].xy * u_texture_rect_size + u_texture_rect_position;
+    //PENSER QUE LE C'EST LE RECT QUI MANQUE ET NOM LA TAILLE DE LA TEXTURE TOTAL.
+    vec2 tmp = vec2((gl_TexCoord[0].x / u_texture_rect_size.x) * u_texture_size.x, (gl_TexCoord[0].y / u_texture_rect_size.y) * u_texture_size.y);
 
     // Get the color of the noise texture at a position the current fragment position offset by the time
-    vec4 tmp_current_texture_color = texture2D(u_current_texture, frag_coord);
-    
-    //Base distortion map texture.
-    vec2 tmp_distortion_coord = gl_TexCoord[0].xy + vec2(0.025 * u_time, 0.025 * u_time);
-    
-    vec4 tmp_distortion_map_color = texture2D(u_distortion_map_texture, tmp_distortion_coord);
+    vec4 noiseTexCol = texture2D(u_distortion_map_texture, vec2(gl_TexCoord[0].x + 0.025 * u_time, gl_TexCoord[0].y + 0.025 * u_time));
     
     // Reduce the offset
-    float reducedOffset = tmp_distortion_map_color.x / 50;
+    float reducedOffset = noiseTexCol.r / 50;
 
     // Upper part is normal
-    if (frag_coord.y + reducedOffset < u_level)
+    if (tmp.y + reducedOffset < u_level)
     {
         // multiply it by the color
-        gl_FragColor = gl_Color * tmp_current_texture_color;
+        gl_FragColor = texture2D(u_current_texture, gl_TexCoord[0].xy);
     }
     else
     {
         // Get the color of the screen at the offset location
-        vec4 off_set_color = texture2D(u_current_texture, tmp_distortion_coord + vec2(reducedOffset, reducedOffset));
+        vec4 col = texture2D(u_current_texture, gl_TexCoord[0].xy + vec2(reducedOffset, reducedOffset));
 
         // Set the fragment color
-        gl_FragColor = vec4 (off_set_color.r / 3.44594, off_set_color.g, off_set_color.b / 1.024, off_set_color.a);
-
+        gl_FragColor = vec4(col.r / 3.44594, col.g, col.b / 1.024, col.a);
     }
-})";
+}
+)";
 }
 
 void lc::shader::water_shader::texture_to_search()
