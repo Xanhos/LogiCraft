@@ -127,7 +127,7 @@ public:
 
 
 	PatronNode(int type);
-	PatronNode(const PatronNode& node);
+	PatronNode(const PatronNode& node, bool invoke_copy = false);
 	PatronNode(PatronNode&& node);
 
 	PatronNode& operator=(const PatronNode& node) = default;
@@ -139,7 +139,7 @@ public:
 	 * \param node Node to add
 	 * \return Node added
 	 */
-	PatronNode* Add(const PatronNode& node);
+	PatronNode* Add(const PatronNode& node, bool invoke_copy = false);
 	/**
 	 * @brief Add a existing node to the current node
 	 * 

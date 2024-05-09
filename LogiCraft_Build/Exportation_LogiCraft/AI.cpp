@@ -97,6 +97,13 @@ void lc::AI::Load(std::ifstream& load)
             node = bt::Node::New(bt::ActionNode::Play_Sound(sound_name,new_sound,getParent(),attenuation,minDistance));
             std::dynamic_pointer_cast<bt::ActionNode::Play_Sound>(node)->Setup(node);
         }
+        else if (type_cast == bt::node_type::PLAY_ANIMATION)
+        {
+            std::string anim_name, key_anim_name;
+            load >> anim_name >> key_anim_name;
+
+            node = bt::Node::New(bt::ActionNode::Play_Animation(getParent(),anim_name,key_anim_name));
+        }
         else if(type_cast == bt::node_type::WANDER)
         {
             node = bt::Node::New(bt::ActionNode::Wander(getParent()));
