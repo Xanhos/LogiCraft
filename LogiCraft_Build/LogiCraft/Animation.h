@@ -108,6 +108,8 @@ namespace lc
 		void current_animation_is_reversed(const bool& reversed = true);
 
 		void save_animation_file(const bool open_file_browser = true, std::string path = "") const;
+
+		const auto& get_all_key_animation() {return m_animation_keys_;}
 	private:
 		void texture_to_search();
 

@@ -212,6 +212,7 @@ bt::NodePtr bt::Factory(const node_type& type)
 		return Node::New(ActionNode::MoveTo());
 		break;
 	case node_type::PLAY_ANIMATION:
+		return Node::New(ActionNode::Play_Animation());
 		break;
 	case node_type::PLAY_SOUND:
 		return Node::New(ActionNode::Play_Sound());
@@ -378,5 +379,39 @@ bool bt::ActionNode::Jump::tick()
 		m_need_to_jump_ = true;
 	}
 	return m_need_to_jump_;
+}
+
+bt::ActionNode::Play_Animation::Play_Animation(const std::weak_ptr<lc::GameObject>& owner,const std::string& anim_name,
+	const std::string& key_anim_name) : m_owner_(owner), m_anim_name_(anim_name), m_key_anim_name_(key_anim_name)
+{
+}
+
+
+bool bt::ActionNode::Play_Animation::tick()
+{
+	if(m_animation_.expired())
+	{
+		if(!m_owner_.expired())
+		{
+			auto object = m_owner_.lock();
+			for(auto& component : object->getComponents())
+			{
+				if(auto anim = std::dynamic_pointer_cast<lc::Animation>(component))
+				{
+					if(anim->getName() == this->m_anim_name_)
+						this->m_animation_ = anim;
+				}
+			}
+		}		
+	}
+
+	if(!m_animation_.expired())
+	{
+		auto anim = m_animation_.lock();
+		anim->select_animation_key(m_key_anim_name_,true);
+		return true;		
+	}
+
+	return false;
 }
 
