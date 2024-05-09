@@ -67,7 +67,8 @@ void lc::GameComponent::Hierarchie_Draw(unsigned int _parentID, std::list<std::s
 		ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.25882f, 0.5882f, 1.f, 1.f));
 	}
 	if (ImGui::TreeNodeEx(std::string(m_typeName + std::to_string(_parentID) + std::to_string(m_ID)).c_str(),
-		ImGuiTreeNodeFlags_Selected | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth, m_typeName.c_str()))
+		ImGuiTreeNodeFlags_Selected | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth,
+		std::string(m_typeName + ':' + m_name).c_str()))
 	{
 		if (_actComp != std::prev(_compList.end()))
 		{

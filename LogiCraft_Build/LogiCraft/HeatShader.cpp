@@ -9,6 +9,9 @@ namespace lc
         {
 			m_name = "Heat Shader";
         	m_typeName = "Heat Shader";
+        	m_type = TYPE::SHADER;
+
+        	m_ressource_to_search_ = std::make_pair(true, "");
         	
             heat_shader::setup_shader_script_string();
             
@@ -25,6 +28,9 @@ namespace lc
         heat_shader::~heat_shader()
         {
             m_shader_.reset();
+
+        	if (!m_heat_ressource_.expired())
+        		m_heat_ressource_.lock()->isUsedByAComponent() = false;
         }
 
         void heat_shader::UpdateEvent(sf::Event& event)
@@ -33,6 +39,7 @@ namespace lc
 
         void heat_shader::Update(WindowManager& window)
         {
+        	this->texture_to_search();
         }
 
         void heat_shader::Draw(WindowManager& window)
@@ -42,6 +49,9 @@ namespace lc
             m_shader_->setUniform("u_distortion_factor", m_distortion_factor_);
             m_shader_->setUniform("u_rise_factor", m_rise_factor_);
             m_shader_->setUniform("u_time", m_time_);
+
+        	if (!m_heat_ressource_.expired())
+        		window.draw(m_heat_ressource_.lock()->getShape(), m_shader_states_);
         }
 
         void heat_shader::Draw(sf::RenderTexture& window)
@@ -58,71 +68,77 @@ namespace lc
 
         void heat_shader::Save(std::ofstream& save, sf::RenderTexture& texture, int depth)
         {
+        	save << static_cast<int>(m_type)
+			 << " " << m_typeName
+        	 << " " << m_rise_factor_
+        	 << " " << m_distortion_factor_
+			 << " " << (m_heat_ressource_.expired() ? static_cast<std::string>("No_Texture") : m_heat_ressource_.lock()->getName()) << '\n';
         }
 
         void heat_shader::Load(std::ifstream& load)
         {
+        	std::string tmp_texture_name;
+        	load >> m_rise_factor_ >> m_distortion_factor_ >> tmp_texture_name;
+
+        	m_ressource_to_search_ = std::make_pair(true, tmp_texture_name);
         }
 
         std::shared_ptr<lc::GameComponent> heat_shader::Clone()
         {
-            //FAIRE UN CLONE DU SHADER.
-            return std::make_shared<heat_shader>(*this);
+        	auto tmp_component = std::make_shared<heat_shader>(*this);
+        	tmp_component->m_shader_ = std::make_shared<sf::Shader>();
+        	tmp_component->m_shader_->loadFromMemory(m_shader_script_, sf::Shader::Fragment);
+        	tmp_component->m_shader_states_.shader = tmp_component->m_shader_.get();
+            return tmp_component;
         }
 
         void heat_shader::setHierarchieFunc()
         {
             m_hierarchieInformation = [this]()
             {
-                //Lock of the selected ressource (or not if there selected ressource)
-			const auto tmp_ressource = m_heat_ressource_.lock();
+				const auto tmp_ressource = m_heat_ressource_.lock();
 
-			if (ImGui::BeginCombo("Selected Ressource", tmp_ressource ? tmp_ressource->getName().c_str() : "No Ressource Selected"))
-			{
-				const bool tmp_is_selected(false);
-
-				if (tmp_ressource)
+				if (ImGui::BeginCombo("Selected Ressource", tmp_ressource ? tmp_ressource->getName().c_str() : "No Ressource Selected"))
 				{
-					if (ImGui::Selectable(std::string("No Texture ##" + std::to_string(m_ID)).c_str(), tmp_is_selected))
-					{
-						if (tmp_ressource)
-							tmp_ressource->isUsedByAComponent() = false;
-						
-						m_heat_ressource_.reset();
-					}
-				}
+					const bool tmp_is_selected(false);
 
-				for (const auto& component : getParent()->getComponents())
-				{
-					std::shared_ptr<lc::Ressource> tmp_ressource_component(std::dynamic_pointer_cast<lc::Texture>(component));
-					if (!tmp_ressource_component)
-						tmp_ressource_component = std::dynamic_pointer_cast<lc::Animation>(component);
-
-					if (tmp_ressource_component)
-					{
-						//If the ressource is not already use by another component we use it.
-						if (!tmp_ressource_component->isUsedByAComponent())
+					if (tmp_ressource)
+						if (ImGui::Selectable(std::string("No Texture ##" + std::to_string(m_ID)).c_str(), tmp_is_selected))
 						{
-							if (ImGui::Selectable(std::string(tmp_ressource_component->getName() + "##" + std::to_string(tmp_ressource_component->getID())).c_str(), tmp_is_selected))
-							{
-								//If there were already a component used on the particles, we set it to un use,
-								//to replace by the new one.
-								if (tmp_ressource)
-									tmp_ressource->isUsedByAComponent() = false;
+							if (tmp_ressource)
+								tmp_ressource->isUsedByAComponent() = false;
+							
+							m_heat_ressource_.reset();
+						}
 
-								//The new ressource is set to use.
-								tmp_ressource_component->isUsedByAComponent() = true;
-								//The weak_ptr of the ressource is set to the new one,
-								//the texture size is change to the new ressource,
-								//and the particles origin is set to the half of the size.
-								m_heat_ressource_ = tmp_ressource_component;
+					for (const auto& component : getParent()->getComponents())
+					{
+						if (auto tmp_ressource_component = std::dynamic_pointer_cast<lc::Texture>(component))
+						{
+							//If the ressource is not already use by another component we use it.
+							if (!tmp_ressource_component->isUsedByAComponent())
+							{
+								if (ImGui::Selectable(std::string(tmp_ressource_component->getName() + "##" + std::to_string(tmp_ressource_component->getID())).c_str(), tmp_is_selected))
+								{
+									//If there were already a component used on the particles, we set it to un use,
+									//to replace by the new one.
+									if (tmp_ressource)
+										tmp_ressource->isUsedByAComponent() = false;
+
+									//The new ressource is set to use.
+									tmp_ressource_component->isUsedByAComponent() = true;
+									//The weak_ptr of the ressource is set to the new one
+									m_heat_ressource_ = tmp_ressource_component;
+								}
 							}
 						}
 					}
+
+					ImGui::EndCombo();
 				}
 
-				ImGui::EndCombo();
-			}
+            	ImGui::DragFloat("Distortion Factor", &m_distortion_factor_, 0.001f);
+            	ImGui::DragFloat("Rise Factor", &m_rise_factor_, 0.01f);
             };
         }
 
@@ -179,6 +195,27 @@ void main()
     gl_FragColor = gl_Color * texture2D(u_current_texture, distortedTextureCoordinate);
 }
 )";
+        }
+
+        void heat_shader::texture_to_search()
+        {
+        	if (m_ressource_to_search_.first)
+        	{
+        		for (auto& component : getParent()->getComponents())
+        		{
+        			if (const auto tmp_texture = std::dynamic_pointer_cast<lc::Texture>(component))
+        			{
+        				if (m_ressource_to_search_.second == tmp_texture->getName())
+        				{
+        					m_heat_ressource_ = tmp_texture;
+        					tmp_texture->isUsedByAComponent() = true;
+        					break;
+        				}
+        			}
+        		}
+
+        		m_ressource_to_search_.first = false;
+        	}
         }
     }
 }

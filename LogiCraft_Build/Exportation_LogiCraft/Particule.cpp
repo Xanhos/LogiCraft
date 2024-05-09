@@ -219,6 +219,9 @@ namespace lc
 			Particles::s_thread_particles_.clear();
 		}
 
+		if (!m_particles_ressource_.expired())
+			m_particles_ressource_.lock()->isUsedByAComponent() = false;
+
 		m_particles_.clear();
 	}
 

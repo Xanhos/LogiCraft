@@ -42,6 +42,8 @@ SOFTWARE.
 #include "Event.h"
 #include "Particule.h"
 #include "Animation.h"
+#include "HeatShader.h"
+#include "Shader.h"
 
 
 lc::GameObject::GameObject()
@@ -185,10 +187,17 @@ void lc::GameObject::Load(std::ifstream& load)
 		}
 		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::ANIMATION)
 			addComponent(std::make_shared<lc::Animation>())->Load(load);
-
 		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::CONVEX)
 		{			
 			addComponent(std::make_shared<lc::Convex>())->Load(load);
+		}
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::SHADER)
+		{
+			std::string tmp_shader_name;
+			load >> tmp_shader_name;
+
+			if (tmp_shader_name == "Heat Shader")
+				addComponent(std::make_shared<lc::shader::heat_shader>())->Load(load);
 		}
 		check('}');
 	}

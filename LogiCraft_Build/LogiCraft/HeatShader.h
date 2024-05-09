@@ -28,13 +28,15 @@ namespace lc
             
         private:
             virtual void setup_shader_script_string() override;
+
+            void texture_to_search();
         private:
             float m_distortion_factor_;
             float m_rise_factor_;
 
             std::weak_ptr<lc::Ressource> m_heat_ressource_;
             
-            RessourceToSearch ressource_to_search_;
+            RessourceToSearch m_ressource_to_search_;
         };
     }
 }

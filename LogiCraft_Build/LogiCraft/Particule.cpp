@@ -355,7 +355,10 @@ namespace lc
 								//If there were already a component used on the particles, we set it to un use,
 								//to replace by the new one.
 								if (tmp_ressource)
+								{
+									tmp_ressource->getShape().setFillColor(sf::Color::White);
 									tmp_ressource->isUsedByAComponent() = false;
+								}
 
 								//The new ressource is set to use.
 								tmp_ressource_component->isUsedByAComponent() = true;

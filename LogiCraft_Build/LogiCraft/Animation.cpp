@@ -118,6 +118,8 @@ namespace lc
 		m_name = "Animation";
 		m_typeName = "Animation";
 		m_type = TYPE::ANIMATION;
+
+		m_texture_to_search_ = std::make_pair(true, "");
 	}
 
 	Animation::~Animation()
@@ -138,28 +140,6 @@ namespace lc
 		if (const auto tmp_texture = m_texture_.lock())
 			if (const auto tmp_animation_key = m_actual_animation_key_.lock())
 				tmp_animation_key->update_animation_key(tmp_texture, m_animation_is_paused_, m_animation_is_reversed_, m_isUsedByAComponent);
-				/*if (!m_animation_is_paused_)
-				{
-					tmp_animation_key->get_frame_timer() += Tools::getDeltaTime();
-					if (tmp_animation_key->get_frame_timer() >= tmp_animation_key->get_frame_time())
-					{
-						m_animation_is_reversed_ ? tmp_animation_key->get_actual_frame()-- : tmp_animation_key->get_actual_frame()++;
-
-						if (tmp_animation_key->get_actual_frame() <= 0 && m_animation_is_reversed_)
-							tmp_animation_key->get_actual_frame() = tmp_animation_key->get_total_frame() - 1;
-						else if (tmp_animation_key->get_actual_frame() > tmp_animation_key->get_total_frame() - 1 && !m_animation_is_reversed_)
-							tmp_animation_key->get_actual_frame() = 0;
-
-						tmp_animation_key->get_frame_timer() = 0.f;
-					}
-
-					if (!tmp_animation_key->get_frames_rects().empty())
-					{
-						tmp_texture->getShape().setTextureRect(tmp_animation_key->get_frames_rects()[tmp_animation_key->get_actual_frame()]);
-						if (!m_isUsedByAComponent)
-							tmp_texture->getShape().setSize(sf::Vector2f(tmp_animation_key->get_frames_rects()[tmp_animation_key->get_actual_frame()].getSize()));
-					}
-				}*/
 	}
 
 	void Animation::Draw(WindowManager& window)
