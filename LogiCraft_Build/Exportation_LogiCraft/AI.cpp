@@ -75,20 +75,34 @@ void lc::AI::Load(std::ifstream& load)
             std::string attack_name;
             load >> attack_name;
 
+            auto scene = getParent();
+            while (scene->getParent())
+            {
+                scene = scene->getParent();
+            }
+
             if (attack_name == "damageBox")
             {
+                node = bt::Node::New(bt::ActionNode::DamageBox(getParent(), scene->getObject("cible")));
+                std::dynamic_pointer_cast<bt::ActionNode::DamageBox>(node)->Setup(node);
                 std::cout << "damageBox loaded" << std::endl;
             }
             else if (attack_name == "lanceHit")
             {
+                node = bt::Node::New(bt::ActionNode::LanceHit(getParent(), scene->getObject("cible")));
+                std::dynamic_pointer_cast<bt::ActionNode::LanceHit>(node)->Setup(node);
                 std::cout << "lanceHit loaded" << std::endl;
             }
             else if (attack_name == "CrazyHit")
             {
+                node = bt::Node::New(bt::ActionNode::CrazyHit(getParent(), scene->getObject("cible")));
+                std::dynamic_pointer_cast<bt::ActionNode::CrazyHit>(node)->Setup(node);
                 std::cout << "CrazyHit loaded" << std::endl;
             }
             else if (attack_name == "pickHit")
             {
+                node = bt::Node::New(bt::ActionNode::PickHit(getParent(), scene->getObject("cible")));
+                std::dynamic_pointer_cast<bt::ActionNode::PickHit>(node)->Setup(node);
                 std::cout << "pickHit loaded" << std::endl;
             }
             else if (attack_name == "protect")
@@ -97,10 +111,14 @@ void lc::AI::Load(std::ifstream& load)
             }
             else if (attack_name == "hit")
             {
+                node = bt::Node::New(bt::ActionNode::Hit(getParent(), scene->getObject("cible")));
+                std::dynamic_pointer_cast<bt::ActionNode::Hit>(node)->Setup(node);
                 std::cout << "hit loaded" << std::endl;
             }
             else if (attack_name == "lanceSpawn")
             {
+                node = bt::Node::New(bt::ActionNode::lanceSpawn(getParent(), scene->getObject("cible")));
+                std::dynamic_pointer_cast<bt::ActionNode::lanceSpawn>(node)->Setup(node);
                 std::cout << "lanceSpawn loaded" << std::endl;
             }
             else
