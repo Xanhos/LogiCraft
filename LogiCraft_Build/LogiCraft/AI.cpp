@@ -80,7 +80,7 @@ void lc::AI::Update(WindowManager& _window)
             ImGui::SetWindowSize(sf::Vector2f(_window.getSize() / 2), ImGuiCond_Once);
 
             ImGui::BeginChild("Tree information##lc", ImVec2((ImGui::GetWindowSize().x / 2) - 20, ImGui::GetWindowSize().y - 40), true, ImGuiWindowFlags_AlwaysHorizontalScrollbar);
-            m_root.Display(&m_selectedNode);
+            m_root.Display(&m_selectedNode,getParent());
             ImGui::EndChild();
 
 

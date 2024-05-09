@@ -37,6 +37,8 @@ SOFTWARE.
 #include <list>
 #include <memory>
 #include <functional>
+
+#include "Animation.h"
 #include "GameObject.h"
 #include "RigidBody.h"
 
@@ -415,7 +417,7 @@ namespace bt
 			void Setup(NodePtr node);
 			bool tick();
 		};
-
+		
 		class Jump : public Node
 		{
 			std::weak_ptr<lc::GameObject> m_owner_;
@@ -427,6 +429,17 @@ namespace bt
 			void Setup(NodePtr node);
 			bool tick();
 			
+		};
+
+		class Play_Animation : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_owner_;
+			std::weak_ptr<lc::Animation> m_animation_;
+			std::string m_anim_name_, m_key_anim_name_;
+		public:
+			Play_Animation() {}
+			Play_Animation(const std::weak_ptr<lc::GameObject>& owner,const std::string& anim_name,const std::string& key_anim_name);
+			bool tick();
 		};
 	}
 
