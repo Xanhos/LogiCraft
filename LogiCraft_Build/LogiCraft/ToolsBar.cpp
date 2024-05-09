@@ -92,9 +92,11 @@ void ToolsBar::Update(std::shared_ptr <lc::GameObject> object, WindowManager& _w
 					ShowHelp();
 				if (ImGui::BeginMenu(std::to_string(Tools::getDeltaTime()).c_str()))
 				{
+					ImGui::EndMenu();
 				}
 				if (ImGui::BeginMenu(std::to_string(Tools::frameRate()).c_str()))
 				{
+					ImGui::EndMenu();
 				}
 				ImGui::EndMainMenuBar();
 			});

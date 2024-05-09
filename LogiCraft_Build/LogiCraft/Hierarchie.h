@@ -62,6 +62,8 @@ private:
 	*/
 	void SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, Viewports& _viewports);
 
+	void add_component_to_object_window_display();
+
 	void CreateNewObjectBehavior();
 
 	/*
@@ -116,6 +118,7 @@ private:
 	*/
 	bool IsAChldOfASltObj(std::shared_ptr<lc::GameObject> _gameObject, std::shared_ptr<lc::GameObject> _scene);
 
+	void setup_components_function();
 private:
 	ObjWeakPtrList m_selectedGameObjects;
 	ObjSharedPtrList m_copyPasteObjects;
@@ -124,8 +127,11 @@ private:
 	
 	bool m_hasMoveAnObject;
 	bool m_wantToCreateAGameObject;
-	bool m_isDraging;
+	bool m_isDragging;
 	bool m_isClicking;
+
+	std::pair<bool, std::weak_ptr<lc::GameObject>> m_want_to_add_a_component_;
+	std::map<std::string, std::function<void()>> m_components_map_;
 	
 	float m_copyPasteTimer;
 };
