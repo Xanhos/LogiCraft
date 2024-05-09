@@ -220,4 +220,24 @@ Objects
 {
 }
 
+snail 954.966 1185.76 1 1 232 168 0 0 0 0
+Components
+{
+0 0 0 1584 1006 spritesheet_slug.png 0 0
+
+6 Animation spritesheet_slug walking 1
+walking 0 314 232 168 0 5 0.15 5
+
+7 954.966 1185.76 1584 1006 0 0 1 0
+
+1 
+0 1
+1 1
+8 0
+
+}
+Objects
+{
+}
+
 }

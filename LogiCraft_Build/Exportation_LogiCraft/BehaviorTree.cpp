@@ -492,7 +492,7 @@ void bt::ActionNode::LanceHit::Setup(NodePtr node)
 
 				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::LanceHit>(node);
 
-
+				
 				if (node_cast->m_target_.lock() != nullptr)
 				{
 					auto rbt = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody");
