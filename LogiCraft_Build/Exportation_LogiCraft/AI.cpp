@@ -173,7 +173,7 @@ void lc::AI::Load(std::ifstream& load)
                 auto scene = getParent();
                 while(scene->getParent())
                     scene = scene->getParent();
-                std::weak_ptr<GameObject> player = scene->getObject("slug"), agent = getParent();
+                std::weak_ptr<GameObject> player = scene->getObject("cible"), agent = getParent();
                 std::dynamic_pointer_cast<bt::Decorator::Condition>(node)->setCondition([player, agent, detection_range]
                 {
                     if(!player.expired() and !agent.expired())

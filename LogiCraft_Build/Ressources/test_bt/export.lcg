@@ -58,7 +58,7 @@ Components
 3 1 0 100
 14 0 lanceHit
 
-9 0 slug
+9 0 cible
 8 0
 
 }
@@ -83,8 +83,8 @@ Components
 3 1 0 100
 14 0 hit
 
-9 0 slug
-9 0 slug
+9 0 cible
+9 0 cible
 8 0
 
 }
@@ -132,7 +132,7 @@ Components
 
 14 0 lanceHit
 
-9 0 slug
+9 0 cible
 8 0
 
 }
@@ -155,7 +155,7 @@ Components
 3 1 0 298
 14 0 lanceSpawn
 
-9 0 slug
+9 0 cible
 8 0
 
 }
@@ -206,7 +206,7 @@ Idle 0 0 1617 1029 0 7 0.15 4
 
 14 0 pickHit
 
-9 0 slug
+9 0 cible
 
 }
 Objects
