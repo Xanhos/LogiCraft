@@ -152,6 +152,7 @@ bool lc::RigidBody::CheckAllObject(std::shared_ptr<lc::GameObject> _object)
 					if (Tools::Collisions::lineRect({  m_collider.getPosition() + sf::Vector2f{0.f,m_collider.getSize().y} + sf::Vector2f{0.f,m_velocity.y} *Tools::getDeltaTime(), {{m_collider.getPosition() + m_collider.getSize() + sf::Vector2f{0.f,m_velocity.y}*Tools::getDeltaTime() }} }, { rb->m_collider.getPosition(), rb->m_collider.getSize()}))
 					{
 						m_velocity.y = 0.f;
+						getParent()->getTransform().getPosition().y = rb->getCollider().getPosition().y - m_collider.getSize().y;
 					}
 				}
 				else if (m_velocity.y < 0.f)

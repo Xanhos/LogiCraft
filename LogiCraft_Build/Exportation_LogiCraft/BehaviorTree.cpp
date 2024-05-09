@@ -661,3 +661,47 @@ bool bt::ActionNode::lanceSpawn::tick()
 	}
 	return m_bool_damage_;
 }
+
+bt::ActionNode::TestController::TestController(const std::shared_ptr<lc::GameObject>& agent_) : m_agent_(agent_), m_bool_controller_(false)
+{
+}
+
+void bt::ActionNode::TestController::Setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody"))
+	{
+		auto rba = agent->getComponent<lc::RigidBody>("RigidBody");
+
+		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+
+
+				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::lanceSpawn>(node);
+
+				if (KEY(Right))
+				{
+					rigid_body->getParent()->getTransform().getPosition().x += 500 * Tools::getDeltaTime();
+				}
+				if (KEY(Left))
+				{
+					rigid_body->getParent()->getTransform().getPosition().x -= 500 * Tools::getDeltaTime();
+				}
+				if (KEY(Up))
+				{
+					rigid_body->getVelocity().y = -500;
+				}
+
+
+			});
+	}
+}
+
+bool bt::ActionNode::TestController::tick()
+{
+	if (!m_agent_.expired() )
+	{
+		m_bool_controller_ = true;
+	}
+	return m_bool_controller_;
+}

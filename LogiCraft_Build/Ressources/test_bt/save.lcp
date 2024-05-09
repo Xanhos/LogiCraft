@@ -9,14 +9,19 @@ Components
 {
 0 Texture 0 0 120 60 ../ASSETS\Calque_2.png 0 0
 
-7 RigidBody -3031.3 1224.65 120 60 0 0 0 0 0 0 RigidBody
+7 RigidBody -3031.3 1224.65 120 60 0 0 0 0 1 0 RigidBody
+
+1 IA
+0 1
+14 0 controller
+
 
 }
 Objects
 {
 }
 
-slug -828.057 1188.19 1 1 221 157 0 0 0 0
+slug -987.371 1169.66 1 1 221 157 0 0 0 0
 Components
 {
 0 Texture 0 0 1105 157 ../ASSETS\walk_slug_1_221x157.png 0 0
@@ -24,7 +29,7 @@ Components
 6 Animation Animation walk_slug_1_221x157 Walking 1
 Walking 0 0 221 157 0 5 0.156 5
 
-7 RigidBody -828.057 1188.19 221 157 0 0 0 0 1 0 RigidBody
+7 RigidBody -987.371 1169.66 221 157 0 0 0 0 1 0 RigidBody
 
 1 IA
 0 2
@@ -208,19 +213,7 @@ Objects
 {
 }
 
-sol -3465.88 1345.24 35 4 7000 800 0 0 0 0
-Components
-{
-0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
-
-7 RigidBody -3465.88 1345.24 7000 800 0 0 0 0 0 0 RigidBody
-
-}
-Objects
-{
-}
-
-snail -1318.55 1177.3 1 1 232 168 0 0 0 0
+snail -1329.85 1162.33 1 1 232 168 0 0 0 0
 Components
 {
 0 Texture 0 0 1584 1006 ../ASSETS\spritesheet_slug.png 0 0
@@ -228,12 +221,48 @@ Components
 6 Animation Animation spritesheet_slug walking 1
 walking 0 314 232 168 0 5 0.15 5
 
-7 RigidBody -1318.55 1177.3 232 168 0 0 0 0 1 0 RigidBody
+7 RigidBody -1329.85 1162.33 232 168 0 0 0 0 1 0 RigidBody
 
 1 IA
 0 1
 1 1
 8 0
+
+}
+Objects
+{
+}
+
+L3a -3806.68 1363.51 1 1 3840 2160 0 0 0 0
+Components
+{
+0 Texture 0 0 3840 2160 ../ASSETS\BG_L3\L3a.png 0 0
+
+7 RigidBody -3806.68 1363.51 3840 2160 0 0 0 0 0 0 RigidBody
+
+}
+Objects
+{
+}
+
+L3aP 33.1516 1363.51 1 1 3840 2160 0 0 0 0
+Components
+{
+0 Texture 0 0 3840 2160 ../ASSETS\BG_L3\L3a.png 0 0
+
+7 RigidBody 33.1516 1363.51 3840 2160 0 0 0 0 0 0 RigidBody
+
+}
+Objects
+{
+}
+
+L3a_copie_13 -7635.72 1534.36 1 1 3840 2160 0 0 0 0
+Components
+{
+0 Texture 0 0 3840 2160 ../ASSETS\BG_L3\L3a.png 0 0
+
+7 RigidBody -7635.72 1534.36 3840 2160 0 0 0 0 0 0 RigidBody
 
 }
 Objects

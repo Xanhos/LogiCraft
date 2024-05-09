@@ -361,6 +361,17 @@ namespace bt
 			bool tick() override;
 		};
 
+		class TestController : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			bool m_bool_controller_;
+		public:
+			TestController() : m_agent_(), m_bool_controller_(false) {}
+			TestController(const std::shared_ptr<lc::GameObject>& agent_);
+			void Setup(NodePtr node);
+			bool tick() override;
+		};
+
 		class Wander : public Node
 		{
 			std::weak_ptr<lc::GameObject> m_agent_;

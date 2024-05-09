@@ -99,6 +99,7 @@ void lc::AI::Load(std::ifstream& load)
                 std::dynamic_pointer_cast<bt::ActionNode::CrazyHit>(node)->Setup(node);
                 std::cout << "CrazyHit loaded" << std::endl;
             }
+
             else if (attack_name == "pickHit")
             {
                 node = bt::Node::New(bt::ActionNode::PickHit(getParent(), scene->getObject("cible")));
@@ -119,6 +120,12 @@ void lc::AI::Load(std::ifstream& load)
             {
                 node = bt::Node::New(bt::ActionNode::lanceSpawn(getParent(), scene->getObject("cible")));
                 std::dynamic_pointer_cast<bt::ActionNode::lanceSpawn>(node)->Setup(node);
+                std::cout << "lanceSpawn loaded" << std::endl;
+            }
+            else if (attack_name == "controller")
+            {
+                node = bt::Node::New(bt::ActionNode::TestController(getParent()));
+                std::dynamic_pointer_cast<bt::ActionNode::TestController>(node)->Setup(node);
                 std::cout << "lanceSpawn loaded" << std::endl;
             }
             else
