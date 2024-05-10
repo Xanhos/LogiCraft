@@ -33,6 +33,9 @@ SOFTWARE.
 ---------------------------------------------------------------------------------*/
 
 #include "GameObject.h"
+
+#include <mutex>
+
 #include "Texture.h"
 #include "RigidBody.h"
 #include "Font.h"
@@ -150,29 +153,49 @@ std::shared_ptr<lc::GameObject> lc::GameObject::CreateGameObject(std::string _na
 	return std::make_shared<GameObject>(_name, _depth);
 }
 
-std::shared_ptr<lc::GameObject> lc::GameObject::LoadScene(std::string _SceneToLoad)
+
+std::shared_ptr<lc::GameObject> lc::GameObject::LoadScene(std::string _SceneToLoad, WindowManager& window_)
 {
 	_SceneToLoad = "../Ressources/" + _SceneToLoad;
-
+	const int thread_limit = 10;
+	std::cout << _SceneToLoad << "\n";
 	auto world = CreateGameObject("WORLD");
+	auto bg = world->addObject(background_holder_name);
 	FileReader file(_SceneToLoad + "/export.lcg");
-
-	for (auto& dir_entry : fs::directory_iterator(_SceneToLoad))
+	int thread_number;
+	file >> thread_number;
+	ThreadManager thread_list(thread_number);
+	std::mutex mutex;
+	for(int i = 0; i < thread_number; i++)
 	{
-		if (dir_entry.path().extension() == ".png")
+		sf::Vector2i index;
+		file >> index;
+		thread_list.AddNewThread([=, &mutex]
 		{
-			std::istringstream iss(Tools::replaceSpace(dir_entry.path().filename().stem().string()));
-			
-			std::string garbage;
-			int pos_bg_x(0), pos_bg_y(0), depth(0);
-			sf::Vector2f position(0,0);
-			iss >> pos_bg_x >> pos_bg_y >> garbage >> garbage >> depth;
-			position = sf::Vector2f(static_cast<float>(0 + (screenResolution.x * pos_bg_x)), static_cast<float>(0 + (screenResolution.y * pos_bg_y)));
-			world->addObject("BACKGROUND " + std::to_string(static_cast<unsigned char>(depth)),static_cast<unsigned char>(depth))->addComponent(std::make_shared<Texture>(dir_entry.path().filename().string(), dir_entry.path().string()))->setRelativePosition(position);
-		}
+			for (auto& dir_entry : fs::directory_iterator(_SceneToLoad))
+			{
+				if (dir_entry.path().extension() == ".png")
+				{
+					std::istringstream iss(Tools::replaceSpace(dir_entry.path().filename().stem().string()));			
+					std::string garbage;
+					int pos_bg_x(0), pos_bg_y(0), depth(0);
+					sf::Vector2f position(0,0);
+					iss >> pos_bg_x >> pos_bg_y >> garbage >> garbage >> depth;
+					if(pos_bg_x == index.x and pos_bg_y == index.y)
+					{
+						position = sf::Vector2f(static_cast<float>(0 + (screenResolution.x * pos_bg_x)), static_cast<float>(0 + (screenResolution.y * pos_bg_y)));
+						mutex.lock();
+						auto object = bg->addObject("BACKGROUND " + std::to_string(static_cast<unsigned char>(depth)),static_cast<unsigned char>(depth));
+						std::cout << dir_entry.path().string() + "\n";
+						mutex.unlock();
+						object->addComponent(std::make_shared<Texture>(dir_entry.path().filename().string(), dir_entry.path().string()))->setRelativePosition(position);
+					}
+				}
+			}
+		});	
 	}
+	bg->Update(window_);
 	world->Load(file);
-	world->ClearGarbargeObjects();
 	return world;
 }
 
@@ -208,6 +231,7 @@ void lc::GameObject::CheckMaxSize()
 void lc::GameObject::UpdateEvent(sf::Event& _event)
 {
 	for (auto& object : m_objects)
+		
 			object->UpdateEvent(_event);
 
 	for (auto& component : m_components)
@@ -244,8 +268,9 @@ void lc::GameObject::Draw(WindowManager& _window)
 	for (auto& object : m_objects)
 			object->Draw(_window);
 
-	for (auto& component : m_components)
-		component->Draw(_window);
+	if(Tools::Collisions::rect_rect({getTransform().getPosition(),getTransform().getSize()},{_window.getWindow().getView().getCenter() - _window.getWindow().getView().getSize() / 2.f,_window.getWindow().getView().getSize()}))
+		for (auto& component : m_components)
+			component->Draw(_window);
 }
 
 void lc::GameObject::Draw(sf::RenderTexture& _renderer)

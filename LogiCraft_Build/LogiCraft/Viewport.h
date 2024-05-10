@@ -42,6 +42,7 @@ SOFTWARE.
 #include "GameObject.h"
 
 const sf::Vector2f screenSize(3840.f, 2160.f);
+const unsigned short screenLimit = 32;
 
 class Viewport
 {

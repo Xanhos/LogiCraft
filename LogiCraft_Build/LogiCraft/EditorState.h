@@ -42,7 +42,6 @@ class EditorState : public State
 private:
 	MainMenu m_mainMenu;
 	Viewports m_viewports;
-
 	std::shared_ptr<lc::GameObject> m_scene;
 public:
 	EditorState(WindowManager& window, StateList* listState);

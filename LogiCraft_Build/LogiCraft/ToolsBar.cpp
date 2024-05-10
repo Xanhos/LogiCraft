@@ -59,6 +59,7 @@ void ToolsBar::Update(std::shared_ptr <lc::GameObject> object, WindowManager& _w
 							if (ImGui::MenuItem("New", "Ctrl + N") || (KEY(LControl) && KEY(N))) { New(object, _viewport); }
 							if (ImGui::MenuItem("Load", "Ctrl + O") || (KEY(LControl) && KEY(O))) { m_isLoading = true; }
 							if (ImGui::MenuItem("Save As", "Ctrl + S") || (KEY(LControl) && KEY(S))) { m_isSaving = true; }
+							if (ImGui::MenuItem("Export as", "Ctrl + E") || (KEY(LControl) && KEY(E))) { m_isExporting = true; }
 							if (ImGui::MenuItem("Exit", "Ctrl + W") ||(KEY(LControl) && KEY(W))) { Exit(_window); }
 							ImGui::EndMenu();
 						});
@@ -111,6 +112,19 @@ void ToolsBar::Update(std::shared_ptr <lc::GameObject> object, WindowManager& _w
 				std::filesystem::create_directory(std::string("../Ressources/" + std::string(m_path)));
 				Save(object, _viewport, _window.getWindow());
 				m_isSaving = false;
+				m_path.clear();
+			}
+			});
+	}
+	if (m_isExporting)
+	{
+		Tools::IG::CreateWindow("Export", m_isExporting, ImGuiWindowFlags_AlwaysAutoResize, [&] {
+			InputText("Export Name", m_path, 100);
+			if (Button("Export") && m_path[0] != '\0')
+			{
+				std::filesystem::create_directory(std::string("../Ressources/" + std::string(m_path)));
+				Export(object, _viewport, _window.getWindow());
+				m_isExporting = false;
 				m_path.clear();
 			}
 			});
@@ -178,19 +192,19 @@ void ToolsBar::Load(std::shared_ptr <lc::GameObject> _game_object, std::string p
 {
 	New(_game_object, _viewport);
 	std::ifstream load(path);
-	_game_object->Load(load);
-
-	for (auto& object : _game_object->getObjects())
+	int number_of_screen(0);
+	load >> number_of_screen;
+	for(int i = 0; i < number_of_screen; i++)
 	{
-		for (auto& screen : _viewport.getAllScreenzone())
+		sf::Vector2i screen_index;
+		load >> screen_index;
+		for(auto& screen : _viewport.getAllScreenzone())
 		{
-			if (Tools::Collisions::point_rect(object->getTransform().getPosition(), screen.getScreenShape().getGlobalBounds()))
-			{
-				if(!screen.isUsed())
-					_viewport.setScreenZoneToUse(screen);
-			}
+			if(screen.getScreenIndex() == screen_index)
+				_viewport.setScreenZoneToUse(screen);
 		}
-	}
+	}	
+	_game_object->Load(load);
 }
 
 void ToolsBar::ShowHelp()
@@ -204,6 +218,7 @@ void ToolsBar::ShowHelp()
 	ImGui::BulletText("LControl + N => Clear and create a new scene.");
 	ImGui::BulletText("LControl + O => Open the load menu.");
 	ImGui::BulletText("LControl + S => Open the save menu.");
+	ImGui::BulletText("LControl + E => Open the export menu.");
 	ImGui::BulletText("LControl + W => Close the program.");
 	ImGui::BulletText("LControl + Release Left Click => Add component to a hovered object.");
 	ImGui::BulletText("LControl + Left Click on unused screen zone => Allow the screen zone.");
@@ -216,34 +231,74 @@ void ToolsBar::ShowHelp()
 	ImGui::End();
 }
 
-//METTRE ANIMATION typename : Animation.
+
 void ToolsBar::Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _viewports, sf::RenderWindow& _window)
 {
 	Tools::s_filePool.clear();
 	std::ofstream save("../Ressources/" + std::string(m_path) + "/save.lcp");
 	FileWriter exportation("../Ressources/" + std::string(m_path) + "/export.lcg");
 	sf::RenderTexture render_texture;
+	save << std::count_if(_viewports.getAllScreenzone().begin(),_viewports.getAllScreenzone().end(), [](ScreenZone& screen){return screen.isUsed();}) << " ";
+	for (auto& screen : _viewports.getAllScreenzone())
+	{
+		if (screen.isUsed())
+			save << screen.getScreenIndex() << " ";
+	}
+	save << "\n";
+	_game_object->Save(save, exportation, render_texture, s_actualLayer.first);
+	save.close();
+	exportation.close();
+	fs::remove(fs::path("../Ressources/" + std::string(m_path) + "/export.lcg"));	
+}
+void ToolsBar::Export(std::shared_ptr<lc::GameObject> _game_object, Viewports& _viewports, sf::RenderWindow& _window)
+{
+	Tools::s_filePool.clear();
+	std::ofstream save("../Ressources/" + std::string(m_path) + "/save.lcp");
+	FileWriter exportation("../Ressources/" + std::string(m_path) + "/export.lcg");
+	std::ostringstream oss;
+	
+	oss << std::count_if(_viewports.getAllScreenzone().begin(),_viewports.getAllScreenzone().end(), [](ScreenZone& screen){return screen.isUsed();}) << " ";
+	for (auto& screen : _viewports.getAllScreenzone())
+	{
+		if (screen.isUsed())
+			oss << screen.getScreenIndex() << " ";
+	}
+	oss << "\n";
+	save << oss.str();
+	exportation << oss.str();
+	sf::RenderTexture render_texture;
 	_game_object->NeedToBeExported({"AI", "RigidBody", "Particles", "Animation", "Event", "Button"});
 	_game_object->Save(save, exportation, render_texture, s_actualLayer.first);
 
-	render_texture.create(screenSize.x, screenSize.y);
+	
+	std::list<std::thread> thread_list;
 	for (auto& screen : _viewports.getAllScreenzone())
 	{
 		if (screen.isUsed())
 		{
-			render_texture.setView(sf::View(sf::Vector2f(screenSize.x / 2.f + (screenSize.x * screen.getScreenIndex().x), screenSize.y / 2.f + (screenSize.y * screen.getScreenIndex().y)), sf::Vector2f(screenSize.x, screenSize.y)));
-			for (int depth = 0; depth <= s_layers.size(); depth++)
+			thread_list.push_back(std::thread([&]
 			{
-				render_texture.clear(sf::Color::Transparent);
-				_game_object->SaveRenderer(render_texture, depth);
-				sf::Image image;
-				image = render_texture.getTexture().copyToImage();
-				image.flipVertically();
-				image.saveToFile("../Ressources/" + std::string(m_path) + "/" + std::string(std::to_string(screen.getScreenIndex().x) + "_" + std::to_string(screen.getScreenIndex().y)) + "_" + std::string(m_path) + "_layer_" + std::to_string(depth) + ".png");
-			}
+				sf::RenderTexture render_texture_thread;				
+				render_texture_thread.create(screenSize.x, screenSize.y);
+				render_texture_thread.setView(sf::View(sf::Vector2f(screenSize.x / 2.f + (screenSize.x * screen.getScreenIndex().x), screenSize.y / 2.f + (screenSize.y * screen.getScreenIndex().y)), sf::Vector2f(screenSize.x, screenSize.y)));
+				for (int depth = 0; depth <= s_layers.size(); depth++)
+				{
+					render_texture_thread.clear(sf::Color::Transparent);
+					_game_object->SaveRenderer(render_texture_thread, depth);
+					sf::Image image;
+					image = render_texture_thread.getTexture().copyToImage();
+					image.flipVertically();
+					image.saveToFile("../Ressources/" + std::string(m_path) + "/" + std::string(std::to_string(screen.getScreenIndex().x) + "_" + std::to_string(screen.getScreenIndex().y)) + "_" + std::string(m_path) + "_layer_" + std::to_string(depth) + ".png");
+				}
+			}));
 		}
 	}
+	for(auto& i : thread_list)
+		i.join();
+	
 	_game_object->ResetExport();
+	save.close();
+	exportation.close();
 }
 
 void ToolsBar::Exit( WindowManager& _window)
