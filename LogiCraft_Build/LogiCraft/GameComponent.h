@@ -142,13 +142,15 @@ namespace lc
 
 		static unsigned short& getGeneralID() { return m_generalID; }
 
+		bool& isVisible() { return m_isVisible; }
+
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) = 0;
 		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth) = 0;
 		virtual void Load(std::ifstream& load) = 0;
 		virtual void Export(std::ofstream& exportation) {}
+		
 		/*
 		*@brief This function is used to set the function that will be called when the component is drawn in the hierarchy.
-		* 
 		*/
 		virtual void setHierarchieFunc() = 0;
 #pragma endregion
@@ -158,6 +160,7 @@ namespace lc
 		std::string m_typeName;
 
 		bool m_needToBeDeleted;
+		bool m_isVisible;
 
 		std::function<void()> m_hierarchieInformation;
 

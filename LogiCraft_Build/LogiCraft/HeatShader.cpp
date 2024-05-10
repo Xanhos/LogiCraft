@@ -30,7 +30,7 @@ namespace lc
             m_shader_.reset();
 
         	if (!m_heat_ressource_.expired())
-        		m_heat_ressource_.lock()->isUsedByAComponent() = false;
+        		m_heat_ressource_.lock()->isVisible() = false;
         }
 
         void heat_shader::UpdateEvent(sf::Event& event)
@@ -106,7 +106,7 @@ namespace lc
 						if (ImGui::Selectable(std::string("No Texture ##" + std::to_string(m_ID)).c_str(), tmp_is_selected))
 						{
 							if (tmp_ressource)
-								tmp_ressource->isUsedByAComponent() = false;
+								tmp_ressource->isVisible() = false;
 							
 							m_heat_ressource_.reset();
 						}
@@ -116,17 +116,17 @@ namespace lc
 						if (auto tmp_ressource_component = std::dynamic_pointer_cast<lc::Texture>(component))
 						{
 							//If the ressource is not already use by another component we use it.
-							if (!tmp_ressource_component->isUsedByAComponent())
+							if (!tmp_ressource_component->isVisible())
 							{
 								if (ImGui::Selectable(std::string(tmp_ressource_component->getName() + "##" + std::to_string(tmp_ressource_component->getID())).c_str(), tmp_is_selected))
 								{
 									//If there were already a component used on the particles, we set it to un use,
 									//to replace by the new one.
 									if (tmp_ressource)
-										tmp_ressource->isUsedByAComponent() = false;
+										tmp_ressource->isVisible() = false;
 
 									//The new ressource is set to use.
-									tmp_ressource_component->isUsedByAComponent() = true;
+									tmp_ressource_component->isVisible() = true;
 									//The weak_ptr of the ressource is set to the new one
 									m_heat_ressource_ = tmp_ressource_component;
 								}
@@ -208,7 +208,7 @@ void main()
         				if (m_ressource_to_search_.second == tmp_texture->getName())
         				{
         					m_heat_ressource_ = tmp_texture;
-        					tmp_texture->isUsedByAComponent() = true;
+        					tmp_texture->isVisible() = true;
         					break;
         				}
         			}

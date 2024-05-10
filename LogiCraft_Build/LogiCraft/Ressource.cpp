@@ -44,7 +44,7 @@ lc::Ressource::Ressource()
 {
 	m_displayThumbnail = false;
 	m_type = Ressource::TYPE::NONE;
-	m_isUsedByAComponent = false;
+	m_isVisible = false;
 }
 
 lc::Ressource::~Ressource()

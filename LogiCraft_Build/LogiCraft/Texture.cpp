@@ -39,7 +39,7 @@ SOFTWARE.
 lc::Texture::Texture()
 {
 	m_renderer.setTexture(&m_texture);
-	m_isUsedByAComponent = false;
+	m_isVisible = false;
 }
 
 lc::Texture::Texture(std::string name, sf::IntRect rect, std::string path, std::string newRepo)
@@ -64,7 +64,7 @@ lc::Texture::Texture(std::string name, sf::IntRect rect, std::string path, std::
 		m_texturePath = newRepo + "/" + m_textureName;
 	else m_texturePath = path;
 
-	m_isUsedByAComponent = false;
+	m_isVisible = false;
 	m_filterColor = sf::Color(0xF90FF0FF);
 }
 
@@ -83,7 +83,7 @@ lc::Texture::Texture(const Texture& _texture)
 	m_typeName = "Texture";
 	m_filterColor = sf::Color(0xF90FF0FF);
 	m_type = TYPE::TEXTURE;
-	m_isUsedByAComponent = false;
+	m_isVisible = false;
 }
 
 lc::Texture::Texture(std::string name, sf::IntRect rect, std::string path, sf::Vector2f _position, sf::Vector2f _scale, sf::Vector2f _relative)
@@ -107,7 +107,7 @@ lc::Texture::Texture(std::string name, sf::IntRect rect, std::string path, sf::V
 	m_type = TYPE::TEXTURE;
 	m_filterColor = sf::Color(0xF90FF0FF);
 	m_relativePosition = _relative;
-	m_isUsedByAComponent = false;
+	m_isVisible = false;
 }
 
 lc::Texture::~Texture()
@@ -178,7 +178,7 @@ void lc::Texture::Update(WindowManager& _window)
 
 void lc::Texture::Draw(WindowManager& _window)
 {
-	if (!m_isUsedByAComponent)
+	if (!m_isVisible)
 	{
 		if (getParent())
 		{
@@ -197,7 +197,7 @@ void lc::Texture::Draw(WindowManager& _window)
 
 void lc::Texture::Draw(sf::RenderTexture& _window)
 {
-	if (!m_isUsedByAComponent)
+	if (!m_isVisible)
 	{
 		if (getParent())
 		{
@@ -226,7 +226,7 @@ void lc::Texture::setHierarchieFunc()
 
 			ImGui::Text("Texture Name : %s", m_textureName.c_str());
 
-			if (!m_isUsedByAComponent)
+			if (!m_isVisible)
 				ImGui::DragFloat2("Relative Position", m_relativePosition, 1.0f, 0.0f, 0.0f, "%.2f");
 	};
 }

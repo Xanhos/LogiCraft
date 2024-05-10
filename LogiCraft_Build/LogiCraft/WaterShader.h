@@ -27,13 +27,12 @@ namespace lc
         private:
             virtual void setup_shader_script_string() override;
 
-            void texture_to_search();
+            void draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object);
         private:
             float m_level_;
 
-            std::weak_ptr<lc::Ressource> m_water_ressource_;
-            
-            RessourceToSearch m_ressource_to_search_;
+            std::shared_ptr<sf::RenderTexture> m_shader_renderer_;
+            sf::Sprite m_shader_renderer_sprite_;
        };
     }
 }

@@ -341,7 +341,8 @@ void lc::GameObject::Draw(sf::RenderTexture& _renderer)
 			object->Draw(_renderer);
 
 	for (auto& component : m_components)
-		component->Draw(_renderer);
+		if (component->isVisible())
+			component->Draw(_renderer);
 }
 
 void lc::GameObject::Draw(sf::RenderTexture& _renderer, unsigned char _depth)

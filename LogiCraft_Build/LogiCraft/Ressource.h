@@ -49,7 +49,6 @@ namespace lc
 	protected:
 		sf::RectangleShape m_renderer;//Renderer of the ressource
 		bool m_displayThumbnail;
-		bool m_isUsedByAComponent;
 		sf::Vector2f m_thumbnailSize;
 		sf::Vector2f m_relativePosition;//Relative position to the parent
 		sf::Color m_filterColor;//Color of the filter in the content browser
@@ -75,7 +74,6 @@ namespace lc
 		std::string& getName() { return m_name; }
 		bool getThumbnail() { return m_displayThumbnail; }
 		sf::Color getFilterColor() { return m_filterColor; }
-		bool& isUsedByAComponent() { return m_isUsedByAComponent; }
 
 		void ToggleThumbnail() { m_displayThumbnail = !m_displayThumbnail; }
 
