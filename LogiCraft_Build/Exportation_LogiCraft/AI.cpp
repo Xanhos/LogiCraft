@@ -185,7 +185,7 @@ void lc::AI::Load(std::ifstream& load)
                 {
                     if(!player.expired() and !agent.expired() and player.lock() != nullptr and agent.lock() != nullptr)
                     {
-                        return Tools::Vector::getDistance(player.lock()->getTransform().getPosition(),agent.lock()->getTransform().getPosition()) < detection_range;
+                        return Tools::Vector::getDistance(player.lock()->getTransform().getPosition() + (player.lock()->getTransform().getSize()/2.f) - player.lock()->getTransform().getOrigin(), agent.lock()->getTransform().getPosition() + (agent.lock()->getTransform().getSize() / 2.f) - agent.lock()->getTransform().getOrigin()) < detection_range;
                     }
                     return false;
                 });
