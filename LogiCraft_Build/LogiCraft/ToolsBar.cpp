@@ -192,19 +192,19 @@ void ToolsBar::Load(std::shared_ptr <lc::GameObject> _game_object, std::string p
 {
 	New(_game_object, _viewport);
 	std::ifstream load(path);
-	_game_object->Load(load);
-
-	for (auto& object : _game_object->getObjects())
+	int number_of_screen(0);
+	load >> number_of_screen;
+	for(int i = 0; i < number_of_screen; i++)
 	{
-		for (auto& screen : _viewport.getAllScreenzone())
+		sf::Vector2i screen_index;
+		load >> screen_index;
+		for(auto& screen : _viewport.getAllScreenzone())
 		{
-			if (Tools::Collisions::point_rect(object->getTransform().getPosition(), screen.getScreenShape().getGlobalBounds()))
-			{
-				if(!screen.isUsed())
-					_viewport.setScreenZoneToUse(screen);
-			}
+			if(screen.getScreenIndex() == screen_index)
+				_viewport.setScreenZoneToUse(screen);
 		}
-	}
+	}	
+	_game_object->Load(load);
 }
 
 void ToolsBar::ShowHelp()
@@ -231,28 +231,46 @@ void ToolsBar::ShowHelp()
 	ImGui::End();
 }
 
-//METTRE ANIMATION typename : Animation.
+
 void ToolsBar::Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _viewports, sf::RenderWindow& _window)
 {
 	Tools::s_filePool.clear();
 	std::ofstream save("../Ressources/" + std::string(m_path) + "/save.lcp");
 	FileWriter exportation("../Ressources/" + std::string(m_path) + "/export.lcg");
 	sf::RenderTexture render_texture;
+	save << std::count_if(_viewports.getAllScreenzone().begin(),_viewports.getAllScreenzone().end(), [](ScreenZone& screen){return screen.isUsed();}) << " ";
+	for (auto& screen : _viewports.getAllScreenzone())
+	{
+		if (screen.isUsed())
+			save << screen.getScreenIndex() << " ";
+	}
+	save << "\n";
 	_game_object->Save(save, exportation, render_texture, s_actualLayer.first);
 	save.close();
 	exportation.close();
 	fs::remove(fs::path("../Ressources/" + std::string(m_path) + "/export.lcg"));	
 }
-
 void ToolsBar::Export(std::shared_ptr<lc::GameObject> _game_object, Viewports& _viewports, sf::RenderWindow& _window)
 {
 	Tools::s_filePool.clear();
 	std::ofstream save("../Ressources/" + std::string(m_path) + "/save.lcp");
 	FileWriter exportation("../Ressources/" + std::string(m_path) + "/export.lcg");
+	std::ostringstream oss;
+	
+	oss << std::count_if(_viewports.getAllScreenzone().begin(),_viewports.getAllScreenzone().end(), [](ScreenZone& screen){return screen.isUsed();}) << " ";
+	for (auto& screen : _viewports.getAllScreenzone())
+	{
+		if (screen.isUsed())
+			oss << screen.getScreenIndex() << " ";
+	}
+	oss << "\n";
+	save << oss.str();
+	exportation << oss.str();
 	sf::RenderTexture render_texture;
 	_game_object->NeedToBeExported({"AI", "RigidBody", "Particles", "Animation", "Event", "Button"});
 	_game_object->Save(save, exportation, render_texture, s_actualLayer.first);
 
+	
 	std::list<std::thread> thread_list;
 	for (auto& screen : _viewports.getAllScreenzone())
 	{

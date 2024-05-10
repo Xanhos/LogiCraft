@@ -3,6 +3,24 @@
 
 #include "GameObject.h"
 
+ThreadManager::~ThreadManager()
+{
+	while(!m_thread_list_.empty())
+		this->Update();
+}
+
+void ThreadManager::Update()
+{
+	for(auto it = m_thread_list_.begin();it != m_thread_list_.end();)
+	{
+		if(*it->second)
+		{
+			it->first.join();
+			it = m_thread_list_.erase(it);
+		}
+	}
+}
+
 FileWriter::FileWriter(fs::path path) : std::ofstream(path), m_path(path)
 {
 }
