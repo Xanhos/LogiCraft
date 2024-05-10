@@ -112,7 +112,7 @@ namespace lc
 		{
 			if (const auto tmp_animation_key = m_actual_animation_key_.lock())
 			{
-				if (!m_animation_is_paused_)
+				if ((!m_animation_is_paused_ and !m_stop_at_last_frame) or (!m_animation_is_paused_ and m_stop_at_last_frame and tmp_animation_key->get_actual_frame() != tmp_animation_key->get_total_frame() - 1))
 				{
 					tmp_animation_key->get_frame_timer() += Tools::getDeltaTime();
 					if (tmp_animation_key->get_frame_timer() >= tmp_animation_key->get_frame_time())
@@ -209,36 +209,42 @@ namespace lc
 		return (m_texture_.expired() ? m_renderer : m_texture_.lock()->getShape());
 	}
 
-	void Animation::select_animation_key(const std::string& name, const bool reset_last_anim_key)
+	void Animation::select_animation_key(const std::string& name, const bool& reset_last_anim_key)
 	{
 		const auto tmp_act_anim_key = m_actual_animation_key_.lock();
-		if (tmp_act_anim_key ? tmp_act_anim_key->get_name() != name : true)
+
+		if (tmp_act_anim_key && reset_last_anim_key)
 		{
-			if (tmp_act_anim_key && reset_last_anim_key)
-			{
-				tmp_act_anim_key->get_actual_frame() = 0;
-				tmp_act_anim_key->get_frame_timer() = 0.f;
-			}
-
-			m_actual_animation_key_ = m_animation_keys_.at(name);
-
-			const auto tmp_act_anim_key = m_actual_animation_key_.lock();
-			const auto tmp_texture = m_texture_.lock();
-			tmp_texture->getShape().setTextureRect(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()]);
-			tmp_texture->getShape().setSize(sf::Vector2f(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()].getSize()));
+			tmp_act_anim_key->get_actual_frame() = 0;
+			tmp_act_anim_key->get_frame_timer() = 0.f;
 		}
+	
+		
+		m_actual_animation_key_ = m_animation_keys_.at(name);
+
+		const auto tmp_act_anim_key_second = m_actual_animation_key_.lock();
+		const auto tmp_texture = m_texture_.lock();
+		tmp_texture->getShape().setTextureRect(tmp_act_anim_key_second->get_frames_rects()[tmp_act_anim_key_second->get_actual_frame()]);
+		tmp_texture->getShape().setSize(sf::Vector2f(tmp_act_anim_key_second->get_frames_rects()[tmp_act_anim_key_second->get_actual_frame()].getSize()));
+		
 	}
 
-	void Animation::current_animation_is_paused(const bool paused)
+	void Animation::current_animation_is_paused(const bool& paused)
 	{
 		m_animation_is_paused_ = paused;
 	}
 
-	void Animation::current_animation_is_reversed(const bool reversed)
+	void Animation::current_animation_is_reversed(const bool& reversed)
 	{
 		m_animation_is_reversed_ = reversed;
 	}
 
+	void Animation::set_stop_at_last_frame(const bool& stop_at_last_frame)
+	{
+		m_stop_at_last_frame = stop_at_last_frame;		
+	}
+
+	
 	void Animation::texture_to_search()
 	{
 		if (m_texture_to_search_.first)

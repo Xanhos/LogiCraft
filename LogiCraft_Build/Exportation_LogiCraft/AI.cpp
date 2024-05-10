@@ -87,6 +87,12 @@ void lc::AI::Load(std::ifstream& load)
             node = bt::Node::New(bt::ActionNode::Jump(jump_height,getParent()));
             std::dynamic_pointer_cast<bt::ActionNode::Jump>(node)->Setup(node);            
         }
+        else if (type_cast == bt::node_type::DIRECTION)
+        {
+            int direction;
+            load >> direction;
+            node = bt::Node::New(bt::Decorator::Direction(direction,getParent()));
+        }
         else if (type_cast == bt::node_type::PLAY_SOUND)
         {
             std::string sound_name;
@@ -100,9 +106,10 @@ void lc::AI::Load(std::ifstream& load)
         else if (type_cast == bt::node_type::PLAY_ANIMATION)
         {
             std::string anim_name, key_anim_name;
-            load >> anim_name >> key_anim_name;
+            bool stop_at_last_frame,reverse_anim; 
+            load >> anim_name >> key_anim_name >>stop_at_last_frame >> reverse_anim;
 
-            node = bt::Node::New(bt::ActionNode::Play_Animation(getParent(),anim_name,key_anim_name));
+            node = bt::Node::New(bt::ActionNode::Play_Animation(getParent(),anim_name,key_anim_name,stop_at_last_frame,reverse_anim));
         }
         else if(type_cast == bt::node_type::WANDER)
         {

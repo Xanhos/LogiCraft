@@ -43,20 +43,24 @@ SOFTWARE.
 #include "RigidBody.h"
 
 #define SECURE_TASK(task) (task ? task->tick() : false)
-/*	pushNode("SEQUENCE");
-pushNode("SELECTOR");
-pushNode("INVERSER");
-pushNode("CONDITION");
-pushNode("LOOP");
-pushNode("COOLDOWN");
-pushNode("FORCE SUCCESS");
-pushNode("KEEP IN CONE");
-pushNode("WANDER");
-pushNode("MOVE TO");
-pushNode("PLAY ANIMATION");
-pushNode("PLAY SOUND");
-pushNode("ROTATE TO");
-pushNode("WAIT");*/
+/*pushNode("SEQUENCE");
+	pushNode("SELECTOR");
+	pushNode("INVERSER");
+	pushNode("CONDITION");
+	pushNode("LOOP");
+	pushNode("COOLDOWN");
+	pushNode("DIRECTION");
+	pushNode("DO ON ANIM FRAME");
+	pushNode("FORCE SUCCESS");
+	pushNode("WANDER");
+	pushNode("MOVE TO");
+	pushNode("PLAY ANIMATION");
+	pushNode("PLAY SOUND");
+	pushNode("ROTATE TO");
+	pushNode("WAIT");
+	pushNode("ATTACK");
+	pushNode("SHOT");
+	pushNode("JUMP");*/
 
 
 namespace bt
@@ -68,8 +72,9 @@ namespace bt
 		CONDITION,
 		LOOP,
 		COOLDOWN,
+		DIRECTION,
+		DO_ON_ANIM_FRAME,
 		FORCE_SUCCESS,
-		KEEP_IN_CONE,
 		WANDER,
 		MOVE_TO,
 		PLAY_ANIMATION,
@@ -261,6 +266,15 @@ namespace bt
 			}
 		};
 
+		class Direction : public  Node
+		{
+			std::weak_ptr<lc::GameObject> m_owner_;
+			int m_direction_;
+		public:
+			Direction() : m_direction_(0){}
+			Direction(const int& direction,const std::weak_ptr<lc::GameObject>& owner) : m_owner_(owner),m_direction_(direction){}
+			bool tick();
+		};
 	}
 
 #pragma endregion
@@ -352,13 +366,12 @@ namespace bt
 			std::weak_ptr<lc::GameObject> m_owner_;
 			std::weak_ptr<lc::Animation> m_animation_;
 			std::string m_anim_name_, m_key_anim_name_;
+			bool m_stop_at_last_frame_, m_reverse_;
 		public:
-			Play_Animation() {}
-			Play_Animation(const std::weak_ptr<lc::GameObject>& owner,const std::string& anim_name,const std::string& key_anim_name);
+			Play_Animation() : m_stop_at_last_frame_(false), m_reverse_(false){}
+			Play_Animation(const std::weak_ptr<lc::GameObject>& owner,const std::string& anim_name,const std::string& key_anim_name, const bool& stop_at_last_frame, const bool& reverse);
 			bool tick();
 		};
 	}
-
-
 }
 

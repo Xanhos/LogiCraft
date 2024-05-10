@@ -184,44 +184,30 @@ bt::NodePtr bt::Factory(const node_type& type)
 	switch (type) {
 	case node_type::SEQUENCE:
 		return Node::New(Composite::Sequence());
-		break;
 	case node_type::SELECTOR:
 		return Node::New(Composite::Selector());
-		break;
 	case node_type::INVERSER:
 		return Node::New(Decorator::Inverser());
-		break;
 	case node_type::CONDITION:
 		return Node::New(Decorator::Condition());
-		break;
+	case node_type::DIRECTION:
+		return Node::New(Decorator::Direction());
 	case node_type::LOOP:
 		return Node::New(Decorator::Loop());
-		break;
 	case node_type::COOLDOWN:
 		return Node::New(Decorator::Cooldown());
-		break;
 	case node_type::FORCE_SUCCESS:
 		return Node::New(Decorator::ForceSuccess());
-		break;
-	case node_type::KEEP_IN_CONE:
-		break;
 	case node_type::WANDER:
 		return Node::New(ActionNode::Wander());
-		break;
 	case node_type::MOVE_TO:
 		return Node::New(ActionNode::MoveTo());
-		break;
 	case node_type::PLAY_ANIMATION:
 		return Node::New(ActionNode::Play_Animation());
-		break;
 	case node_type::PLAY_SOUND:
 		return Node::New(ActionNode::Play_Sound());
-		break;
-	case node_type::ROTATE_TO:
-		break;
 	case node_type::WAIT:
 		return Node::New(ActionNode::Wait());
-		break;
 	default:
 		return Node::New(Composite::Sequence());
 	}
@@ -382,7 +368,8 @@ bool bt::ActionNode::Jump::tick()
 }
 
 bt::ActionNode::Play_Animation::Play_Animation(const std::weak_ptr<lc::GameObject>& owner,const std::string& anim_name,
-	const std::string& key_anim_name) : m_owner_(owner), m_anim_name_(anim_name), m_key_anim_name_(key_anim_name)
+	const std::string& key_anim_name, const bool& stop_at_last_frame, const bool& reverse)
+: m_owner_(owner), m_anim_name_(anim_name), m_key_anim_name_(key_anim_name), m_stop_at_last_frame_(stop_at_last_frame),m_reverse_(reverse)
 {
 }
 
@@ -409,9 +396,28 @@ bool bt::ActionNode::Play_Animation::tick()
 	{
 		auto anim = m_animation_.lock();
 		anim->select_animation_key(m_key_anim_name_,true);
+		anim->set_stop_at_last_frame(m_stop_at_last_frame_);
+		anim->current_animation_is_reversed(m_reverse_);
 		return true;		
 	}
 
 	return false;
+}
+
+bool bt::Decorator::Direction::tick()
+{
+	if(!m_owner_.expired())
+	{
+		auto agent = m_owner_.lock();
+		if(agent->hasComponent("RigidBody"))
+		{
+			auto rb = agent->getComponent<lc::RigidBody>("RigidBody");
+			if(m_direction_ == 0 and rb->getVelocity().x < 0)
+				return true;
+			if (m_direction_ == 1 and rb->getVelocity().x > 0)
+				return true;							
+		}
+	}
+	return false;	
 }
 
