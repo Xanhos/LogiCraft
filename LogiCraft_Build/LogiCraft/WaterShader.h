@@ -41,6 +41,8 @@ namespace lc
             sf::Sprite m_render_sprite_;
 
             sf::Vector2u m_renderer_size_;
+
+            bool m_is_in_view_;
        };
     }
 }

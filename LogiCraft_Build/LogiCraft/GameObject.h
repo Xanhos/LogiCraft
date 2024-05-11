@@ -62,6 +62,9 @@ namespace lc
 		virtual void Draw(WindowManager& _window);
 		virtual void Draw(sf::RenderTexture& _renderer);
 		virtual void Draw(sf::RenderTexture& _renderer, unsigned char _depth);
+
+		bool is_in_window_view(WindowManager& window);
+		bool is_in_window_view(const sf::RenderTexture& window);
 #pragma region STATIC
 		/*
 		* @brief A function to create a GameObject.

@@ -1,7 +1,7 @@
 #include "WaterShader.h"
 
 lc::shader::water_shader::water_shader()
-    : m_level_(0.5f), m_distortion_level_(50)
+    : m_level_(0.5f), m_distortion_level_(50), m_is_in_view_(true)
 {
     m_name = "Water Shader";
     m_typeName = "Water Shader";
@@ -42,6 +42,8 @@ void lc::shader::water_shader::Update(WindowManager& window)
 
 void lc::shader::water_shader::Draw(WindowManager& window)
 {
+    m_is_in_view_ = getParent()->is_in_window_view(window);
+    
     m_time_ += Tools::getDeltaTime();
 
     m_shader_->setUniform("u_time", m_time_);
@@ -54,27 +56,35 @@ void lc::shader::water_shader::Draw(WindowManager& window)
     m_render_view_.setCenter(getParent()->getTransform().getPosition() + sf::Vector2f(m_render_texture_->getSize() / 2u));
     m_render_view_.setSize(sf::Vector2f(m_render_texture_->getSize()));
 
-    m_render_texture_->setView(m_render_view_);
-    m_render_texture_->clear(sf::Color::Black);
+    if (m_is_in_view_)
+    {
+        m_render_texture_->setView(m_render_view_);
+        m_render_texture_->clear(sf::Color::Black);   
+    }
     
     for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
         this->draw_in_shader(obj_element, window);
+
+    if (m_is_in_view_)
+    {
+        m_render_texture_->display();
     
-    m_render_texture_->display();
+        m_renderer.setTexture(&m_render_texture_->getTexture());
+        m_renderer.setTextureRect({{0, 0}, sf::Vector2i(m_render_texture_->getSize())});
+        m_renderer.setSize(sf::Vector2f(m_render_texture_->getSize()));
+        m_renderer.setPosition(getParent()->getTransform().getPosition());
+        m_renderer.setScale(getParent()->getTransform().getScale());
+        m_renderer.setOrigin(getParent()->getTransform().getOrigin());
+        m_renderer.setRotation(getParent()->getTransform().getRotation());
     
-    m_renderer.setTexture(&m_render_texture_->getTexture());
-    m_renderer.setTextureRect({{0, 0}, sf::Vector2i(m_render_texture_->getSize())});
-    m_renderer.setSize(sf::Vector2f(m_render_texture_->getSize()));
-    m_renderer.setPosition(getParent()->getTransform().getPosition());
-    m_renderer.setScale(getParent()->getTransform().getScale());
-    m_renderer.setOrigin(getParent()->getTransform().getOrigin());
-    m_renderer.setRotation(getParent()->getTransform().getRotation());
-    
-    window.draw(m_renderer, m_shader_states_);
+        window.draw(m_renderer, m_shader_states_);
+    }
 }
     
 void lc::shader::water_shader::Draw(sf::RenderTexture& window)
 {
+    m_is_in_view_ = getParent()->is_in_window_view(window);
+    
     m_time_ += Tools::getDeltaTime();
 
     m_shader_->setUniform("u_time", m_time_);
@@ -87,23 +97,29 @@ void lc::shader::water_shader::Draw(sf::RenderTexture& window)
     m_render_view_.setCenter(getParent()->getTransform().getPosition() + sf::Vector2f(m_render_texture_->getSize() / 2u));
     m_render_view_.setSize(sf::Vector2f(m_render_texture_->getSize()));
 
-    m_render_texture_->setView(m_render_view_);
-    m_render_texture_->clear(sf::Color::Black);
+    if (m_is_in_view_)
+    {
+        m_render_texture_->setView(m_render_view_);
+        m_render_texture_->clear(sf::Color::Black);   
+    }
     
     for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
         this->draw_in_shader(obj_element, window);
+
+    if (m_is_in_view_)
+    {
+        m_render_texture_->display();
     
-    m_render_texture_->display();
-    
-    m_renderer.setTexture(&m_render_texture_->getTexture());
-    m_renderer.setTextureRect({{0, 0}, sf::Vector2i(m_render_texture_->getSize())});
-    m_renderer.setSize(sf::Vector2f(m_render_texture_->getSize()));
-    m_renderer.setPosition(getParent()->getTransform().getPosition());
-    m_renderer.setScale(getParent()->getTransform().getScale());
-    m_renderer.setOrigin(getParent()->getTransform().getOrigin());
-    m_renderer.setRotation(getParent()->getTransform().getRotation());
-    
-    window.draw(m_renderer, m_shader_states_);
+        m_renderer.setTexture(&m_render_texture_->getTexture());
+        m_renderer.setTextureRect({{0, 0}, sf::Vector2i(m_render_texture_->getSize())});
+        m_renderer.setSize(sf::Vector2f(m_render_texture_->getSize()));
+        m_renderer.setPosition(getParent()->getTransform().getPosition());
+        m_renderer.setScale(getParent()->getTransform().getScale());
+        m_renderer.setOrigin(getParent()->getTransform().getOrigin());
+        m_renderer.setRotation(getParent()->getTransform().getRotation());
+
+        window.draw(m_renderer, m_shader_states_);
+    }
 }
 
 void lc::shader::water_shader::Save(std::ofstream& save, sf::RenderTexture& texture, int depth)
@@ -182,7 +198,7 @@ void lc::shader::water_shader::draw_in_shader(const std::shared_ptr<lc::GameObje
 {
     if (game_object->getDepth() <= getParent()->getDepth() && !game_object->hasComponent("Water Shader"))
     {
-        if (this->is_totally_in(game_object))
+        if (this->is_totally_in(game_object) && m_is_in_view_)
         {
             game_object->Draw(*m_render_texture_);
             game_object->isVisible() = false;
@@ -193,7 +209,8 @@ void lc::shader::water_shader::draw_in_shader(const std::shared_ptr<lc::GameObje
             {game_object->getTransform().getPosition(), game_object->getTransform().getSize()}))
             {
                 game_object->Draw(window);
-                game_object->Draw(*m_render_texture_);
+                if (m_is_in_view_)
+                    game_object->Draw(*m_render_texture_);
                 game_object->isVisible() = false;
             }
             else
@@ -211,7 +228,7 @@ void lc::shader::water_shader::draw_in_shader(const std::shared_ptr<lc::GameObje
 {
     if (game_object->getDepth() <= getParent()->getDepth() && !game_object->hasComponent("Water Shader"))
     {
-        if (this->is_totally_in(game_object))
+        if (this->is_totally_in(game_object) && m_is_in_view_)
         {
             game_object->Draw(*m_render_texture_);
             game_object->isVisible() = false;
@@ -222,7 +239,8 @@ void lc::shader::water_shader::draw_in_shader(const std::shared_ptr<lc::GameObje
             {game_object->getTransform().getPosition(), game_object->getTransform().getSize()}))
             {
                 game_object->Draw(window);
-                game_object->Draw(*m_render_texture_);
+                if (m_is_in_view_)
+                    game_object->Draw(*m_render_texture_);
                 game_object->isVisible() = false;
             }
             else
