@@ -85,7 +85,7 @@ namespace lc
 	}
 
 	void AnimationKey::update_animation_key(const std::shared_ptr<lc::Texture>& texture, 
-		const bool& animation_is_paused, const bool& animation_is_reversed, const bool& is_visible)
+		const bool& animation_is_paused, const bool& animation_is_reversed)
 	{
 		if (!animation_is_paused)
 		{
@@ -105,8 +105,7 @@ namespace lc
 			if (!m_frames_rects_.empty())
 			{
 				texture->getShape().setTextureRect(m_frames_rects_[m_actual_frame_]);
-				if (!is_visible)
-					texture->getShape().setSize(sf::Vector2f(m_frames_rects_[m_actual_frame_].getSize()));
+				texture->getShape().setSize(sf::Vector2f(m_frames_rects_[m_actual_frame_].getSize()));
 			}
 		}
 	}
@@ -125,7 +124,7 @@ namespace lc
 	Animation::~Animation()
 	{
 		if (!m_texture_.expired())
-			m_texture_.lock()->isVisible() = false;
+			m_texture_.lock()->isVisible() = true;
 	}
 
 	void Animation::UpdateEvent(sf::Event& event)
@@ -141,7 +140,7 @@ namespace lc
 
 		if (const auto tmp_texture = m_texture_.lock())
 			if (const auto tmp_animation_key = m_actual_animation_key_.lock())
-				tmp_animation_key->update_animation_key(tmp_texture, m_animation_is_paused_, m_animation_is_reversed_, m_isVisible);
+				tmp_animation_key->update_animation_key(tmp_texture, m_animation_is_paused_, m_animation_is_reversed_);
 	}
 
 	void Animation::Draw(WindowManager& window)
@@ -288,7 +287,7 @@ namespace lc
 						if (ImGui::Selectable(std::string("No Texture ##" + std::to_string(m_ID)).c_str(), tmp_is_selected))
 						{
 							const auto tmp_texture = m_texture_.lock();
-							tmp_texture->isVisible() = false;
+							tmp_texture->isVisible() = true;
 							tmp_texture->getShape().setTextureRect(tmp_texture->getTextureRect());
 
 							m_texture_.reset();
@@ -299,15 +298,15 @@ namespace lc
 					{
 						if (auto tmp_texture_component = std::dynamic_pointer_cast<lc::Texture>(component))
 						{
-							if (!tmp_texture_component->isVisible())
+							if (tmp_texture_component->isVisible())
 							{
 								if (ImGui::Selectable(std::string(tmp_texture_component->getName() + "##" + std::to_string(tmp_texture_component->getID())).c_str(), tmp_is_selected))
 								{
 									if (!m_texture_.expired())
-										m_texture_.lock()->isVisible() = false;
+										m_texture_.lock()->isVisible() = true;
 
 									m_texture_ = tmp_texture_component;
-									tmp_texture_component->isVisible() = true;
+									tmp_texture_component->isVisible() = false;
 								}
 							}
 						}
@@ -519,7 +518,7 @@ namespace lc
 					if (m_texture_to_search_.second == tmp_texture->getName())
 					{
 						m_texture_ = tmp_texture;
-						tmp_texture->isVisible() = true;
+						tmp_texture->isVisible() = false;
 						break;
 					}
 				}
@@ -545,15 +544,12 @@ namespace lc
 	{
 		if (const auto tmp_texture = m_texture_.lock())
 		{
-			if (!m_isVisible)
-			{
-				tmp_texture->getShape().setOrigin(getParent()->getTransform().getOrigin());
-				tmp_texture->getShape().setScale(getParent()->getTransform().getScale());
-				tmp_texture->getShape().setRotation(getParent()->getTransform().getRotation());
+			tmp_texture->getShape().setOrigin(getParent()->getTransform().getOrigin());
+			tmp_texture->getShape().setScale(getParent()->getTransform().getScale());
+			tmp_texture->getShape().setRotation(getParent()->getTransform().getRotation());
 
-				tmp_texture->getShape().setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
-				window.draw(tmp_texture->getShape());
-			}
+			tmp_texture->getShape().setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
+			window.draw(tmp_texture->getShape());
 
 			tmp_texture->getShape().setPosition(m_renderer_.get_size() / 2.f);
 			m_renderer_.Draw(tmp_texture->getShape());

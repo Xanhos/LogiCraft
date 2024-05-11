@@ -351,7 +351,7 @@ namespace lc
 					if (tmp_ressource_component)
 					{
 						//If the ressource is not already use by another component we use it.
-						if (!tmp_ressource_component->isVisible())
+						if (tmp_ressource_component->isVisible())
 						{
 							if (ImGui::Selectable(std::string(tmp_ressource_component->getName() + "##" + std::to_string(tmp_ressource_component->getID())).c_str(), tmp_is_selected))
 							{
@@ -360,11 +360,11 @@ namespace lc
 								if (tmp_ressource)
 								{
 									tmp_ressource->getShape().setFillColor(sf::Color::White);
-									tmp_ressource->isVisible() = false;
+									tmp_ressource->isVisible() = true;
 								}
 
 								//The new ressource is set to use.
-								tmp_ressource_component->isVisible() = true;
+								tmp_ressource_component->isVisible() = false;
 								//The weak_ptr of the ressource is set to the new one,
 								//the texture size is change to the new ressource,
 								//and the particles origin is set to the half of the size.
@@ -688,7 +688,7 @@ namespace lc
 					if (ressource_to_search_.second == tmp_ressource->getName())
 					{
 						m_particles_ressource_ = tmp_ressource;
-						tmp_ressource->isVisible() = true;
+						tmp_ressource->isVisible() = false;
 						break;
 					}
 				}

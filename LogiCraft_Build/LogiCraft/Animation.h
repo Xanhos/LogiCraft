@@ -61,7 +61,7 @@ namespace lc
 		void create_frames_rect();
 
 		void update_animation_key(const std::shared_ptr<lc::Texture>& texture, 
-			const bool& animation_is_paused, const bool& animation_is_reversed, const bool& is_used_by_a_component);
+			const bool& animation_is_paused, const bool& animation_is_reversed);
 	private:
 		std::string m_name_;
 

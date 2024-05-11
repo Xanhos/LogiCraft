@@ -136,9 +136,8 @@ namespace lc
 
 		unsigned short getID() const { return m_ID; }
 		void setID(unsigned short _ID) { m_ID = _ID; }
-
-		void hasToBeDeleted(bool _needToBeDeleted) { m_needToBeDeleted = _needToBeDeleted; }
-		bool needToBeDeleted() const { return m_needToBeDeleted; }
+		
+		bool& needToBeDeleted() { return m_needToBeDeleted; }
 
 		static unsigned short& getGeneralID() { return m_generalID; }
 

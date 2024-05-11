@@ -325,9 +325,8 @@ namespace lc
 
 		void setID(unsigned int _ID) { m_ID = _ID; }
 		unsigned int getID() const { return m_ID; }
-
-		void needToBeRemoved(bool _state) { m_needToBeRemove = _state; }
-		bool hasToBeRemoved() const { return m_needToBeRemove; }
+		
+		bool& needToBeDeleted() { return m_needToBeDeleted; }
 
 		bool& isLock() { return m_isLock; }
 
@@ -346,7 +345,7 @@ namespace lc
 		unsigned int m_ID;
 		unsigned char m_depth;
 
-		bool m_needToBeRemove;
+		bool m_needToBeDeleted;
 		bool m_isLock;
 		bool m_isVisible;
 		bool m_Saved = false;

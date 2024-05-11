@@ -98,6 +98,8 @@ void lc::GameComponent::Hierarchie_Draw(unsigned int _parentID, std::list<std::s
 		ImGui::SameLine();
 		ImGui::Text("Delete component");
 
+		ImGui::Checkbox(std::string("is Visible##" + std::to_string(m_ID)).c_str(), &m_isVisible);
+
 		if (m_hierarchieInformation)
 			m_hierarchieInformation();
 		else
