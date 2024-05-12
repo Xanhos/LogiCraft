@@ -18,10 +18,10 @@ lc::shader::water_shader::water_shader()
     m_shader_->setUniform("u_distortion_map_texture", m_texture_map_);
     m_shader_->setUniform("u_current_texture", sf::Shader::CurrentTexture);
 
-    m_renderer_size_ = { 500u, 500u };
+    m_render_size_ = { 500u, 500u };
     
     m_render_texture_ = std::make_shared<sf::RenderTexture>();
-    m_render_texture_->create(m_renderer_size_.x, m_renderer_size_.y);
+    m_render_texture_->create(m_render_size_.x, m_render_size_.y);
     
     m_render_view_ = { sf::Vector2f(m_render_texture_->getSize() / 2u), sf::Vector2f(m_render_texture_->getSize()) };
 }
@@ -29,7 +29,7 @@ lc::shader::water_shader::water_shader()
 lc::shader::water_shader::~water_shader()
 {
     m_shader_.reset();
-    
+    m_render_texture_.reset();
 }
 
 void lc::shader::water_shader::UpdateEvent(sf::Event& event)
@@ -46,29 +46,35 @@ void lc::shader::water_shader::Draw(WindowManager& window)
     
     m_time_ += Tools::getDeltaTime();
 
+    //Set the shader uniform values.
     m_shader_->setUniform("u_time", m_time_);
     m_shader_->setUniform("u_level", m_level_);
     m_shader_->setUniform("u_distortion_level", m_distortion_level_);
 
-    if (m_renderer_size_ != m_render_texture_->getSize())
-        m_render_texture_->create(m_renderer_size_.x, m_renderer_size_.y);
-    
+    //If the zone where the shader is applied changed, the render texture is recreated with the good size.
+    if (m_render_size_ != m_render_texture_->getSize())
+        m_render_texture_->create(m_render_size_.x, m_render_size_.y);
+
+    //Set the view center and size.
     m_render_view_.setCenter(getParent()->getTransform().getPosition() + sf::Vector2f(m_render_texture_->getSize() / 2u));
     m_render_view_.setSize(sf::Vector2f(m_render_texture_->getSize()));
 
+    //Set the view a clear the render texture.
     if (m_is_in_view_)
     {
         m_render_texture_->setView(m_render_view_);
         m_render_texture_->clear(sf::Color::Black);   
     }
-    
+
+    //Display of the object in the shader.
     for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
         this->draw_in_shader(obj_element, window);
 
+    //Then set the texture of the render texture on the renderer and draw it with the shader.
     if (m_is_in_view_)
     {
         m_render_texture_->display();
-    
+
         m_renderer.setTexture(&m_render_texture_->getTexture());
         m_renderer.setTextureRect({{0, 0}, sf::Vector2i(m_render_texture_->getSize())});
         m_renderer.setSize(sf::Vector2f(m_render_texture_->getSize()));
@@ -76,7 +82,7 @@ void lc::shader::water_shader::Draw(WindowManager& window)
         m_renderer.setScale(getParent()->getTransform().getScale());
         m_renderer.setOrigin(getParent()->getTransform().getOrigin());
         m_renderer.setRotation(getParent()->getTransform().getRotation());
-    
+
         window.draw(m_renderer, m_shader_states_);
     }
 }
@@ -87,29 +93,35 @@ void lc::shader::water_shader::Draw(sf::RenderTexture& window)
     
     m_time_ += Tools::getDeltaTime();
 
+    //Set the shader uniform values.
     m_shader_->setUniform("u_time", m_time_);
     m_shader_->setUniform("u_level", m_level_);
     m_shader_->setUniform("u_distortion_level", m_distortion_level_);
 
-    if (m_renderer_size_ != m_render_texture_->getSize())
-        m_render_texture_->create(m_renderer_size_.x, m_renderer_size_.y);
-    
+    //If the zone where the shader is applied changed, the render texture is recreated with the good size.
+    if (m_render_size_ != m_render_texture_->getSize())
+        m_render_texture_->create(m_render_size_.x, m_render_size_.y);
+
+    //Set the view center and size.
     m_render_view_.setCenter(getParent()->getTransform().getPosition() + sf::Vector2f(m_render_texture_->getSize() / 2u));
     m_render_view_.setSize(sf::Vector2f(m_render_texture_->getSize()));
 
+    //Set the view a clear the render texture.
     if (m_is_in_view_)
     {
         m_render_texture_->setView(m_render_view_);
         m_render_texture_->clear(sf::Color::Black);   
     }
-    
+
+    //Display of the object in the shader.
     for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
         this->draw_in_shader(obj_element, window);
 
+    //Then set the texture of the render texture on the renderer and draw it with the shader.
     if (m_is_in_view_)
     {
         m_render_texture_->display();
-    
+
         m_renderer.setTexture(&m_render_texture_->getTexture());
         m_renderer.setTextureRect({{0, 0}, sf::Vector2i(m_render_texture_->getSize())});
         m_renderer.setSize(sf::Vector2f(m_render_texture_->getSize()));
@@ -127,13 +139,13 @@ void lc::shader::water_shader::Save(std::ofstream& save, sf::RenderTexture& text
     save << static_cast<int>(m_type)
         << " " << m_level_
         << " " << m_distortion_level_
-        << " " << m_renderer_size_.x
-        << " " << m_renderer_size_.y;
+        << " " << m_render_size_.x
+        << " " << m_render_size_.y;
 }
 
 void lc::shader::water_shader::Load(std::ifstream& load)
 {
-    load >> m_level_ >> m_distortion_level_ >> m_renderer_size_.x >> m_renderer_size_.y;
+    load >> m_level_ >> m_distortion_level_ >> m_render_size_.x >> m_render_size_.y;
 }
 
 std::shared_ptr<lc::GameComponent> lc::shader::water_shader::Clone()
@@ -152,9 +164,9 @@ void lc::shader::water_shader::setHierarchieFunc()
         ImGui::SliderFloat("Water Level", &m_level_, 0.f, 1.f);
         ImGui::DragInt("Distortion Level", &m_distortion_level_, 1.f);
 
-        unsigned int tmp_tab[2]{ m_renderer_size_.x, m_renderer_size_.y };
+        unsigned int tmp_tab[2]{ m_render_size_.x, m_render_size_.y };
         ImGui::DragScalarN("Water Size", ImGuiDataType_U32, &tmp_tab, 2);
-        m_renderer_size_ = {tmp_tab[0], tmp_tab[1]};
+        m_render_size_ = {tmp_tab[0], tmp_tab[1]};
     };
 }
 
@@ -196,15 +208,19 @@ void main()
 
 void lc::shader::water_shader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, sf::RenderTexture& window)
 {
+    //The shader will affect only the objects who are under or on the same depth.
     if (game_object->getDepth() <= getParent()->getDepth() && !game_object->hasComponent("Water Shader"))
     {
+        //If the object is totally in the zone of the shader, then one draw is done.
         if (this->is_totally_in(game_object) && m_is_in_view_)
         {
             game_object->Draw(*m_render_texture_);
-            game_object->isVisible() = false;
+            game_object->isVisible() = false; //The object is made invisible so is not drawn two times.
         }
         else
         {
+            //If the object is not totally in the zone of the shader,
+            //then he needs to be drawn one time in the window and a second time in the render texture.
             if (Tools::Collisions::rect_rect({getParent()->getTransform().getPosition(), getParent()->getTransform().getSize()},
             {game_object->getTransform().getPosition(), game_object->getTransform().getSize()}))
             {
@@ -215,26 +231,32 @@ void lc::shader::water_shader::draw_in_shader(const std::shared_ptr<lc::GameObje
             }
             else
             {
-                game_object->isVisible() = true;
+                game_object->isVisible() = true; //And if the object is totally out of the bound of the zone,
+                //he just will be drawn as normal.
             }
         }
     }
-    
+
+    //We do the same if the object has children.
     for (const auto& obj_element : game_object->getObjects())
         this->draw_in_shader(obj_element, window);
 }
 
 void lc::shader::water_shader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, WindowManager& window)
 {
+    //The shader will affect only the objects who are under or on the same depth.
     if (game_object->getDepth() <= getParent()->getDepth() && !game_object->hasComponent("Water Shader"))
     {
+        //If the object is totally in the zone of the shader, then one draw is done.
         if (this->is_totally_in(game_object) && m_is_in_view_)
         {
             game_object->Draw(*m_render_texture_);
-            game_object->isVisible() = false;
+            game_object->isVisible() = false; //The object is made invisible so is not drawn two times.
         }
         else
         {
+            //If the object is not totally in the zone of the shader,
+            //then he needs to be drawn one time in the window and a second time in the render texture.
             if (Tools::Collisions::rect_rect({getParent()->getTransform().getPosition(), getParent()->getTransform().getSize()},
             {game_object->getTransform().getPosition(), game_object->getTransform().getSize()}))
             {
@@ -245,24 +267,13 @@ void lc::shader::water_shader::draw_in_shader(const std::shared_ptr<lc::GameObje
             }
             else
             {
-                game_object->isVisible() = true;
+                game_object->isVisible() = true; //And if the object is totally out of the bound of the zone,
+                //he just will be drawn as normal.
             }
         }
     }
-    
+
+    //We do the same if the object has children.
     for (const auto& obj_element : game_object->getObjects())
         this->draw_in_shader(obj_element, window);
-}
-
-bool lc::shader::water_shader::is_totally_in(const std::shared_ptr<lc::GameObject>& game_object)
-{
-    if (game_object->getTransform().getPosition().x >= getParent()->getTransform().getPosition().x &&
-        game_object->getTransform().getPosition().y >= getParent()->getTransform().getPosition().y &&
-        game_object->getTransform().getPosition().x + game_object->getTransform().getSize().x <= getParent()->getTransform().getPosition().x + getParent()->getTransform().getSize().x &&
-        game_object->getTransform().getPosition().y + game_object->getTransform().getSize().y <= getParent()->getTransform().getPosition().y + getParent()->getTransform().getSize().y)
-    {
-        return true;
-    }
-    
-    return false;
 }

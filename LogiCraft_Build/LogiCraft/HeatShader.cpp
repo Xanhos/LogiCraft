@@ -10,8 +10,6 @@ namespace lc
 			m_name = "Heat Shader";
         	m_typeName = "Heat Shader";
         	m_type = TYPE::SHADER;
-
-        	m_ressource_to_search_ = std::make_pair(true, "");
         	
             heat_shader::setup_shader_script_string();
             
@@ -23,14 +21,19 @@ namespace lc
 
             m_shader_->setUniform("u_distortion_map_texture", m_texture_map_);
             m_shader_->setUniform("u_current_texture", sf::Shader::CurrentTexture);
+
+        	m_render_size_ = { 500u, 500u };
+    
+        	m_render_texture_ = std::make_shared<sf::RenderTexture>();
+        	m_render_texture_->create(m_render_size_.x, m_render_size_.y);
+    
+        	m_render_view_ = { sf::Vector2f(m_render_texture_->getSize() / 2u), sf::Vector2f(m_render_texture_->getSize()) };
         }
 
         heat_shader::~heat_shader()
         {
-            m_shader_.reset();
-
-        	if (!m_heat_ressource_.expired())
-        		m_heat_ressource_.lock()->isVisible() = true;
+        	m_shader_.reset();
+        	m_render_texture_.reset();
         }
 
         void heat_shader::UpdateEvent(sf::Event& event)
@@ -39,31 +42,94 @@ namespace lc
 
         void heat_shader::Update(WindowManager& window)
         {
-        	this->texture_to_search();
         }
 
         void heat_shader::Draw(WindowManager& window)
         {
+        	m_is_in_view_ = getParent()->is_in_window_view(window);
+        	
             m_time_ += Tools::getDeltaTime();
 
             m_shader_->setUniform("u_distortion_factor", m_distortion_factor_);
             m_shader_->setUniform("u_rise_factor", m_rise_factor_);
             m_shader_->setUniform("u_time", m_time_);
 
-        	if (!m_heat_ressource_.expired())
-        		window.draw(m_heat_ressource_.lock()->getShape(), m_shader_states_);
+        	if (m_render_size_ != m_render_texture_->getSize())
+        		m_render_texture_->create(m_render_size_.x, m_render_size_.y);
+
+        	m_render_view_.setCenter(getParent()->getTransform().getPosition() + sf::Vector2f(m_render_texture_->getSize() / 2u));
+        	m_render_view_.setSize(sf::Vector2f(m_render_texture_->getSize()));
+
+        	if (m_is_in_view_)
+        	{
+        		m_render_texture_->setView(m_render_view_);
+        		m_render_texture_->clear(sf::Color::Black);   
+        	}
+
+        	for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
+        		this->draw_in_shader(obj_element, window);
+        	
+        	if (m_is_in_view_)
+        	{
+        		m_render_texture_->display();
+
+        		m_renderer.setTexture(&m_render_texture_->getTexture());
+        		m_renderer.setTextureRect({{0, 0}, sf::Vector2i(m_render_texture_->getSize())});
+        		m_renderer.setSize(sf::Vector2f(m_render_texture_->getSize()));
+        		m_renderer.setPosition(getParent()->getTransform().getPosition());
+        		m_renderer.setScale(getParent()->getTransform().getScale());
+        		m_renderer.setOrigin(getParent()->getTransform().getOrigin());
+        		m_renderer.setRotation(getParent()->getTransform().getRotation());
+
+        		window.draw(m_renderer, m_shader_states_);
+        	}
         }
 
         void heat_shader::Draw(sf::RenderTexture& window)
         {
+        	m_is_in_view_ = getParent()->is_in_window_view(window);
+        	
             m_time_ += Tools::getDeltaTime();
 
+        	//Set the shader uniform values.
             m_shader_->setUniform("u_distortion_factor", m_distortion_factor_);
             m_shader_->setUniform("u_rise_factor", m_rise_factor_);
             m_shader_->setUniform("u_time", m_time_);
 
-        	if (!m_heat_ressource_.expired())
-				window.draw(m_heat_ressource_.lock()->getShape(), m_shader_states_);
+        	//If the zone where the shader is applied changed, the render texture is recreated with the good size.
+        	if (m_render_size_ != m_render_texture_->getSize())
+        		m_render_texture_->create(m_render_size_.x, m_render_size_.y);
+
+        	//Set the view center and size.
+        	m_render_view_.setCenter(getParent()->getTransform().getPosition() + sf::Vector2f(m_render_texture_->getSize() / 2u));
+        	m_render_view_.setSize(sf::Vector2f(m_render_texture_->getSize()));
+
+        	//Set the view a clear the render texture.
+        	if (m_is_in_view_)
+        	{
+        		m_render_texture_->setView(m_render_view_);
+        		m_render_texture_->clear(sf::Color::Black);   
+        	}
+
+        	//Display of the object in the shader.
+        	for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
+        		this->draw_in_shader(obj_element, window);
+
+        	//Then set the texture of the render texture on the renderer and draw it with the shader.
+        	if (m_is_in_view_)
+        	{
+        		m_render_texture_->display();
+
+        		m_renderer.setTexture(&m_render_texture_->getTexture());
+        		m_renderer.setTextureRect({{0, 0}, sf::Vector2i(m_render_texture_->getSize())});
+        		m_renderer.setSize(sf::Vector2f(m_render_texture_->getSize()));
+        		m_renderer.setPosition(getParent()->getTransform().getPosition());
+        		m_renderer.setScale(getParent()->getTransform().getScale());
+        		m_renderer.setOrigin(getParent()->getTransform().getOrigin());
+        		m_renderer.setRotation(getParent()->getTransform().getRotation());
+
+        		window.draw(m_renderer, m_shader_states_);
+        	}
         }
 
         void heat_shader::Save(std::ofstream& save, sf::RenderTexture& texture, int depth)
@@ -71,16 +137,13 @@ namespace lc
         	save << static_cast<int>(m_type)
 			 << " " << m_typeName
         	 << " " << m_rise_factor_
-        	 << " " << m_distortion_factor_
-			 << " " << (m_heat_ressource_.expired() ? static_cast<std::string>("No_Texture") : m_heat_ressource_.lock()->getName()) << '\n';
+        	 << " " << m_distortion_factor_;
         }
 
         void heat_shader::Load(std::ifstream& load)
         {
         	std::string tmp_texture_name;
-        	load >> m_rise_factor_ >> m_distortion_factor_ >> tmp_texture_name;
-
-        	m_ressource_to_search_ = std::make_pair(true, tmp_texture_name);
+        	load >> m_rise_factor_ >> m_distortion_factor_;
         }
 
         std::shared_ptr<lc::GameComponent> heat_shader::Clone()
@@ -96,47 +159,6 @@ namespace lc
         {
             m_hierarchieInformation = [this]()
             {
-				const auto tmp_ressource = m_heat_ressource_.lock();
-
-				if (ImGui::BeginCombo("Selected Ressource", tmp_ressource ? tmp_ressource->getName().c_str() : "No Ressource Selected"))
-				{
-					const bool tmp_is_selected(false);
-
-					if (tmp_ressource)
-						if (ImGui::Selectable(std::string("No Texture ##" + std::to_string(m_ID)).c_str(), tmp_is_selected))
-						{
-							if (tmp_ressource)
-								tmp_ressource->isVisible() = true;
-							
-							m_heat_ressource_.reset();
-						}
-
-					for (const auto& component : getParent()->getComponents())
-					{
-						if (auto tmp_ressource_component = std::dynamic_pointer_cast<lc::Texture>(component))
-						{
-							//If the ressource is not already use by another component we use it.
-							if (tmp_ressource_component->isVisible())
-							{
-								if (ImGui::Selectable(std::string(tmp_ressource_component->getName() + "##" + std::to_string(tmp_ressource_component->getID())).c_str(), tmp_is_selected))
-								{
-									//If there were already a component used on the particles, we set it to un use,
-									//to replace by the new one.
-									if (tmp_ressource)
-										tmp_ressource->isVisible() = true;
-
-									//The new ressource is set to use.
-									tmp_ressource_component->isVisible() = false;
-									//The weak_ptr of the ressource is set to the new one
-									m_heat_ressource_ = tmp_ressource_component;
-								}
-							}
-						}
-					}
-
-					ImGui::EndCombo();
-				}
-
             	ImGui::DragFloat("Distortion Factor", &m_distortion_factor_, 0.001f);
             	ImGui::DragFloat("Rise Factor", &m_rise_factor_, 0.01f);
             };
@@ -188,7 +210,7 @@ void main()
     // to tell us how high up we are and damp accordingly
     // Remember, OpenGL 0 is at the bottom
 
-    distortionPositionOffset *= gl_TexCoord[0].t; //Do 1.f - gl_TexCoord[0].t to reverse it and made the heat start upward.
+    distortionPositionOffset *= 1.f - gl_TexCoord[0].t; //Do 1.f - gl_TexCoord[0].t to reverse it and made the heat start upward.
 
     vec2 distortedTextureCoordinate = gl_TexCoord[0].st + distortionPositionOffset;
 
@@ -197,25 +219,76 @@ void main()
 )";
         }
 
-        void heat_shader::texture_to_search()
+        void heat_shader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, WindowManager& window)
         {
-        	if (m_ressource_to_search_.first)
+        	//The shader will affect only the objects who are under or on the same depth.
+        	if (game_object->getDepth() <= getParent()->getDepth() && !game_object->hasComponent("Water Shader"))
         	{
-        		for (auto& component : getParent()->getComponents())
+        		//If the object is totally in the zone of the shader, then one draw is done.
+        		if (this->is_totally_in(game_object) && m_is_in_view_)
         		{
-        			if (const auto tmp_texture = std::dynamic_pointer_cast<lc::Texture>(component))
+        			game_object->Draw(*m_render_texture_);
+        			game_object->isVisible() = false; //The object is made invisible so is not drawn two times.
+        		}
+        		else
+        		{
+        			//If the object is not totally in the zone of the shader,
+        			//then he needs to be drawn one time in the window and a second time in the render texture.
+        			if (Tools::Collisions::rect_rect({getParent()->getTransform().getPosition(), getParent()->getTransform().getSize()},
+					{game_object->getTransform().getPosition(), game_object->getTransform().getSize()}))
         			{
-        				if (m_ressource_to_search_.second == tmp_texture->getName())
-        				{
-        					m_heat_ressource_ = tmp_texture;
-        					tmp_texture->isVisible() = false;
-        					break;
-        				}
+        				game_object->Draw(window);
+        				if (m_is_in_view_)
+        					game_object->Draw(*m_render_texture_);
+        				game_object->isVisible() = false;
+        			}
+        			else
+        			{
+        				game_object->isVisible() = true; //And if the object is totally out of the bound of the zone,
+        												 //he just will be drawn as normal.
         			}
         		}
-
-        		m_ressource_to_search_.first = false;
         	}
+
+        	//We do the same if the object has children.
+        	for (const auto& obj_element : game_object->getObjects())
+        		this->draw_in_shader(obj_element, window);
+        }
+
+        void heat_shader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, sf::RenderTexture& window)
+        {
+        	//The shader will affect only the objects who are under or on the same depth.
+        	if (game_object->getDepth() <= getParent()->getDepth() && !game_object->hasComponent("Heat Shader"))
+        	{
+        		//If the object is totally in the zone of the shader, then one draw is done.
+        		if (this->is_totally_in(game_object) && m_is_in_view_)
+        		{
+        			game_object->Draw(*m_render_texture_);
+        			game_object->isVisible() = false; //The object is made invisible so is not drawn two times.
+        		}
+        		else
+        		{
+        			//If the object is not totally in the zone of the shader,
+        			//then he needs to be drawn one time in the window and a second time in the render texture.
+        			if (Tools::Collisions::rect_rect({getParent()->getTransform().getPosition(), getParent()->getTransform().getSize()},
+					{game_object->getTransform().getPosition(), game_object->getTransform().getSize()}))
+        			{
+        				game_object->Draw(window);
+        				if (m_is_in_view_)
+        					game_object->Draw(*m_render_texture_);
+        				game_object->isVisible() = false;
+        			}
+        			else
+        			{
+        				game_object->isVisible() = true; //And if the object is totally out of the bound of the zone,
+        												 //he just will be drawn as normal.
+        			}
+        		}
+        	}
+
+        	//We do the same if the object has children.
+        	for (const auto& obj_element : game_object->getObjects())
+        		this->draw_in_shader(obj_element, window);
         }
     }
 }

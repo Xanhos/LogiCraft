@@ -25,6 +25,8 @@ namespace lc
 			virtual void setHierarchieFunc() = 0;
 		protected:
 			virtual void setup_shader_script_string() = 0;
+
+			bool is_totally_in(const std::shared_ptr<lc::GameObject>& game_object);
 		protected:
 			std::shared_ptr<sf::Shader> m_shader_;
 			sf::RenderStates m_shader_states_;

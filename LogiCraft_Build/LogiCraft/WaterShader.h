@@ -29,18 +29,14 @@ namespace lc
 
             void draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, sf::RenderTexture& window);
             void draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, WindowManager& window);
-
-            bool is_totally_in(const std::shared_ptr<lc::GameObject>& game_object);
         private:
             float m_level_;
             int m_distortion_level_;
 
             std::shared_ptr<sf::RenderTexture> m_render_texture_;
             sf::View m_render_view_;
-
             sf::Sprite m_render_sprite_;
-
-            sf::Vector2u m_renderer_size_;
+            sf::Vector2u m_render_size_;
 
             bool m_is_in_view_;
        };

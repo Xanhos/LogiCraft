@@ -15,3 +15,16 @@ lc::shader::shader::~shader()
 {
     m_shader_.reset();
 }
+
+bool lc::shader::shader::is_totally_in(const std::shared_ptr<lc::GameObject>& game_object)
+{
+    if (game_object->getTransform().getPosition().x >= getParent()->getTransform().getPosition().x &&
+    game_object->getTransform().getPosition().y >= getParent()->getTransform().getPosition().y &&
+    game_object->getTransform().getPosition().x + game_object->getTransform().getSize().x <= getParent()->getTransform().getPosition().x + getParent()->getTransform().getSize().x &&
+    game_object->getTransform().getPosition().y + game_object->getTransform().getSize().y <= getParent()->getTransform().getPosition().y + getParent()->getTransform().getSize().y)
+    {
+        return true;
+    }
+    
+    return false;
+}
