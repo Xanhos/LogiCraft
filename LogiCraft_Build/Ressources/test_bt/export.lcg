@@ -222,7 +222,7 @@ Components
 {
 0 0 0 1584 1006 spritesheet_slug.png 0 0
 
-6 Animation spritesheet_slug walking 2 0 0
+6 Animation spritesheet_slug walking 2
 walking 0 314 232 168 0 5 0.15 5
 hiding 0 828 232 168 0 6 0.082 6
 
