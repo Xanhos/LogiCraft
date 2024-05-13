@@ -53,7 +53,8 @@ void bt::ActionNode::MoveTo::Setup(NodePtr node)
 				{
 					if (!node_cast->m_target_.expired())
 					{
-						rigid_body->getVelocity().x = Tools::Vector::normalize(node_cast->m_target_.lock()->getTransform().getPosition() - node_cast->m_agent_.lock()->getTransform().getPosition()).x * node_cast->m_speed_;
+						rigid_body->getVelocity().x = Tools::Vector::normalize((node_cast->m_target_.lock()->getTransform().getPosition() + node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize()/2.f)
+							- (node_cast->m_agent_.lock()->getTransform().getPosition() + rigid_body->getCollider().getSize()/2.f)).x * node_cast->m_speed_;
 					}
 					node_cast->m_bool_go_to_ = false;
 				}

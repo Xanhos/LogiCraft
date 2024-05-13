@@ -184,8 +184,9 @@ void lc::AI::Load(std::ifstream& load)
                 std::dynamic_pointer_cast<bt::Decorator::Condition>(node)->setCondition([player, agent, detection_range]
                 {
                     if(!player.expired() and !agent.expired() and player.lock() != nullptr and agent.lock() != nullptr)
-                    {
-                        return Tools::Vector::getDistance(player.lock()->getTransform().getPosition() + (player.lock()->getTransform().getSize()/2.f) - player.lock()->getTransform().getOrigin(), agent.lock()->getTransform().getPosition() + (agent.lock()->getTransform().getSize() / 2.f) - agent.lock()->getTransform().getOrigin()) < detection_range;
+                    { 
+                        return Tools::Vector::getDistance(player.lock()->getTransform().getPosition() + (player.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() /2.f),
+                            agent.lock()->getTransform().getPosition() + (agent.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() / 2.f)) < detection_range;
                     }
                     return false;
                 });
