@@ -10,7 +10,7 @@ namespace lc
 	{
 	}
 
-	AnimationKey::AnimationKey(std::string name, int total_frame, sf::Vector2i max_frame, float frame_time, sf::IntRect frame_rect)
+	AnimationKey::AnimationKey(const std::string& name, const int& total_frame, const sf::Vector2i& max_frame, const float& frame_time, const sf::IntRect& frame_rect)
 		: m_name_(name), m_base_frame_rect_(frame_rect), m_max_frame_(max_frame), m_total_frame_(total_frame), m_actual_frame_(0), m_frame_timer_(0.f),
 		  m_frame_time_(frame_time)
 	{
@@ -118,6 +118,19 @@ namespace lc
 		m_name = "Animation";
 		m_typeName = "Animation";
 		m_type = TYPE::ANIMATION;
+
+		m_texture_to_search_ = std::make_pair(true, "");
+	}
+
+	Animation::Animation(const std::shared_ptr<lc::Texture>& used_texture, const std::string& name)
+		: m_base_total_frame_(0), m_base_frame_time_(0.f),
+		m_window_his_open_(false), m_animation_is_paused_(false), m_animation_is_reversed_(false) , m_want_to_load_anim_(false)
+	{
+		m_name = name;
+		m_typeName = "Animation";
+		m_type = TYPE::ANIMATION;
+
+		m_texture_ = used_texture;
 
 		m_texture_to_search_ = std::make_pair(true, "");
 	}
@@ -233,30 +246,6 @@ namespace lc
 		m_texture_to_search_ = std::make_pair(true, tmp_texture_name);
 	}
 
-	void Animation::LoadFromAnimFile()
-	{
-		std::ifstream file(m_anim_path_);
-		if(file.is_open() and fs::path(m_anim_path_).extension() == ".anim")
-		{
-			int tmp_key_anim_count;
-			m_texture_to_search_.first = true;
-			file >> m_name >> m_texture_to_search_.second >> tmp_key_anim_count;
-			for (int i = 0; i < tmp_key_anim_count; i++){
-				AnimationKey tmp_key_anim;
-				file >> tmp_key_anim.get_name()
-				 >> tmp_key_anim.get_base_int_rect()
-				 >> tmp_key_anim.get_max_frame()
-				 >> tmp_key_anim.get_frame_time()
-				 >> tmp_key_anim.get_total_frame();
-
-				tmp_key_anim.create_frames_rect();
-
-				m_animation_keys_.emplace(tmp_key_anim.get_name(), std::make_shared<AnimationKey>(tmp_key_anim));
-
-			}
-		}
-	}
-
 	std::shared_ptr<lc::GameComponent> Animation::Clone()
 	{
 		auto tmp_clone = std::make_shared<lc::Animation>(*this);
@@ -290,19 +279,29 @@ namespace lc
 				if (ImGui::Button("Open Animation Window Test"))
 					m_window_his_open_ = true;
 				if(ImGui::Button("Load A .anim"))
-					m_want_to_load_anim_ = !m_want_to_load_anim_;
+					m_want_to_load_anim_ = true;
+			
 				if(m_want_to_load_anim_)
 				{
-					ImGui::Begin(("Load animation##" + std::to_string(getID())).c_str(),&m_window_his_open_, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
-					if(!m_anim_path_.empty())
-						ImGui::Text(m_anim_path_.c_str());
+					ImGui::Begin(("Load animation##" + std::to_string(getID())).c_str(), &m_want_to_load_anim_, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+					
 					if(Button("Search .anim"))
 					{
 						Tools::IG::LoadRessourcesFromFile(m_anim_path_,"anim");
 					}
+
+					if(!m_anim_path_.empty())
+					{
+						ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
+						
+						ImGui::Text(std::string("Path : " + m_anim_path_).c_str());	
+					}
+
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
+					
 					if(Button("Load anim") and !m_anim_path_.empty())
 					{
-						LoadFromAnimFile();
+						load_animation_file(m_anim_path_);
 						m_want_to_load_anim_ = false;
 					}
 					ImGui::End();
@@ -477,27 +476,46 @@ namespace lc
 		return m_texture_.lock();
 	}
 
-	void Animation::select_animation_key(const std::string& name, const bool reset_last_anim_key)
+	void Animation::select_animation_key(
+		const std::string& name, const int& start_frame, const float start_frame_timer, const bool reset_last_anim_key
+	)
 	{
-		const auto tmp_act_anim_key = m_actual_animation_key_.lock();
-		if (tmp_act_anim_key ? tmp_act_anim_key->get_name() != name : true)
+		auto tmp_act_anim_key = m_actual_animation_key_.lock();
+
+		if (tmp_act_anim_key && reset_last_anim_key)
 		{
-			if (tmp_act_anim_key && reset_last_anim_key)
-			{
-				tmp_act_anim_key->get_actual_frame() = 0;
-				tmp_act_anim_key->get_frame_timer() = 0.f;
-			}
-
-			m_actual_animation_key_ = m_animation_keys_.at(name);
-
-			const auto tmp_act_anim_key = m_actual_animation_key_.lock();
-			const auto tmp_texture = m_texture_.lock();
-			if (!tmp_act_anim_key->get_frames_rects().empty())
-			{
-				tmp_texture->getShape().setTextureRect(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()]);
-				tmp_texture->getShape().setSize(sf::Vector2f(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()].getSize()));
-			}
+			tmp_act_anim_key->get_actual_frame() = 0;
+			tmp_act_anim_key->get_frame_timer() = 0.f;
 		}
+		
+		m_actual_animation_key_ = m_animation_keys_.at(name);
+
+		tmp_act_anim_key = m_actual_animation_key_.lock();
+		const auto tmp_texture = m_texture_.lock();
+		tmp_act_anim_key->get_actual_frame() = start_frame;
+		tmp_act_anim_key->get_frame_timer() = start_frame_timer;
+		tmp_texture->getShape().setTextureRect(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()]);
+		tmp_texture->getShape().setSize(sf::Vector2f(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()].getSize()));
+	}
+
+	void Animation::select_animation_key(
+		const std::string& name, const bool reset_last_anim_key
+	)
+	{
+		auto tmp_act_anim_key = m_actual_animation_key_.lock();
+
+		if (tmp_act_anim_key && reset_last_anim_key)
+		{
+			tmp_act_anim_key->get_actual_frame() = 0;
+			tmp_act_anim_key->get_frame_timer() = 0.f;
+		}
+		
+		m_actual_animation_key_ = m_animation_keys_.at(name);
+
+		tmp_act_anim_key = m_actual_animation_key_.lock();
+		const auto tmp_texture = m_texture_.lock();
+		tmp_texture->getShape().setTextureRect(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()]);
+		tmp_texture->getShape().setSize(sf::Vector2f(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()].getSize()));
 	}
 
 	void Animation::current_animation_is_paused(const bool& paused)
@@ -508,6 +526,31 @@ namespace lc
 	void Animation::current_animation_is_reversed(const bool& reversed)
 	{
 		m_animation_is_reversed_ = reversed;
+	}
+
+	void Animation::load_animation_file(const std::string& path)
+	{
+		std::ifstream file(path);
+		if(file.is_open() and fs::path(path).extension() == ".anim")
+		{
+			int tmp_key_anim_count;
+			
+			m_texture_to_search_.first = true;
+			file >> m_name >> m_texture_to_search_.second >> tmp_key_anim_count;
+			
+			for (int i = 0; i < tmp_key_anim_count; i++){
+				AnimationKey tmp_key_anim;
+				file >> tmp_key_anim.get_name()
+				 >> tmp_key_anim.get_base_int_rect()
+				 >> tmp_key_anim.get_max_frame()
+				 >> tmp_key_anim.get_frame_time()
+				 >> tmp_key_anim.get_total_frame();
+
+				tmp_key_anim.create_frames_rect();
+
+				m_animation_keys_.emplace(tmp_key_anim.get_name(), std::make_shared<AnimationKey>(tmp_key_anim));
+			}
+		}
 	}
 
 	void Animation::save_animation_file(const bool open_file_browser, std::string path) const
@@ -529,7 +572,7 @@ namespace lc
 				fs::create_directory(path + tmp_file_name);
 
 			//Then we write every information in the .anim file.
-			std::ofstream tmp_save_animation(path + '\\' + tmp_file_name + '\\' + tmp_file_name + "." + tmp_extention_name, std::ios::out);
+			std::ofstream tmp_save_animation(path + '\\' + tmp_file_name + '\\' + m_name + "." + tmp_extention_name, std::ios::out);
 			{
 				tmp_save_animation << m_name << '\n';
 				tmp_save_animation << (m_texture_.expired() ? "No_texture" : m_texture_.lock()->getName()) << '\n';
@@ -543,19 +586,29 @@ namespace lc
 					tmp_save_animation << animation_key_pair.second->get_total_frame() << '\n';
 				}
 			}
+			
 			tmp_save_animation.close();
-
-			//And the image is register.
-			if (!m_texture_.expired())
-				m_texture_.lock()->getTexture().copyToImage().saveToFile(path + '\\' + tmp_file_name + '\\' + tmp_file_name + ".png");
 		}
+	}
+
+	void Animation::add_animation_key(
+		const std::string& name, const int& total_frame, const sf::Vector2i& max_frame, const float& frame_time,
+		const sf::IntRect& frame_rect
+	)
+	{
+		m_animation_keys_.emplace(name, std::make_shared<AnimationKey>(name, total_frame, max_frame, frame_time, frame_rect));
+	}
+
+	void Animation::delete_animation_key(const std::string& name)
+	{
+		m_animation_keys_.erase(name);
 	}
 
 	void Animation::texture_to_search()
 	{
 		if (m_texture_to_search_.first)
 		{
-			for (auto& component : getParent()->getComponents())
+			for (const auto& component : getParent()->getComponents())
 			{
 				if (const auto tmp_texture = std::dynamic_pointer_cast<lc::Texture>(component))
 				{

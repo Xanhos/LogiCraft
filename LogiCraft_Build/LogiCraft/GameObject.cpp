@@ -292,8 +292,7 @@ void lc::GameObject::CheckMaxSize()
 void lc::GameObject::UpdateEvent(sf::Event& _event)
 {
 	for (auto& object : m_objects)
-		if (object->isVisible())
-			object->UpdateEvent(_event);
+		object->UpdateEvent(_event);
 
 	for (auto& component : m_components)
 		component->UpdateEvent(_event);
