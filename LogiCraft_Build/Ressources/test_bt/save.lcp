@@ -279,4 +279,28 @@ Objects
 {
 }
 
+L3a5 3869.19 -754.389 1 1 3840 2160 0 0 0 0
+Components
+{
+0 Texture 0 0 3840 2160 ../ASSETS\BG_L3\L3a.png 0 0
+
+7 RigidBody 3869.19 -754.389 3840 2160 0 0 0 0 0 0 RigidBody
+
+}
+Objects
+{
+}
+
+L3a5_copie_18 -11427.1 -575.957 1 1 3840 2160 0 0 0 0
+Components
+{
+0 Texture 0 0 3840 2160 ../ASSETS\BG_L3\L3a.png 0 0
+
+7 RigidBody -11427.1 -575.957 3840 2160 0 0 0 0 0 0 RigidBody
+
+}
+Objects
+{
+}
+
 }
