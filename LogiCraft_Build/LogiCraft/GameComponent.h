@@ -128,20 +128,16 @@ namespace lc
 		*/
 		inline std::shared_ptr<lc::GameObject> getParent() { return m_wptrParent.lock(); }
 
-		void setName(std::string _name) { m_name = _name; }
-		std::string getName() const { return m_name; }
+		std::string& getName() { return m_name; }
+		std::string& getTypeName() { return m_typeName; }
 
-		void setTypeName(std::string _typeName) { m_typeName = _typeName; }
-		std::string getTypeName() const { return m_typeName; }
-
-		unsigned short getID() const { return m_ID; }
-		void setID(unsigned short _ID) { m_ID = _ID; }
+		unsigned int& getID() { return m_ID; }
 		
 		bool& needToBeDeleted() { return m_needToBeDeleted; }
-
-		static unsigned short& getGeneralID() { return m_generalID; }
-
 		bool& isVisible() { return m_isVisible; }
+		bool& isUpdated() { return m_isVisible; }
+
+		static unsigned int& getGeneralID() { return m_generalID; }
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) = 0;
 		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth) = 0;
@@ -160,11 +156,12 @@ namespace lc
 
 		bool m_needToBeDeleted;
 		bool m_isVisible;
+		bool m_isUpdated;
 
 		std::function<void()> m_hierarchieInformation;
 
-		unsigned short m_ID;
-		inline static unsigned short m_generalID = 0u;
+		unsigned int m_ID;
+		inline static unsigned int m_generalID = 0u;
 	private:
 		std::weak_ptr<lc::GameObject> m_wptrParent;
 	};

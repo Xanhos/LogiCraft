@@ -43,7 +43,7 @@ namespace lc
 		Font();
 		Font(const std::string& name,const std::string& path,const std::string& sentence = "Lorem Ipsum");
 		Font(const Font& font);
-		~Font();
+		virtual ~Font() override;
 		sf::Font& getFont() { return m_font; }
 		const std::string& getSentence() { return m_sentence; }
 		void setNewSentence(const std::string& sentence);

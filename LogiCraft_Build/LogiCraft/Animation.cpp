@@ -17,9 +17,7 @@ namespace lc
 		this->create_frames_rect();
 	}
 
-	AnimationKey::~AnimationKey()
-	{
-	}
+	AnimationKey::~AnimationKey() = default;
 
 	std::string& AnimationKey::get_name()
 	{
@@ -113,18 +111,20 @@ namespace lc
 
 	Animation::Animation()
 		: m_base_total_frame_(0), m_base_frame_time_(0.f),
-		m_window_his_open_(false), m_animation_is_paused_(false), m_animation_is_reversed_(false) , m_want_to_load_anim_(false)
+		  m_window_his_open_(false), m_animation_is_paused_(false), m_animation_is_reversed_(false),
+		  m_stop_at_last_frame_(false), m_want_to_load_anim_(false)
 	{
 		m_name = "Animation";
 		m_typeName = "Animation";
 		m_type = TYPE::ANIMATION;
 
-		m_texture_to_search_ = std::make_pair(true, "");
+		m_texture_to_search_ = std::make_pair(false, "");
 	}
 
 	Animation::Animation(const std::shared_ptr<lc::Texture>& used_texture, const std::string& name)
 		: m_base_total_frame_(0), m_base_frame_time_(0.f),
-		m_window_his_open_(false), m_animation_is_paused_(false), m_animation_is_reversed_(false) , m_want_to_load_anim_(false)
+		  m_window_his_open_(false), m_animation_is_paused_(false), m_animation_is_reversed_(false),
+		  m_stop_at_last_frame_(false), m_want_to_load_anim_(false)
 	{
 		m_name = name;
 		m_typeName = "Animation";
@@ -132,7 +132,7 @@ namespace lc
 
 		m_texture_ = used_texture;
 
-		m_texture_to_search_ = std::make_pair(true, "");
+		m_texture_to_search_ = std::make_pair(false, "");
 	}
 
 	Animation::~Animation()
@@ -471,11 +471,6 @@ namespace lc
 		return (m_texture_.expired() ? m_renderer : m_texture_.lock()->getShape());
 	}
 
-	std::shared_ptr<lc::Texture> Animation::get_texture() const
-	{
-		return m_texture_.lock();
-	}
-
 	void Animation::select_animation_key(
 		const std::string& name, const int& start_frame, const float start_frame_timer, const bool reset_last_anim_key
 	)
@@ -526,6 +521,11 @@ namespace lc
 	void Animation::current_animation_is_reversed(const bool& reversed)
 	{
 		m_animation_is_reversed_ = reversed;
+	}
+
+	void Animation::set_stop_at_last_frame(const bool& stop_at_last_frame)
+	{
+		m_stop_at_last_frame_ = stop_at_last_frame;		
 	}
 
 	void Animation::load_animation_file(const std::string& path)

@@ -40,7 +40,6 @@ SOFTWARE.
 lc::Texture::Texture()
 {
 	m_renderer.setTexture(&m_texture);
-	m_isUsedByAComponent = false;
 }
 
 lc::Texture::Texture(std::string name, std::string path, sf::IntRect rect )
@@ -58,7 +57,6 @@ lc::Texture::Texture(std::string name, std::string path, sf::IntRect rect )
 	m_name = name;
 	m_typeName = "Texture";
 	m_type = TYPE::TEXTURE;
-	m_isUsedByAComponent = false;
 }
 
 lc::Texture::Texture(std::string name, const sf::Texture& texture, sf::IntRect rect)
@@ -76,7 +74,6 @@ lc::Texture::Texture(std::string name, const sf::Texture& texture, sf::IntRect r
 	m_name = name;
 	m_typeName = "Texture";
 	m_type = TYPE::TEXTURE;
-	m_isUsedByAComponent = false;
 }
 
 lc::Texture::Texture(const Texture& _texture)
@@ -89,7 +86,6 @@ lc::Texture::Texture(const Texture& _texture)
 	m_name = _texture.m_name;
 	m_typeName = "Texture";
 	m_type = TYPE::TEXTURE;
-	m_isUsedByAComponent = false;
 }
 
 
@@ -132,38 +128,32 @@ void lc::Texture::Update(WindowManager& _window)
 
 void lc::Texture::Draw(WindowManager& _window)
 {
-	if (!m_isUsedByAComponent)
+	if (getParent())
 	{
-		if (getParent())
-		{
-			m_renderer.setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
-			m_renderer.setScale(getParent()->getTransform().getScale());
-			m_renderer.setRotation(getParent()->getTransform().getRotation());
-			m_renderer.setOrigin(getParent()->getTransform().getOrigin());
-		}
-
-		m_renderer.setSize((sf::Vector2f)m_textureRect.getSize());
-
-		_window.draw(m_renderer);
+		m_renderer.setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
+		m_renderer.setScale(getParent()->getTransform().getScale());
+		m_renderer.setRotation(getParent()->getTransform().getRotation());
+		m_renderer.setOrigin(getParent()->getTransform().getOrigin());
 	}
+
+	m_renderer.setSize((sf::Vector2f)m_textureRect.getSize());
+
+	_window.draw(m_renderer);
 }
 
 void lc::Texture::Draw(sf::RenderTexture& _window)
 {
-	if (!m_isUsedByAComponent)
+	if (getParent())
 	{
-		if (getParent())
-		{
-			m_renderer.setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
-			m_renderer.setScale(getParent()->getTransform().getScale());
-			m_renderer.setRotation(getParent()->getTransform().getRotation());
-			m_renderer.setOrigin(getParent()->getTransform().getOrigin());
-		}
-
-		m_renderer.setSize((sf::Vector2f)m_textureRect.getSize());
-
-		_window.draw(m_renderer);
+		m_renderer.setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
+		m_renderer.setScale(getParent()->getTransform().getScale());
+		m_renderer.setRotation(getParent()->getTransform().getRotation());
+		m_renderer.setOrigin(getParent()->getTransform().getOrigin());
 	}
+
+	m_renderer.setSize((sf::Vector2f)m_textureRect.getSize());
+
+	_window.draw(m_renderer);
 }
 
 std::shared_ptr<lc::GameComponent> lc::Texture::Clone()

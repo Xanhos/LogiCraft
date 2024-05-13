@@ -527,7 +527,7 @@ bool bt::Decorator::Do_On_Anim_Frame::tick()
 	}
 
 	if(const auto anim = m_animation_.lock())	
-		if(const auto anim_key = anim->get_current_animation_key().lock())		
+		if(const auto anim_key = anim->get_actual_animation_key().lock())		
 			if(anim_key->get_name() == m_key_anim_name_)
 			{
 				if(anim_key->get_actual_frame() == m_action_frame_ and m_new_frame_)

@@ -48,7 +48,6 @@ namespace lc
 		enum class TYPE { NONE = -1, TEXTURE, IA, BUTTON, FONT, MUSIC, SOUND, ANIMATION, RIGIDBODY, EVENT, PARTICULES };
 		protected:
 		sf::RectangleShape m_renderer;//Renderer of the ressource
-		bool m_isUsedByAComponent;
 		sf::Vector2f m_relativePosition;//Relative position to the parent
 
 	public:
@@ -64,13 +63,11 @@ namespace lc
 		virtual void Draw(sf::RenderTexture& _window) = 0;
 		virtual std::shared_ptr<lc::GameComponent> Clone() = 0;
 
-		virtual sf::RectangleShape& getShape() { return m_renderer; };
-		std::string& getName() { return m_name; };
-		bool& isUsedByAComponent() { return m_isUsedByAComponent; }
-
-		sf::Vector2f getRelativePosition();
-		void setRelativePosition(sf::Vector2f pos);
-		void setPosition(sf::Vector2f pos);
+		virtual sf::RectangleShape& getShape() { return m_renderer; }
+		sf::Vector2f getRelativePosition() const { return m_relativePosition; }
+		
+		void setRelativePosition(const sf::Vector2f& position) { m_relativePosition = position; }
+		void setPosition(sf::Vector2f position) { m_renderer.setPosition(position); }
 		sf::Vector2f getMaximumSize() { return  m_relativePosition + sf::Vector2f{m_renderer.getSize().x * m_renderer.getScale().x, m_renderer.getSize().y * m_renderer.getScale().y}; }
 
 	};

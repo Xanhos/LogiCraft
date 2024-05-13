@@ -91,7 +91,7 @@ namespace lc
 		{
 			auto tmp_component = std::make_shared<T>();
 			tmp_component->setParent(this->shared_from_this());
-			tmp_component->setID(lc::GameComponent::getGeneralID()++);
+			tmp_component->getID() = lc::GameComponent::getGeneralID()++;
 			m_components.push_back(tmp_component);
 
 			return tmp_component;
@@ -107,9 +107,8 @@ namespace lc
 		template<class T>
 		std::shared_ptr<T> addComponent(std::shared_ptr<T> _component)
 		{
-
 			_component->setParent(this->shared_from_this());
-			_component->setID(lc::GameComponent::getGeneralID()++);
+			_component->getID() = lc::GameComponent::getGeneralID()++;
 			m_components.push_back(_component);
 
 			return _component;

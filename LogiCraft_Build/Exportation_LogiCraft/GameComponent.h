@@ -99,60 +99,57 @@ namespace lc
 		}
 #pragma endregion
 
-		GameComponent();
-		GameComponent(std::string _name);
+	GameComponent();
+	GameComponent(std::string _name);
 
-		virtual ~GameComponent();
+	virtual ~GameComponent();
 
-		virtual void UpdateEvent(sf::Event& _event) = 0;
+	virtual void UpdateEvent(sf::Event& _event) = 0;
 
-		virtual void Update(WindowManager& _window) = 0;
+	virtual void Update(WindowManager& _window) = 0;
 
-		virtual void Draw(WindowManager& _window) = 0;
-		virtual void Draw(sf::RenderTexture& _window) = 0;
-		void Hierarchie_Draw(unsigned int _parentID, std::list<std::shared_ptr<lc::GameComponent>>::iterator& _actComp, std::list<std::shared_ptr<lc::GameComponent>>& _compList);
+	virtual void Draw(WindowManager& _window) = 0;
+	virtual void Draw(sf::RenderTexture& _window) = 0;
 
-		virtual std::shared_ptr<lc::GameComponent> Clone() = 0;
+	virtual std::shared_ptr<lc::GameComponent> Clone() = 0;
 
 #pragma region SETTER/GETTER
-		/*
-		* @brief This function is used to set the parent of the component.
-		* @brief Its use when you call AddComponent from the class GameObject.
-		* @see GameObject()
-		*/
-		inline void setParent(const std::shared_ptr<lc::GameObject> _parent) { m_wptrParent = _parent; }
+	/*
+	* @brief This function is used to set the parent of the component.
+	* @brief Its use when you call AddComponent from the class GameObject.
+	* @see GameObject()
+	*/
+	inline void setParent(const std::shared_ptr<lc::GameObject> _parent) { m_wptrParent = _parent; }
 
-		/*
-		* @brief This function just return the shared_ptr of the parent.
-		*/
-		inline std::shared_ptr<lc::GameObject> getParent() { return m_wptrParent.lock(); }
+	/*
+	* @brief This function just return the shared_ptr of the parent.
+	*/
+	inline std::shared_ptr<lc::GameObject> getParent() { return m_wptrParent.lock(); }
+		
+	std::string& getName() { return m_name; }
+	std::string& getTypeName() { return m_typeName; }
 
-		void setName(std::string _name) { m_name = _name; }
-		std::string getName() const { return m_name; }
+	unsigned int& getID() { return m_ID; }
+	
+	bool& needToBeDeleted() { return m_needToBeDeleted; }
+	bool& isVisible() { return m_isVisible; }
+	bool& isUpdated() { return m_isUpdated; }
 
-		void setTypeName(std::string _typeName) { m_typeName = _typeName; }
-		std::string getTypeName() const { return m_typeName; }
+	static unsigned int& getGeneralID() { return m_generalID; }
 
-		unsigned short getID() const { return m_ID; }
-		void setID(unsigned short _ID) { m_ID = _ID; }
-
-		void hasToBeDeleted(bool _needToBeDeleted) { m_needToBeDeleted = _needToBeDeleted; }
-		bool needToBeDeleted() const { return m_needToBeDeleted; }
-
-		static unsigned short& getGeneralID() { return m_generalID; }
-
-		virtual void Load(std::ifstream& load) = 0;	
+	virtual void Load(std::ifstream& load) = 0;	
 #pragma endregion
-
+		
 	protected:
 		std::string m_name;
 		std::string m_typeName;
 
 		bool m_needToBeDeleted;
+		bool m_isVisible;
+		bool m_isUpdated;
 
-
-		unsigned short m_ID;
-		inline static unsigned short m_generalID = 0u;
+		unsigned int m_ID;
+		inline static unsigned int m_generalID = 0u;
 	private:
 		std::weak_ptr<lc::GameObject> m_wptrParent;
 	};

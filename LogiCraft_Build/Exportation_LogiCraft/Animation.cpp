@@ -8,16 +8,14 @@ namespace lc
 	{
 	}
 
-	AnimationKey::AnimationKey(std::string name, int total_frame, sf::Vector2i max_frame, float frame_time, sf::IntRect frame_rect)
+	AnimationKey::AnimationKey(const std::string& name, const int& total_frame, const sf::Vector2i& max_frame, const float& frame_time, const sf::IntRect& frame_rect)
 		: m_name_(name), m_base_frame_rect_(frame_rect), m_max_frame_(max_frame), m_total_frame_(total_frame), m_actual_frame_(0), m_frame_timer_(0.f),
 		  m_frame_time_(frame_time)
 	{
 		this->create_frames_rect();
 	}
 
-	AnimationKey::~AnimationKey()
-	{
-	}
+	AnimationKey::~AnimationKey() = default;
 
 	std::string& AnimationKey::get_name()
 	{
@@ -83,19 +81,60 @@ namespace lc
 		}
 	}
 
+	void AnimationKey::update_animation_key(const std::shared_ptr<lc::Texture>& texture, 
+		const bool& animation_is_paused, const bool& animation_is_reversed)
+	{
+		if (!animation_is_paused)
+		{
+			m_frame_timer_ += Tools::getDeltaTime();
+			if (m_frame_timer_ >= m_frame_time_)
+			{
+				animation_is_reversed ? m_actual_frame_-- : m_actual_frame_++;
+
+				if (m_actual_frame_ < 0 && animation_is_reversed)
+					m_actual_frame_ = m_total_frame_ - 1;
+				else if (m_actual_frame_ > m_total_frame_ - 1 && !animation_is_reversed)
+					m_actual_frame_ = 0;
+
+				m_frame_timer_ = 0.f;
+			}
+
+			if (!m_frames_rects_.empty())
+			{
+				texture->getShape().setTextureRect(m_frames_rects_[m_actual_frame_]);
+				texture->getShape().setSize(sf::Vector2f(m_frames_rects_[m_actual_frame_].getSize()));
+			}
+		}
+	}
+
 	Animation::Animation()
 		: m_base_total_frame_(0), m_base_frame_time_(0.f),
-		 m_animation_is_paused_(false), m_animation_is_reversed_(false)
+		  m_animation_is_paused_(false), m_animation_is_reversed_(false), m_stop_at_last_frame_(false)
 	{
 		m_name = "Animation";
 		m_typeName = "Animation";
 		m_type = TYPE::ANIMATION;
+
+		m_texture_to_search_ = std::make_pair(false, "");
+	}
+
+	Animation::Animation(const std::shared_ptr<lc::Texture>& used_texture, const std::string& name)
+		: m_base_total_frame_(0), m_base_frame_time_(0.f),
+		  m_animation_is_paused_(false), m_animation_is_reversed_(false), m_stop_at_last_frame_(false)
+	{
+		m_name = name;
+		m_typeName = "Animation";
+		m_type = TYPE::ANIMATION;
+
+		m_texture_ = used_texture;
+
+		m_texture_to_search_ = std::make_pair(false, "");
 	}
 
 	Animation::~Animation()
 	{
 		if (!m_texture_.expired())
-			m_texture_.lock()->isUsedByAComponent() = false;
+			m_texture_.lock()->isVisible() = true;
 	}
 
 	void Animation::UpdateEvent(sf::Event& event)
@@ -105,44 +144,15 @@ namespace lc
 	void Animation::Update(WindowManager& window)
 	{
 		this->texture_to_search();
+
+		if (const auto tmp_texture = m_texture_.lock())
+			if (const auto tmp_animation_key = m_actual_animation_key_.lock())
+				tmp_animation_key->update_animation_key(tmp_texture, m_animation_is_paused_, m_animation_is_reversed_);
 	}
 
 	void Animation::Draw(WindowManager& window)
 	{
-		if (const auto tmp_texture = m_texture_.lock())
-		{
-			if (const auto tmp_animation_key = m_actual_animation_key_.lock())
-			{
-				if ((!m_animation_is_paused_ and !m_stop_at_last_frame) or (!m_animation_is_paused_ and m_stop_at_last_frame and tmp_animation_key->get_actual_frame() != tmp_animation_key->get_total_frame() - 1))
-				{
-					tmp_animation_key->get_frame_timer() += Tools::getDeltaTime();
-					if (tmp_animation_key->get_frame_timer() >= tmp_animation_key->get_frame_time())
-					{
-						m_animation_is_reversed_ ? tmp_animation_key->get_actual_frame()-- : tmp_animation_key->get_actual_frame()++;
-
-						if (tmp_animation_key->get_actual_frame() <= 0 && m_animation_is_reversed_)
-							tmp_animation_key->get_actual_frame() = tmp_animation_key->get_total_frame() - 1;
-						else if (tmp_animation_key->get_actual_frame() > tmp_animation_key->get_total_frame() - 1 && !m_animation_is_reversed_)
-							tmp_animation_key->get_actual_frame() = 0;
-
-						tmp_animation_key->get_frame_timer() = 0.f;
-					}
-
-					tmp_texture->getShape().setTextureRect(tmp_animation_key->get_frames_rects()[tmp_animation_key->get_actual_frame()]);
-					tmp_texture->getShape().setSize(sf::Vector2f(tmp_animation_key->get_frames_rects()[tmp_animation_key->get_actual_frame()].getSize()));
-				}
-			}
-
-			if (!m_isUsedByAComponent)
-			{
-				tmp_texture->getShape().setOrigin(getParent()->getTransform().getOrigin());
-				tmp_texture->getShape().setScale(getParent()->getTransform().getScale());
-				tmp_texture->getShape().setRotation(getParent()->getTransform().getRotation());
-
-				tmp_texture->getShape().setPosition(getParent()->getTransform().getPosition());
-				window.draw(tmp_texture->getShape());
-			}
-		}
+		this->draw_animation(window);
 	}
 
 	void Animation::Draw(sf::RenderTexture& window)
@@ -155,8 +165,7 @@ namespace lc
 		std::string tmp_texture_name;
 		std::string tmp_actual_key_name;
 
-		load 
-			 >> m_name
+		load >> m_name
 			 >> tmp_texture_name
 			 >> tmp_actual_key_name
 			 >> tmp_animation_key_cout;
@@ -200,31 +209,52 @@ namespace lc
 
 		return tmp_clone;
 	}
-
-
+	
 	sf::RectangleShape& Animation::getShape()
 	{
 		return (m_texture_.expired() ? m_renderer : m_texture_.lock()->getShape());
 	}
 
-	void Animation::select_animation_key(const std::string& name, const bool& reset_last_anim_key)
+	void Animation::select_animation_key(
+	const std::string& name, const int& start_frame, const float start_frame_timer, const bool reset_last_anim_key
+	)
 	{
-		const auto tmp_act_anim_key = m_actual_animation_key_.lock();
+		auto tmp_act_anim_key = m_actual_animation_key_.lock();
 
 		if (tmp_act_anim_key && reset_last_anim_key)
 		{
 			tmp_act_anim_key->get_actual_frame() = 0;
 			tmp_act_anim_key->get_frame_timer() = 0.f;
 		}
-	
 		
 		m_actual_animation_key_ = m_animation_keys_.at(name);
 
-		const auto tmp_act_anim_key_second = m_actual_animation_key_.lock();
+		tmp_act_anim_key = m_actual_animation_key_.lock();
 		const auto tmp_texture = m_texture_.lock();
-		tmp_texture->getShape().setTextureRect(tmp_act_anim_key_second->get_frames_rects()[tmp_act_anim_key_second->get_actual_frame()]);
-		tmp_texture->getShape().setSize(sf::Vector2f(tmp_act_anim_key_second->get_frames_rects()[tmp_act_anim_key_second->get_actual_frame()].getSize()));
+		tmp_act_anim_key->get_actual_frame() = start_frame;
+		tmp_act_anim_key->get_frame_timer() = start_frame_timer;
+		tmp_texture->getShape().setTextureRect(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()]);
+		tmp_texture->getShape().setSize(sf::Vector2f(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()].getSize()));
+	}
+
+	void Animation::select_animation_key(
+		const std::string& name, const bool reset_last_anim_key
+	)
+	{
+		auto tmp_act_anim_key = m_actual_animation_key_.lock();
+
+		if (tmp_act_anim_key && reset_last_anim_key)
+		{
+			tmp_act_anim_key->get_actual_frame() = 0;
+			tmp_act_anim_key->get_frame_timer() = 0.f;
+		}
 		
+		m_actual_animation_key_ = m_animation_keys_.at(name);
+
+		tmp_act_anim_key = m_actual_animation_key_.lock();
+		const auto tmp_texture = m_texture_.lock();
+		tmp_texture->getShape().setTextureRect(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()]);
+		tmp_texture->getShape().setSize(sf::Vector2f(tmp_act_anim_key->get_frames_rects()[tmp_act_anim_key->get_actual_frame()].getSize()));
 	}
 
 	void Animation::current_animation_is_paused(const bool& paused)
@@ -239,15 +269,47 @@ namespace lc
 
 	void Animation::set_stop_at_last_frame(const bool& stop_at_last_frame)
 	{
-		m_stop_at_last_frame = stop_at_last_frame;		
+		m_stop_at_last_frame_ = stop_at_last_frame;		
 	}
 
-	std::weak_ptr<AnimationKey> Animation::get_current_animation_key()
+	void Animation::load_animation_file(const std::string& path)
 	{
-		return m_actual_animation_key_;
+		std::ifstream file(path);
+		if(file.is_open() and fs::path(path).extension() == ".anim")
+		{
+			int tmp_key_anim_count;
+			
+			m_texture_to_search_.first = true;
+			file >> m_name >> m_texture_to_search_.second >> tmp_key_anim_count;
+			
+			for (int i = 0; i < tmp_key_anim_count; i++){
+				AnimationKey tmp_key_anim;
+				file >> tmp_key_anim.get_name()
+				 >> tmp_key_anim.get_base_int_rect()
+				 >> tmp_key_anim.get_max_frame()
+				 >> tmp_key_anim.get_frame_time()
+				 >> tmp_key_anim.get_total_frame();
+
+				tmp_key_anim.create_frames_rect();
+
+				m_animation_keys_.emplace(tmp_key_anim.get_name(), std::make_shared<AnimationKey>(tmp_key_anim));
+			}
+		}
 	}
 
+	void Animation::add_animation_key(
+	const std::string& name, const int& total_frame, const sf::Vector2i& max_frame, const float& frame_time,
+	const sf::IntRect& frame_rect
+	)
+	{
+		m_animation_keys_.emplace(name, std::make_shared<AnimationKey>(name, total_frame, max_frame, frame_time, frame_rect));
+	}
 
+	void Animation::delete_animation_key(const std::string& name)
+	{
+		m_animation_keys_.erase(name);
+	}
+	
 	void Animation::texture_to_search()
 	{
 		if (m_texture_to_search_.first)
@@ -259,7 +321,7 @@ namespace lc
 					if (m_texture_to_search_.second + ".png" == tmp_texture->getName())
 					{
 						m_texture_ = tmp_texture;
-						tmp_texture->isUsedByAComponent() = true;
+						tmp_texture->isVisible() = false;
 						break;
 					}
 				}
@@ -267,5 +329,18 @@ namespace lc
 
 			m_texture_to_search_.first = false;
 		}	
+	}
+
+	void Animation::draw_animation(WindowManager& window)
+	{
+		if (const auto tmp_texture = m_texture_.lock())
+		{
+			tmp_texture->getShape().setOrigin(getParent()->getTransform().getOrigin());
+			tmp_texture->getShape().setScale(getParent()->getTransform().getScale());
+			tmp_texture->getShape().setRotation(getParent()->getTransform().getRotation());
+
+			tmp_texture->getShape().setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
+			window.draw(tmp_texture->getShape());
+		}
 	}
 }

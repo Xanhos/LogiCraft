@@ -152,7 +152,7 @@ namespace lc
 		void particle_draw(const std::shared_ptr<Particle>& particle, sf::RenderTexture& window);
 
 		/*
-		* @brief Function to know if how of the render option is on.
+		* @brief Function to know if one of the render method is used.
 		* 
 		* @return True if one of them is on then false.
 		*/

@@ -102,6 +102,8 @@ namespace lc
 
 		virtual std::shared_ptr<lc::GameComponent> Clone() override;
 		virtual void Load(std::ifstream& load) override;
+
+		void load_particles_file(std::string path = "");
 	private:
 		/*
 		* @brief When the particles system is load by a save it can have a texture,
@@ -184,7 +186,7 @@ namespace lc
 		float m_spawn_point_extend_size_;
 		
 		float m_spawn_cooldown_;
-		float m_spawn_time_;
+		float m_spawn_timer_;
 		float m_despawn_cooldown_;
 		float m_rotation_speed_;
 		float m_spawn_rotation_;

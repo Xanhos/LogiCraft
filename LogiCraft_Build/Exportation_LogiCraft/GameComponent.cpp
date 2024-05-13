@@ -35,12 +35,14 @@ SOFTWARE.
 #include "GameComponent.h"
 
 lc::GameComponent::GameComponent()
-	: m_name(""), m_ID(0u), m_needToBeDeleted(false)
-{}
+	: m_needToBeDeleted(false), m_isVisible(true), m_isUpdated(false), m_ID(0u)
+{
+}
 
 lc::GameComponent::GameComponent(std::string _name)
-	: m_name(_name), m_ID(0u), m_needToBeDeleted(false)
-{}
+	: m_name(_name), m_needToBeDeleted(false), m_isVisible(true), m_isUpdated(false), m_ID(0u)
+{
+}
 
 lc::GameComponent::~GameComponent()
 {

@@ -44,6 +44,7 @@ SOFTWARE.
 #include "Animation.h"
 #include "HeatShader.h"
 #include "Shader.h"
+#include "WaterShader.h"
 
 
 lc::GameObject::GameObject()
@@ -198,6 +199,8 @@ void lc::GameObject::Load(std::ifstream& load)
 
 			if (tmp_shader_name == "Heat Shader")
 				addComponent(std::make_shared<lc::shader::heat_shader>())->Load(load);
+			if (tmp_shader_name == "Water Shader")
+				addComponent(std::make_shared<lc::shader::water_shader>())->Load(load);
 		}
 		check('}');
 	}

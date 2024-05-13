@@ -237,8 +237,6 @@ void lc::Font::UpdateEvent(sf::Event& _window)
 
 void lc::Font::Update(WindowManager& _window)
 {
-	
-
 }
 
 void lc::Font::Draw(WindowManager& _window)
@@ -252,8 +250,6 @@ void lc::Font::Draw(WindowManager& _window)
 	}
 
 	_window.draw(m_renderer);
-
-	onDraw(_window, sf::Color(sf::Color::Red));
 }
 
 void lc::Font::Draw(sf::RenderTexture& _window)
