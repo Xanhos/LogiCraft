@@ -1,3 +1,4 @@
+1 0 0 
 WORLD 0 0 1 1 0 0 0 0 0 0
 Components
 {
@@ -190,7 +191,7 @@ Components
 {
 0 0 0 6669 2240 BISHOP-IDLE_PNG_7_1617x1029.png 0 0
 
-6 Animation BISHOP-IDLE_PNG_7_1617x1029 Idle 1 0 0
+6 Animation BISHOP-IDLE_PNG_7_1617x1029 Idle 1
 Idle 0 0 1617 1029 0 7 0.15 4
 
 7 239.831 316.238 1617 1029 0 0 1 0
@@ -209,7 +210,7 @@ Idle 0 0 1617 1029 0 7 0.15 4
 14 0 pickHit
 
 0 2
-10 0 Animation Idle 
+10 0 Animation Idle
 9 0 cible
 
 }
@@ -232,9 +233,9 @@ hiding 0 828 232 168 0 6 0.082 6
 0 1
 1 2
 3 1 0 204
-10 0 Animation hiding 
+10 0 Animation hiding
 0 2
-10 0 Animation walking 
+10 0 Animation walking
 8 0
 
 }

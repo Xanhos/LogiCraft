@@ -80,6 +80,7 @@ void lc::GameObject::Load(std::ifstream& load)
 	load >> m_transform.getRotation();
 	load >> m_transform.getOrigin().x >> m_transform.getOrigin().y;
 	load >> tmp;
+	std::cout << m_name << std::endl;
 	m_depth = static_cast<unsigned char>(tmp);
 	while (garbage.find('{') == std::string::npos)
 	{
