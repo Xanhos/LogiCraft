@@ -97,7 +97,7 @@ void ScreenZone::setScreenToUnused()
 
 Viewports::Viewports()
 	: m_optionIsOpen(false), m_isMovementsLocked(false), m_isViewportsLocked(false), m_isZoomsLocked(false), m_hasGrabbedAnObject(false), m_wantToPlaceAnObject(false), 
-	m_screenZoneUnused(16), m_actualSelectedObjectNumber(0u), m_selectedTimer(0.f), m_selection_rect_()
+	m_screenZoneUnused(screenLimit), m_actualSelectedObjectNumber(0u), m_selectedTimer(0.f), m_selection_rect_()
 {
 	ScreenZone tmp_SZ(sf::Vector2i(0, 0));
 	this->setScreenZoneToUse(tmp_SZ);

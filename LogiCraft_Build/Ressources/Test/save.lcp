@@ -4,29 +4,380 @@ Components
 }
 Objects
 {
-anime_poisson__2_358x156 -66.2887 867.624 1 1 2864 156 0 0 0 0
+anime_poisson__2_358x156 -326.31 2744.4 1 1 2864 156 0 0 0 0
 Components
 {
 0 Texture 0 0 2864 156 ../ASSETS\anime_poisson__2_358x156.png 0 0
-
-7 RigidBody -66.2887 867.624 2864 156 0 0 0 0 0 0 RigidBody
 
 }
 Objects
 {
 }
 
-200x200D 1211.44 159.481 1 1 200 200 0 0 0 0
+BISHOP-IDLE_PNG_7_1617x1029 1486.69 1397.62 1 1 6669 2240 0 0 0 0
 Components
 {
-0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
 
-7 RigidBody 1211.44 159.481 200 200 0 0 0 0 0 0 RigidBody
+}
+Objects
+{
+}
 
-1 IA
-0 2
-8 0
-16 0 498
+walk_slug_1_221x157 -723.004 1340.3 1 1 1105 157 0 0 0 0
+Components
+{
+0 Texture 0 0 1105 157 ../ASSETS\walk_slug_1_221x157.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_i1617x1029 -3949.25 162.453 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x10i29 -3046.69 2073.62 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x1029u 2441.94 43.7004 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+anime_poisson__2_358x156_copie_7 -4395.28 2361.39 1 1 2864 156 0 0 0 0
+Components
+{
+0 Texture 0 0 2864 156 ../ASSETS\anime_poisson__2_358x156.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x1029u_copie_8 -1627.03 -339.307 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+anime_poisson__2_358x156_copie_9 -4395.28 2361.39 1 1 2864 156 0 0 0 0
+Components
+{
+0 Texture 0 0 2864 156 ../ASSETS\anime_poisson__2_358x156.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x1029_copie_10 -2582.28 1014.61 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+walk_slug_1_221x157_copie_11 -4791.98 957.292 1 1 1105 157 0 0 0 0
+Components
+{
+0 Texture 0 0 1105 157 ../ASSETS\walk_slug_1_221x157.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_i1617x1029_copie_12 -8018.22 -220.555 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x10i29_copie_13 -7115.66 1690.61 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x1029u_copie_14 -1627.03 -339.307 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+anime_poisson__2_358x156_copie_15 759.877 -1470.46 1 1 2864 156 0 0 0 0
+Components
+{
+0 Texture 0 0 2864 156 ../ASSETS\anime_poisson__2_358x156.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x1029u_copie_16 3528.13 -4171.16 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+anime_poisson__2_358x156_copie_17 759.877 -1470.46 1 1 2864 156 0 0 0 0
+Components
+{
+0 Texture 0 0 2864 156 ../ASSETS\anime_poisson__2_358x156.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x1029_copie_18 2572.88 -2817.24 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+walk_slug_1_221x157_copie_19 363.183 -2874.56 1 1 1105 157 0 0 0 0
+Components
+{
+0 Texture 0 0 1105 157 ../ASSETS\walk_slug_1_221x157.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_i1617x1029_copie_20 -2863.06 -4052.41 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x10i29_copie_21 -1960.5 -2141.24 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x1029u_copie_22 3528.13 -4171.16 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+anime_poisson__2_358x156_copie_23 -4359.13 616.867 1 1 2864 156 0 0 0 0
+Components
+{
+0 Texture 0 0 2864 156 ../ASSETS\anime_poisson__2_358x156.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x1029u_copie_24 -1590.88 -2083.83 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+anime_poisson__2_358x156_copie_25 -4359.13 616.867 1 1 2864 156 0 0 0 0
+Components
+{
+0 Texture 0 0 2864 156 ../ASSETS\anime_poisson__2_358x156.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x1029_copie_26 -2546.13 -729.913 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+walk_slug_1_221x157_copie_27 -4755.82 -787.233 1 1 1105 157 0 0 0 0
+Components
+{
+0 Texture 0 0 1105 157 ../ASSETS\walk_slug_1_221x157.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_i1617x1029_copie_28 -7982.07 -1965.08 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x10i29_copie_29 -7079.51 -53.9128 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x1029u_copie_30 -1590.88 -2083.83 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+anime_poisson__2_358x156_copie_31 -3371.79 5575.56 1 1 2864 156 0 0 0 0
+Components
+{
+0 Texture 0 0 2864 156 ../ASSETS\anime_poisson__2_358x156.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x1029u_copie_32 -603.541 2874.86 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+anime_poisson__2_358x156_copie_33 -3371.79 5575.56 1 1 2864 156 0 0 0 0
+Components
+{
+0 Texture 0 0 2864 156 ../ASSETS\anime_poisson__2_358x156.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x1029_copie_34 -1558.79 4228.78 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+walk_slug_1_221x157_copie_35 -3768.48 4171.46 1 1 1105 157 0 0 0 0
+Components
+{
+0 Texture 0 0 1105 157 ../ASSETS\walk_slug_1_221x157.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_i1617x1029_copie_36 -6994.73 2993.61 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x10i29_copie_37 -11382.7 4487.71 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
+
+}
+Objects
+{
+}
+
+BISHOP-IDLE_PNG_7_1617x1029u_copie_38 -603.541 2874.86 1 1 6669 2240 0 0 0 0
+Components
+{
+0 Texture 0 0 6669 2240 ../ASSETS\BISHOP-IDLE_PNG_7_1617x1029.png 0 0
 
 }
 Objects

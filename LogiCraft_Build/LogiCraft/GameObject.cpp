@@ -303,7 +303,8 @@ void lc::GameObject::Update(WindowManager& _window)
 {
 	for (auto object = m_objects.begin(); object != m_objects.end();)
 	{
-		(*object)->Update(_window);
+		if(object->get()->m_name != "Background_Holder")
+			(*object)->Update(_window);
 		
 		if ((*object)->needToBeDeleted())
 			object = m_objects.erase(object);

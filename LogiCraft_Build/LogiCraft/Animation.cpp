@@ -2,6 +2,7 @@
 
 #include <ranges>
 
+
 namespace lc
 {
 	AnimationKey::AnimationKey()
@@ -112,7 +113,7 @@ namespace lc
 
 	Animation::Animation()
 		: m_base_total_frame_(0), m_base_frame_time_(0.f),
-		m_window_his_open_(false), m_animation_is_paused_(false), m_animation_is_reversed_(false)
+		m_window_his_open_(false), m_animation_is_paused_(false), m_animation_is_reversed_(false) , m_want_to_load_anim_(false)
 	{
 		m_name = "Animation";
 		m_typeName = "Animation";
@@ -232,6 +233,30 @@ namespace lc
 		m_texture_to_search_ = std::make_pair(true, tmp_texture_name);
 	}
 
+	void Animation::LoadFromAnimFile()
+	{
+		std::ifstream file(m_anim_path_);
+		if(file.is_open() and fs::path(m_anim_path_).extension() == ".anim")
+		{
+			int tmp_key_anim_count;
+			m_texture_to_search_.first = true;
+			file >> m_name >> m_texture_to_search_.second >> tmp_key_anim_count;
+			for (int i = 0; i < tmp_key_anim_count; i++){
+				AnimationKey tmp_key_anim;
+				file >> tmp_key_anim.get_name()
+				 >> tmp_key_anim.get_base_int_rect()
+				 >> tmp_key_anim.get_max_frame()
+				 >> tmp_key_anim.get_frame_time()
+				 >> tmp_key_anim.get_total_frame();
+
+				tmp_key_anim.create_frames_rect();
+
+				m_animation_keys_.emplace(tmp_key_anim.get_name(), std::make_shared<AnimationKey>(tmp_key_anim));
+
+			}
+		}
+	}
+
 	std::shared_ptr<lc::GameComponent> Animation::Clone()
 	{
 		auto tmp_clone = std::make_shared<lc::Animation>(*this);
@@ -264,7 +289,25 @@ namespace lc
 
 				if (ImGui::Button("Open Animation Window Test"))
 					m_window_his_open_ = true;
-
+				if(ImGui::Button("Load A .anim"))
+					m_want_to_load_anim_ = !m_want_to_load_anim_;
+				if(m_want_to_load_anim_)
+				{
+					ImGui::Begin(("Load animation##" + std::to_string(getID())).c_str(),&m_window_his_open_, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+					if(!m_anim_path_.empty())
+						ImGui::Text(m_anim_path_.c_str());
+					if(Button("Search .anim"))
+					{
+						Tools::IG::LoadRessourcesFromFile(m_anim_path_,"anim");
+					}
+					if(Button("Load anim") and !m_anim_path_.empty())
+					{
+						LoadFromAnimFile();
+						m_want_to_load_anim_ = false;
+					}
+					ImGui::End();
+				}
+			
 				if (!m_texture_.expired())
 					if (ImGui::Button("Save Animation As A .anim"))
 						this->save_animation_file();
@@ -419,6 +462,7 @@ namespace lc
 						}
 					}
 					ImGui::EndChild();
+					
 				}
 			};
 	}

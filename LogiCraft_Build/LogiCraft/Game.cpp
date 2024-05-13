@@ -104,7 +104,6 @@ void Game::update()
 void Game::render()
 {
     m_windowManager.clear(sf::Color::Black);
-
     ImGui::SFML::Render(m_windowManager.getWindow());
     if (!m_state.empty() and GET_MANAGER->IsReady() and m_state.front().get()->getIsReady())
         m_state.front().get()->render();

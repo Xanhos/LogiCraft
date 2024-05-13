@@ -93,7 +93,8 @@ namespace lc
 		virtual void SaveRenderer(sf::RenderTexture& texture, int depth) override {}
 		void Export(std::ofstream& exportation) override;
 		virtual void Load(std::ifstream& load) override;
-
+		void LoadFromAnimFile();
+		
 		virtual std::shared_ptr<lc::GameComponent> Clone() override;
 		virtual void setHierarchieFunc() override;
 
@@ -108,6 +109,8 @@ namespace lc
 		void current_animation_is_reversed(const bool& reversed = true);
 
 		void save_animation_file(const bool open_file_browser = true, std::string path = "") const;
+
+		const auto& get_all_key_animation() {return m_animation_keys_;}
 	private:
 		void texture_to_search();
 
@@ -118,13 +121,15 @@ namespace lc
 		int m_base_total_frame_;
 		float m_base_frame_time_;
 		std::string m_base_name_;
+		std::string m_anim_path_;
 		sf::IntRect m_base_int_rect_;
 		sf::Vector2i m_base_max_frame_;
 
 		bool m_window_his_open_;
 		bool m_animation_is_paused_;
 		bool m_animation_is_reversed_;
-
+		bool m_want_to_load_anim_;
+		
 		Tools::Renderer m_renderer_;
 
 		std::weak_ptr<lc::Texture> m_texture_;

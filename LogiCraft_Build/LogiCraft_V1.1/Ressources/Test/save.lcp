@@ -4,29 +4,50 @@ Components
 }
 Objects
 {
-anime_poisson__2_358x156 -66.2887 867.624 1 1 2864 156 0 0 0 0
+anime_poisson__2_358x156 422.327 153.421 1 1 358 156 0 0 0 0
 Components
 {
 0 Texture 0 0 2864 156 ../ASSETS\anime_poisson__2_358x156.png 0 0
 
-7 RigidBody -66.2887 867.624 2864 156 0 0 0 0 0 0 RigidBody
+6 Animation Animation anime_poisson__2_358x156 Test 2
+Test 0 0 358 156 0 0 0.137 8
+Test_switch 0 0 150 156 0 0 0.137 8
+
+7 RigidBody 422.327 153.421 358 156 0 0 0 0 0 0 RigidBody
+
+1 IA
+0 4
+10 0 Animation Test
+13 0 5
+
+10 0 Animation Test_switch
+13 0 5
+
 
 }
 Objects
 {
 }
 
-200x200D 1211.44 159.481 1 1 200 200 0 0 0 0
+anime_poisson__2_358x156_copie_3 774.488 347.671 1 1 150 156 0 0 0 0
 Components
 {
-0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+0 Texture 0 0 2864 156 ../ASSETS\anime_poisson__2_358x156.png 0 0
 
-7 RigidBody 1211.44 159.481 200 200 0 0 0 0 0 0 RigidBody
+6 Animation Animation anime_poisson__2_358x156 Test_switch 2
+Test 0 0 358 156 0 0 0.137 8
+Test_switch 0 0 150 156 0 0 0.137 8
+
+7 RigidBody 774.488 347.671 358 156 0 0 0 0 0 0 RigidBody
 
 1 IA
-0 2
-8 0
-16 0 498
+0 4
+10 0 Animation Test_switch
+13 0 5
+
+10 0 Animation Test
+13 0 5
+
 
 }
 Objects
