@@ -73,6 +73,7 @@ namespace lc
 
 		float m_frame_timer_;
 		float m_frame_time_;
+
 	};
 
 	class Animation : public lc::Ressource
@@ -92,11 +93,15 @@ namespace lc
 
 		virtual sf::RectangleShape& getShape() override;
 
-		void select_animation_key(const std::string& name, const bool reset_last_anim_key = false);
+		void select_animation_key(const std::string& name, const bool& reset_last_anim_key = false);
 
-		void current_animation_is_paused(const bool paused = true);
+		void current_animation_is_paused(const bool& paused = true);
 
-		void current_animation_is_reversed(const bool reversed = true);
+		void current_animation_is_reversed(const bool& reversed = true);
+
+		void set_stop_at_last_frame(const bool& stop_at_last_frame);
+
+		std::weak_ptr<AnimationKey> get_current_animation_key();
 	private:
 		void texture_to_search();
 
@@ -109,7 +114,8 @@ namespace lc
 
 		bool m_animation_is_paused_;
 		bool m_animation_is_reversed_;
-
+		bool m_stop_at_last_frame;
+		
 
 		std::weak_ptr<lc::Texture> m_texture_;
 

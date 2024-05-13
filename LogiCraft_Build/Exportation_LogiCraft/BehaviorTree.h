@@ -43,21 +43,6 @@ SOFTWARE.
 #include "RigidBody.h"
 
 #define SECURE_TASK(task) (task ? task->tick() : false)
-/*	pushNode("SEQUENCE");
-pushNode("SELECTOR");
-pushNode("INVERSER");
-pushNode("CONDITION");
-pushNode("LOOP");
-pushNode("COOLDOWN");
-pushNode("FORCE SUCCESS");
-pushNode("KEEP IN CONE");
-pushNode("WANDER");
-pushNode("MOVE TO");
-pushNode("PLAY ANIMATION");
-pushNode("PLAY SOUND");
-pushNode("ROTATE TO");
-pushNode("WAIT");*/
-
 
 namespace bt
 {
@@ -68,8 +53,9 @@ namespace bt
 		CONDITION,
 		LOOP,
 		COOLDOWN,
+		DIRECTION,
+		DO_ON_ANIM_FRAME,
 		FORCE_SUCCESS,
-		KEEP_IN_CONE,
 		WANDER,
 		MOVE_TO,
 		PLAY_ANIMATION,
@@ -80,34 +66,42 @@ namespace bt
 		SHOT,
 		JUMP
 	};
+	
+	enum class condition_type{
+		IN_RANGE_OF_PLAYER,
+		IS_PLAYER_IN_SIGHT,
+		CUSTOM
+	};
 
-
-
-	class Node
+	class Node : public std::enable_shared_from_this<Node>
 	{
 		inline static unsigned int m_idCounter = 0;
+		inline static std::unordered_map<std::string, std::shared_ptr<Node>> m_custom_condition_map_ = {};
 	protected:
 		unsigned int m_id;
 		Node() : m_id(m_idCounter++) {}
 		virtual ~Node() = default;
 		std::weak_ptr<Node> m_parent;
 		
-		template<typename T>
-		std::shared_ptr<T> getNode() { std::make_shared<T>(*this); }
 	public:
 		virtual bool tick() = 0;
-
+		virtual void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) {};
+		virtual void setup(std::shared_ptr<Node> node);
+		virtual std::shared_ptr<Node> clone() {return nullptr;}
+		
 		unsigned int getID() const { return m_id; }
-
+		
+		std::weak_ptr<Node>& getParent() {return m_parent;}
+		
 		template<typename T>
 		static std::shared_ptr<T> New(const T& node) { return std::make_shared<T>(node); }
+
+		static void init_custom_condition();
+		static std::unordered_map<std::string,std::shared_ptr<Node>>& get_unordered_map_custom_condition() {return m_custom_condition_map_;}
 	};
 
 	typedef std::shared_ptr<Node> NodePtr;
 	typedef std::list<std::shared_ptr<Node>> NodeList;
-
-
-	NodePtr Factory(const node_type& type);
 
 #pragma region COMPOSITE
 	namespace Composite
@@ -119,7 +113,7 @@ namespace bt
 			NodeList m_childList;
 			std::weak_ptr<Node> m_wait_node_;
 		public:
-			CompositeNode() :m_childList() ,Node() {}
+			CompositeNode() : m_childList() ,Node() {}
 
 			NodeList& getChilds() { return m_childList; }
 
@@ -144,6 +138,7 @@ namespace bt
 			template <typename T>
 			std::shared_ptr<T> addChild(std::shared_ptr<T> child) {
 				m_childList.push_back(child);
+				m_childList.back()->getParent() = this->weak_from_this();
 				return std::dynamic_pointer_cast<T>(m_childList.back()); }
 
 			std::weak_ptr<Node>& GetWaitingNode() { return m_wait_node_; }
@@ -154,6 +149,7 @@ namespace bt
 		public:
 			Selector() : CompositeNode() {}
 			virtual bool tick();
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 
 		};
 
@@ -162,6 +158,7 @@ namespace bt
 		public:
 			Sequence() : CompositeNode() {}
 			bool tick() override;
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 		};
 	}
 
@@ -177,10 +174,10 @@ namespace bt
 		protected:
 			NodePtr m_task;
 		public:
-			Decorator() { m_task = NodePtr(); }
+			Decorator() {m_task = NodePtr();}
 			Decorator(NodePtr task) { m_task = task; }
 
-			NodePtr setTask(NodePtr task) { m_task = task; return m_task; }
+			NodePtr setTask(NodePtr task) { m_task = task; m_parent = this->shared_from_this() ;return m_task; }
 			NodePtr& getTask() {return m_task;}
 		};
 
@@ -190,6 +187,7 @@ namespace bt
 			Inverser() : Decorator() {}
 			Inverser(NodePtr task) : Decorator(task) {}
 			virtual bool tick() { return  SECURE_TASK(m_task); }
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 		};
 
 		class Loop : public Decorator
@@ -200,6 +198,7 @@ namespace bt
 			Loop(NodePtr task, unsigned int loop) : Decorator(task) { m_loopNbr = loop; }
 
 			void setLoop(unsigned int loop) { m_loopNbr = loop; }
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 
 			virtual bool tick() {
 				if (m_task)
@@ -222,9 +221,14 @@ namespace bt
 			float m_executionTimer;
 			float m_timer;
 		public:
-			Cooldown() : Decorator() { m_timer = 0.f; }
+			Cooldown() : Decorator()
+			{
+				m_timer = 0.f;
+			}
 			Cooldown(NodePtr task, float timer) : Decorator(task) { m_timer = 0.f; m_executionTimer = timer; }
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 
+			
 			void setTimer(float timer) { m_executionTimer = timer; }
 			virtual bool tick() {
 				if (m_timer > m_executionTimer)
@@ -243,24 +247,50 @@ namespace bt
 			ForceSuccess() : Decorator() {}
 			ForceSuccess(NodePtr task) : Decorator(task) {}
 			virtual bool tick() {SECURE_TASK(m_task) ; return true; }
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 		};
 
 		class Condition : public Decorator
 		{
-			std::function<bool()> m_condition;
+			NodePtr m_condition;
 		public:
 			Condition() : Decorator() {}
-			Condition(NodePtr task, std::function<bool()> condition) : Decorator(task) { m_condition = condition; }
+			Condition(NodePtr task, NodePtr condition) : Decorator(task) { m_condition = condition; }
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 
-			void setCondition( std::function<bool()> condition) {m_condition = condition;}
+			void setCondition(NodePtr condition) {m_condition = condition;}
 			virtual bool tick() {
 				if (m_condition)
-					if (m_condition())
+					if (m_condition->tick())
 						return SECURE_TASK(m_task);
 				return false;
 			}
 		};
 
+		class Direction : public  Decorator
+		{
+			std::weak_ptr<lc::GameObject> m_owner_;
+			int m_direction_;
+		public:
+			Direction() : m_direction_(0){}
+			Direction(const int& direction,const std::weak_ptr<lc::GameObject>& owner) : m_owner_(owner),m_direction_(direction){}
+			bool tick() override;
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
+		};
+
+		class Do_On_Anim_Frame : public Decorator
+		{
+			std::weak_ptr<lc::GameObject> m_owner_;
+			std::weak_ptr<lc::Animation> m_animation_;
+			std::string m_anim_name_, m_key_anim_name_;
+			unsigned int m_action_frame_;
+			bool m_new_frame_;
+		public:
+			Do_On_Anim_Frame() : m_action_frame_(0u), m_new_frame_(true) {}
+			Do_On_Anim_Frame(const std::weak_ptr<lc::GameObject>& owner,const std::string& anim_name,const std::string& key_anim_name,const unsigned int& action_frame);
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
+			bool tick() override;
+		};
 	}
 
 #pragma endregion
@@ -275,6 +305,8 @@ namespace bt
 		public:
 			NodeFunc(std::function<bool()> tick) { m_tick = tick; }
 			virtual bool tick() { return (m_tick ? m_tick() : false); }
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
+			std::shared_ptr<Node> clone() override;
 		};
 
 		class MoveTo : public Node
@@ -286,7 +318,8 @@ namespace bt
 		public:
 			MoveTo() : m_agent_(), m_target_(), m_speed_(0.f), m_bool_go_to_(false) {}
 			MoveTo(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_, const float& speed_);
-			void Setup(NodePtr node);
+			void setup(std::shared_ptr<Node> node) override;
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 			bool tick() override;
 		};
 
@@ -299,7 +332,8 @@ namespace bt
 			public:
 			Wander() : m_agent_(), m_bool_wander_(false), m_bool_direction_(false), m_speed_(0.f) {}
 			Wander(const std::shared_ptr<lc::GameObject>& agent_);
-			void Setup(NodePtr node);
+			void setup(NodePtr node) override;
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 			bool tick() override;
 		};
 
@@ -309,14 +343,13 @@ namespace bt
 			float m_time_;
 			std::weak_ptr<Node> m_root_;
 			std::weak_ptr<Node> m_node_;
-			std::weak_ptr<Node> m_parent_;
 		public:
 			Wait() : Node(), m_timer_(0.f), m_time_(0.f) {}
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
+			void setup(std::shared_ptr<Node> node) override;
 			void Setup(NodePtr node, NodePtr parent, NodePtr root);
 			void setTimer(float timer) { m_time_ = timer; }
-			bool tick();
-
-			std::weak_ptr<Node> getParent() {return m_parent_;};
+			bool tick() override;
 		};
 
 		class Play_Sound : public Node
@@ -330,8 +363,9 @@ namespace bt
 		public:
 			Play_Sound() : m_start_new_sound_(false), m_sound_id_(s_general_sound_id_++), m_attenuation_(0.f), m_min_distance_(0.f){}
 			Play_Sound(std::string sound, bool new_sound, std::weak_ptr<lc::GameObject> owner, float attenuation = 0.f, float min_distance = 0.f);
-			void Setup(NodePtr node);
-			bool tick();
+			bool tick() override;
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
+			void setup(std::shared_ptr<Node> node) override;
 		};
 		
 		class Jump : public Node
@@ -342,8 +376,9 @@ namespace bt
 		public:
 			Jump() : m_jump_height_(0.f), m_need_to_jump_(0.f){}
 			Jump(float jump_height, std::weak_ptr<lc::GameObject> owner);
-			void Setup(NodePtr node);
-			bool tick();
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
+			void setup(std::shared_ptr<Node> node) override;
+			bool tick() override;
 			
 		};
 
@@ -352,13 +387,48 @@ namespace bt
 			std::weak_ptr<lc::GameObject> m_owner_;
 			std::weak_ptr<lc::Animation> m_animation_;
 			std::string m_anim_name_, m_key_anim_name_;
+			bool m_stop_at_last_frame_, m_reverse_;
 		public:
-			Play_Animation() {}
-			Play_Animation(const std::weak_ptr<lc::GameObject>& owner,const std::string& anim_name,const std::string& key_anim_name);
-			bool tick();
+			Play_Animation() : m_stop_at_last_frame_(false), m_reverse_(false){}
+			Play_Animation(const std::weak_ptr<lc::GameObject>& owner,const std::string& anim_name,const std::string& key_anim_name, const bool& stop_at_last_frame, const bool& reverse);
+			bool tick() override;
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
+		};
+
+		class In_Range_Of_Player : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_owner_, m_player_;
+			float m_range_;
+		public:
+			In_Range_Of_Player() : m_range_(0.f) {}
+			In_Range_Of_Player(std::weak_ptr<lc::GameObject> owner,float range);
+			bool tick() override;
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
+		};
+
+		class Attack : public Node
+		{
+			NodePtr m_attack_node_;
+		public:
+			Attack() = default;
+			bool tick() override;
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
+			void setup(std::shared_ptr<Node> node) override;
+		};
+
+		class Shot : public Node
+		{
+			NodePtr m_attack_node_;
+		public:
+			Shot() = default;
+			bool tick() override;
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
+			void setup(std::shared_ptr<Node> node) override;
 		};
 	}
 
 
+	NodePtr Factory(const node_type& type);
+	NodePtr Condition_Factory(const condition_type& type, std::ifstream& file);
 }
 

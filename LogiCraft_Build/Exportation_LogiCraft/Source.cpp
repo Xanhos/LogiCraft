@@ -17,7 +17,7 @@ std::shared_ptr<lc::GameObject> load(WindowManager& window_)
 
 int main()
 {
-
+	bt::Node::init_custom_condition();
 	WindowManager window(1920, 1080, "test", false);
 	lc::Button::SetupFunctionPool(window);
 
