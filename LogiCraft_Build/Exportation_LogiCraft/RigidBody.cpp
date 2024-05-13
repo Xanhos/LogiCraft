@@ -107,6 +107,10 @@ void lc::RigidBody::Update(WindowManager& _window)
 
 	else m_velocity = { 0.f,0.f };
 
+
+
+
+
 	if (m_isKinetic)
 		if (getParent())
 		{
@@ -117,6 +121,24 @@ void lc::RigidBody::Update(WindowManager& _window)
 		m_collider.left = getParent()->getTransform().getPosition().x + m_relativePosition.x;
 		m_collider.top = getParent()->getTransform().getPosition().y + m_relativePosition.y;
 	}
+
+
+	if (m_velocity.x < 0)
+	{
+		if (getParent()->getTransform().getScale().x < 0)
+			getParent()->getTransform().getScale().x = -getParent()->getTransform().getScale().x;
+
+		getParent()->getTransform().getOrigin() = sf::Vector2f();
+	}
+	else if (m_velocity.x > 0)
+	{
+		if (getParent()->getTransform().getScale().x > 0)
+			getParent()->getTransform().getScale().x = -getParent()->getTransform().getScale().x;
+
+		getParent()->getTransform().getOrigin().x = m_collider.getSize().x;
+		std::cout << getParent()->getTransform().getOrigin().x << std::endl;
+	}
+
 }
 
 void lc::RigidBody::Draw(WindowManager& _window)

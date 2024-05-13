@@ -164,7 +164,7 @@ void bt::ActionNode::Wander::Setup(NodePtr node)
 				if (!is_on_a_platform or has_hit_a_wall)
 				{
 					node_cast->m_bool_direction_ = !node_cast->m_bool_direction_;
-					rigid_body->getParent()->getTransform().getScale().x = -rigid_body->getParent()->getTransform().getScale().x;
+					/*rigid_body->getParent()->getTransform().getScale().x = -rigid_body->getParent()->getTransform().getScale().x;
 					if (!node_cast->m_bool_direction_)
 					{
 						rigid_body->getParent()->getTransform().getOrigin() = sf::Vector2f();
@@ -172,7 +172,7 @@ void bt::ActionNode::Wander::Setup(NodePtr node)
 					else
 					{
 						rigid_body->getParent()->getTransform().getOrigin() = sf::Vector2f(rigid_body->getParent()->getTransform().getSize().x, 0);
-					}
+					}*/
 				}
 			}
 			else rigid_body->getVelocity().x = 0.f;
