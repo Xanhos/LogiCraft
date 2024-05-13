@@ -1,6 +1,5 @@
 #include "Animation.h"
 
-#include <ranges>
 
 namespace lc
 {
@@ -244,7 +243,12 @@ namespace lc
 		m_stop_at_last_frame = stop_at_last_frame;		
 	}
 
-	
+	std::weak_ptr<AnimationKey> Animation::get_current_animation_key()
+	{
+		return m_actual_animation_key_;
+	}
+
+
 	void Animation::texture_to_search()
 	{
 		if (m_texture_to_search_.first)

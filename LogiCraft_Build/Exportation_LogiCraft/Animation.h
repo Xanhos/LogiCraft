@@ -101,6 +101,7 @@ namespace lc
 
 		void set_stop_at_last_frame(const bool& stop_at_last_frame);
 
+		std::weak_ptr<AnimationKey> get_current_animation_key();
 	private:
 		void texture_to_search();
 

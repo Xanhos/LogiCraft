@@ -88,11 +88,11 @@ void lc::Event::Update(WindowManager& _window)
 {
 	if(m_objectA.expired())
 	{
-		m_objectA = lc::GameObject::GetRoot(getParent())->getObject(m_objectA_name);
+		m_objectA = getParent()->GetRoot()->getObject(m_objectA_name);
 	}
 	if (m_objectB.expired())
 	{
-		m_objectB = lc::GameObject::GetRoot(getParent())->getObject(m_objectB_name);
+		m_objectB = getParent()->GetRoot()->getObject(m_objectB_name);
 	}
 }
 
