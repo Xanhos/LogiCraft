@@ -232,7 +232,7 @@ namespace lc
 		}
 
 		if (!m_particles_ressource_.expired())
-			m_particles_ressource_.lock()->isVisible() = false;
+			m_particles_ressource_.lock()->isVisible() = true;
 
 		m_particles_.clear();
 	}
