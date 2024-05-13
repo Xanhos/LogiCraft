@@ -18,8 +18,7 @@ public:
 	
 	template <typename Func>
 	void AddNewThread(const Func& func);
-	void Update();
-	
+	void Update();	
 };
 
 template <typename Func>

@@ -35,11 +35,20 @@ SOFTWARE.
 #include "BehaviorTree.h"
 #include "SFML_ENGINE/Tools.h"
 
+void bt::ActionNode::NodeFunc::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+}
+
+std::shared_ptr<bt::Node> bt::ActionNode::NodeFunc::clone()
+{
+	return std::make_shared<NodeFunc>(*this);
+}
+
 bt::ActionNode::MoveTo::MoveTo(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_, const float& speed_) :m_agent_(agent_), m_target_(target_), m_speed_(speed_), m_bool_go_to_(false)
 {	
 }
 
-void bt::ActionNode::MoveTo::Setup(NodePtr node)
+void bt::ActionNode::MoveTo::setup(std::shared_ptr<Node> node)
 {
 	auto agent = m_agent_.lock();
 	if (agent->hasComponent("RigidBody"))
@@ -63,6 +72,20 @@ void bt::ActionNode::MoveTo::Setup(NodePtr node)
 	}
 }
 
+void bt::ActionNode::MoveTo::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	std::string target;
+	file >> target;
+	auto scene = owner;
+	while(scene->getParent())
+	{
+		scene = scene->getParent();
+	}
+	m_agent_ = owner;
+	m_target_ = scene->getObject(target);
+	m_speed_ = 100.f;
+}
+
 
 bool bt::ActionNode::MoveTo::tick()
 {
@@ -77,7 +100,7 @@ bt::ActionNode::Wander::Wander(const std::shared_ptr<lc::GameObject>& agent_) : 
 {	
 }
 
-void bt::ActionNode::Wander::Setup(NodePtr node)
+void bt::ActionNode::Wander::setup(NodePtr node)
 {
 	auto agent = m_agent_.lock();
 	if (agent->hasComponent("RigidBody"))
@@ -182,6 +205,13 @@ void bt::ActionNode::Wander::Setup(NodePtr node)
 	}
 }
 
+void bt::ActionNode::Wander::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	m_agent_ = owner;
+	m_speed_ = 100.f;
+}
+
+
 bool bt::ActionNode::Wander::tick()
 {
 	if(!m_agent_.expired())
@@ -192,54 +222,6 @@ bool bt::ActionNode::Wander::tick()
 
 }
 
-bt::NodePtr bt::Factory(const node_type& type)
-{
-	switch (type) {
-	case node_type::SEQUENCE:
-		return Node::New(Composite::Sequence());
-		break;
-	case node_type::SELECTOR:
-		return Node::New(Composite::Selector());
-		break;
-	case node_type::INVERSER:
-		return Node::New(Decorator::Inverser());
-		break;
-	case node_type::CONDITION:
-		return Node::New(Decorator::Condition());
-		break;
-	case node_type::LOOP:
-		return Node::New(Decorator::Loop());
-		break;
-	case node_type::COOLDOWN:
-		return Node::New(Decorator::Cooldown());
-		break;
-	case node_type::FORCE_SUCCESS:
-		return Node::New(Decorator::ForceSuccess());
-		break;
-	case node_type::KEEP_IN_CONE:
-		break;
-	case node_type::WANDER:
-		return Node::New(ActionNode::Wander());
-		break;
-	case node_type::MOVE_TO:
-		return Node::New(ActionNode::MoveTo());
-		break;
-	case node_type::PLAY_ANIMATION:
-		return Node::New(ActionNode::Play_Animation());
-		break;
-	case node_type::PLAY_SOUND:
-		return Node::New(ActionNode::Play_Sound());
-		break;
-	case node_type::ROTATE_TO:
-		break;
-	case node_type::WAIT:
-		return Node::New(ActionNode::Wait());
-		break;
-	default:
-		return Node::New(Composite::Sequence());
-	}
-	
-}
 
 bool bt::Composite::Selector::tick()
 {	
@@ -269,6 +251,10 @@ bool bt::Composite::Selector::tick()
 			return true;
 	}
 	return false;	
+}
+
+void bt::Composite::Selector::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
 }
 
 bool bt::Composite::Sequence::tick()
@@ -305,11 +291,24 @@ bool bt::Composite::Sequence::tick()
 	return true;
 }
 
-void bt::ActionNode::Wait::Setup(NodePtr node, NodePtr parent, NodePtr root)
+void bt::Composite::Sequence::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
 {
-	m_root_ = root;
+}
+
+void bt::ActionNode::Wait::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	file >> m_timer_;
+}
+
+void bt::ActionNode::Wait::setup(std::shared_ptr<Node> node)
+{
+	auto root = getParent();
+	while (!root.lock()->getParent().expired())
+	{
+		root = root.lock()->getParent();
+	}
 	m_node_ = node;
-	m_parent_ = parent;
+	m_root_ = root;
 }
 
 bool bt::ActionNode::Wait::tick()
@@ -344,7 +343,22 @@ bt::ActionNode::Play_Sound::Play_Sound(std::string sound, bool new_sound, std::w
 	
 }
 
-void bt::ActionNode::Play_Sound::Setup(NodePtr node)
+bool bt::ActionNode::Play_Sound::tick()
+{
+	GET_MANAGER->playSound(m_sound_name_,m_sound_id_,m_start_new_sound_, false, m_attenuation_, m_min_distance_);	
+	return true;
+}
+
+void bt::ActionNode::Play_Sound::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	std::string sound_name;
+	bool new_sound = false;
+	float attenuation(0.f), minDistance(0.f);
+	file >> m_sound_name_ >> m_start_new_sound_ >> m_attenuation_ >> m_min_distance_;
+	m_owner = owner;
+}
+
+void bt::ActionNode::Play_Sound::setup(std::shared_ptr<Node> node)
 {
 	if(m_owner.lock()->hasComponent("RigidBody"))
 	{
@@ -358,17 +372,17 @@ void bt::ActionNode::Play_Sound::Setup(NodePtr node)
 	}
 }
 
-bool bt::ActionNode::Play_Sound::tick()
-{
-	GET_MANAGER->playSound(m_sound_name_,m_sound_id_,m_start_new_sound_, false, m_attenuation_, m_min_distance_);	
-	return true;
-}
-
-bt::ActionNode::Jump::Jump(float jump_height, std::weak_ptr<lc::GameObject> owner) : m_jump_height_(jump_height), m_owner_(owner), m_need_to_jump_(0.f)
+bt::ActionNode::Jump::Jump(float jump_height, std::weak_ptr<lc::GameObject> owner) : m_jump_height_(jump_height), m_owner_(owner), m_need_to_jump_(false)
 {
 }
 
-void bt::ActionNode::Jump::Setup(NodePtr node)
+void bt::ActionNode::Jump::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	file >> m_jump_height_;
+	m_owner_ = owner;     
+}
+
+void bt::ActionNode::Jump::setup(std::shared_ptr<Node> node)
 {
 	if(m_owner_.lock()->hasComponent("RigidBody"))
 	{
@@ -722,7 +736,8 @@ bool bt::ActionNode::TestController::tick()
 }
 
 bt::ActionNode::Play_Animation::Play_Animation(const std::weak_ptr<lc::GameObject>& owner,const std::string& anim_name,
-	const std::string& key_anim_name) : m_owner_(owner), m_anim_name_(anim_name), m_key_anim_name_(key_anim_name)
+	const std::string& key_anim_name, const bool& stop_at_last_frame, const bool& reverse)
+: m_owner_(owner), m_anim_name_(anim_name), m_key_anim_name_(key_anim_name), m_stop_at_last_frame_(stop_at_last_frame),m_reverse_(reverse)
 {
 }
 
@@ -748,11 +763,250 @@ bool bt::ActionNode::Play_Animation::tick()
 	if(!m_animation_.expired())
 	{
 		auto anim = m_animation_.lock();
-		anim->select_animation_key(m_key_anim_name_,true);
+		anim->select_animation_key(m_key_anim_name_,false);
+		anim->set_stop_at_last_frame(m_stop_at_last_frame_);
+		anim->current_animation_is_reversed(m_reverse_);
 		return true;		
 	}
 
 	return false;
 }
 
+void bt::ActionNode::Play_Animation::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	file >> m_anim_name_ >> m_key_anim_name_ >> m_stop_at_last_frame_ >> m_reverse_;
+	m_owner_ = owner->weak_from_this();
+}
 
+void bt::Decorator::Inverser::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+}
+
+void bt::Decorator::Loop::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	file >> m_loopNbr;
+}
+
+
+void bt::Decorator::Cooldown::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	file >> m_executionTimer;
+}
+
+
+void bt::Decorator::ForceSuccess::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+}
+
+void bt::Decorator::Condition::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	int type;
+	file >> type;
+	condition_type condition_type_enum = static_cast<condition_type>(type);
+	auto condition = Condition_Factory(condition_type_enum, file);
+	condition->load(file,owner);
+	m_condition = condition;
+}
+
+bool bt::Decorator::Direction::tick()
+{
+	if(!m_owner_.expired())
+	{
+		auto agent = m_owner_.lock();
+		if(agent->hasComponent("RigidBody"))
+		{
+			auto rb = agent->getComponent<lc::RigidBody>("RigidBody");
+			if(m_direction_ == 0 and rb->getVelocity().x < 0)
+				return true;
+			if (m_direction_ == 1 and rb->getVelocity().x > 0)
+				return true;							
+		}
+	}
+	return false;	
+}
+
+void bt::Decorator::Direction::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	int direction;
+	file >> direction;
+	m_owner_ = owner;
+}
+
+void bt::Node::setup(std::shared_ptr<Node> node)
+{
+}
+
+bt::Decorator::Do_On_Anim_Frame::Do_On_Anim_Frame(const std::weak_ptr<lc::GameObject>& owner,
+	const std::string& anim_name, const std::string& key_anim_name, const unsigned int& action_frame) :
+	m_owner_(owner),m_anim_name_(anim_name),m_key_anim_name_(key_anim_name),m_action_frame_(action_frame), m_new_frame_(true)
+{
+}
+
+void bt::Decorator::Do_On_Anim_Frame::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	file >> m_key_anim_name_ >>m_anim_name_ >> m_action_frame_;
+	m_owner_ = owner;
+}
+
+bool bt::Decorator::Do_On_Anim_Frame::tick()
+{
+	if(m_animation_.expired())
+	{
+		if(!m_owner_.expired())
+		{
+			auto object = m_owner_.lock();
+			for(auto& component : object->getComponents())
+			{
+				if(auto anim = std::dynamic_pointer_cast<lc::Animation>(component))
+				{
+					if(anim->getName() == this->m_anim_name_)
+						this->m_animation_ = anim;
+				}
+			}
+		}		
+	}
+
+	if(const auto anim = m_animation_.lock())	
+		if(const auto anim_key = anim->get_current_animation_key().lock())		
+			if(anim_key->get_name() == m_key_anim_name_)
+			{
+				if(anim_key->get_actual_frame() == m_action_frame_ and m_new_frame_)
+				{
+					m_new_frame_ = false;
+					return SECURE_TASK(m_task);
+				}
+				if (anim_key->get_actual_frame() != m_action_frame_ )
+					m_new_frame_ = true;
+			}
+	return false;
+}
+
+bt::ActionNode::In_Range_Of_Player::In_Range_Of_Player(std::weak_ptr<lc::GameObject> owner, float range) : m_owner_(owner), m_range_()
+{
+}
+
+bool bt::ActionNode::In_Range_Of_Player::tick()
+{
+	if(m_player_.expired() and !m_owner_.expired())
+	{
+		auto scene = m_owner_.lock()->GetRoot();
+		if(scene->hasObject("PLAYER"))
+			m_player_ = scene->getObject("PLAYER");
+	}
+
+	if(!m_player_.expired())
+	{
+		if(Tools::Vector::getDistance(m_player_.lock()->getTransform().getPosition(),m_owner_.lock()->getTransform().getPosition()))
+			return true;
+	}
+
+	return false;
+}
+
+void bt::ActionNode::In_Range_Of_Player::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	file >> m_range_;
+}
+
+
+void bt::Node::init_custom_condition()
+{
+	m_custom_condition_map_["Test"] = New(ActionNode::NodeFunc([]{return true;}));
+}
+
+bool bt::ActionNode::Attack::tick()
+{
+	return m_attack_node_->tick();
+}
+
+void bt::ActionNode::Attack::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	std::string m_attack_name;
+	file >> m_attack_name;	
+	
+	m_attack_node_->load(file,owner);
+}
+
+void bt::ActionNode::Attack::setup(std::shared_ptr<Node> node)
+{
+	m_attack_node_->setup(node);
+}
+
+bool bt::ActionNode::Shot::tick()
+{
+	return m_attack_node_->tick();
+}
+
+void bt::ActionNode::Shot::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	std::string m_attack_name;
+	file >> m_attack_name;
+	
+	m_attack_node_->load(file, owner);
+}
+
+void bt::ActionNode::Shot::setup(std::shared_ptr<Node> node)
+{
+	m_attack_node_->setup(node);
+}
+
+bt::NodePtr bt::Factory(const node_type& type)
+{
+	switch (type) {
+	case node_type::SEQUENCE:
+		return Node::New(Composite::Sequence());
+	case node_type::SELECTOR:
+		return Node::New(Composite::Selector());
+	case node_type::INVERSER:
+		return Node::New(Decorator::Inverser());
+	case node_type::CONDITION:
+		return Node::New(Decorator::Condition());
+	case node_type::DIRECTION:
+		return Node::New(Decorator::Direction());
+	case node_type::LOOP:
+		return Node::New(Decorator::Loop());
+	case node_type::COOLDOWN:
+		return Node::New(Decorator::Cooldown());
+	case node_type::FORCE_SUCCESS:
+		return Node::New(Decorator::ForceSuccess());
+	case node_type::WANDER:
+		return Node::New(ActionNode::Wander());
+	case node_type::MOVE_TO:
+		return Node::New(ActionNode::MoveTo());
+	case node_type::PLAY_ANIMATION:
+		return Node::New(ActionNode::Play_Animation());
+	case node_type::PLAY_SOUND:
+		return Node::New(ActionNode::Play_Sound());
+	case node_type::WAIT:
+		return Node::New(ActionNode::Wait());
+	case node_type::DO_ON_ANIM_FRAME:
+		return Node::New(Decorator::Do_On_Anim_Frame());
+	case node_type::ROTATE_TO:
+		break;
+	case node_type::ATTACK:
+		return Node::New(ActionNode::Attack());
+	case node_type::SHOT:
+		return Node::New(ActionNode::Shot());
+	case node_type::JUMP:
+		return Node::New(ActionNode::Jump());		
+	default:
+		return Node::New(Composite::Sequence());
+	}
+}
+
+bt::NodePtr bt::Condition_Factory(const condition_type& type, std::ifstream& file)
+{
+	std::string custom_condition;
+	switch (type)
+	{
+	case condition_type::IN_RANGE_OF_PLAYER:
+		return Node::New(ActionNode::In_Range_Of_Player());
+	case condition_type::IS_PLAYER_IN_SIGHT:
+		return Node::New(ActionNode::NodeFunc([]{return true;}));
+	case condition_type::CUSTOM:
+		file >> custom_condition;
+		return Node::get_unordered_map_custom_condition()[custom_condition]->clone();
+	default:
+		return Node::New(ActionNode::NodeFunc([]{return true;}));
+	}
+}

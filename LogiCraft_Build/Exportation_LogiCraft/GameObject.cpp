@@ -157,10 +157,8 @@ std::shared_ptr<lc::GameObject> lc::GameObject::CreateGameObject(std::string _na
 std::shared_ptr<lc::GameObject> lc::GameObject::LoadScene(std::string _SceneToLoad, WindowManager& window_)
 {
 	_SceneToLoad = "../Ressources/" + _SceneToLoad;
-	const int thread_limit = 10;
 	std::cout << _SceneToLoad << "\n";
 	auto world = CreateGameObject("WORLD");
-	auto bg = world->addObject(background_holder_name);
 	FileReader file(_SceneToLoad + "/export.lcg");
 	int thread_number;
 	file >> thread_number;
@@ -185,7 +183,7 @@ std::shared_ptr<lc::GameObject> lc::GameObject::LoadScene(std::string _SceneToLo
 					{
 						position = sf::Vector2f(static_cast<float>(0 + (screenResolution.x * pos_bg_x)), static_cast<float>(0 + (screenResolution.y * pos_bg_y)));
 						mutex.lock();
-						auto object = bg->addObject("BACKGROUND " + std::to_string(static_cast<unsigned char>(depth)),static_cast<unsigned char>(depth));
+						auto object = world->addObject("BACKGROUND " + std::to_string(static_cast<unsigned char>(depth)),static_cast<unsigned char>(depth));
 						std::cout << dir_entry.path().string() + "\n";
 						mutex.unlock();
 						object->addComponent(std::make_shared<Texture>(dir_entry.path().filename().string(), dir_entry.path().string()))->setRelativePosition(position);
@@ -194,16 +192,17 @@ std::shared_ptr<lc::GameObject> lc::GameObject::LoadScene(std::string _SceneToLo
 			}
 		});	
 	}
-	bg->Update(window_);
+	world->Update(window_);
 	world->Load(file);
 	return world;
 }
 
-std::shared_ptr<lc::GameObject> lc::GameObject::GetRoot(std::shared_ptr<GameObject> object)
+std::shared_ptr<lc::GameObject> lc::GameObject::GetRoot()
 {
-	while(object->getParent())
-		object = object->getParent();
-	return object;
+	auto root = this->getParent();
+	while(root->getParent())
+		root = root->getParent();
+	return root;
 }
 
 void lc::GameObject::CheckMaxSize()
