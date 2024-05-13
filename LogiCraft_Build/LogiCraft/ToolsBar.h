@@ -65,10 +65,12 @@ private:
 	void ShowHelp();
 
 	void Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _viewports, sf::RenderWindow& _window);
-
+	void Export(std::shared_ptr <lc::GameObject> _game_object, Viewports& _viewports, sf::RenderWindow& _window);
+	
 	void Exit(WindowManager& _window);
 	void ChangeLayer(Layer _newLayer);
 
+	bool m_isExporting = false;
 	bool m_isSaving = false;
 	bool m_isLoading = false;
 	bool m_showingHelp = false;

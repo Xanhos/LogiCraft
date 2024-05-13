@@ -202,6 +202,7 @@ bool lc::RigidBody::CheckAllObject(std::shared_ptr<lc::GameObject> _object)
 	}
 
 	for (auto& i : _object->getObjects())
+		if(i->getName() != background_holder_name)
 		CheckAllObject(i);
 
 	return true;
