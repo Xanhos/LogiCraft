@@ -140,7 +140,7 @@ namespace lc
 		  m_spawn_count_(1u),
 		  m_has_product_his_particles_(false),
 		  m_has_gravity_(false),
-		  ressource_to_search_(std::make_pair(false, ""))
+		  m_ressource_to_search_(std::make_pair(false, ""))
 	{
 		m_name = "Particles System";
 		m_typeName = "Particles System";
@@ -184,7 +184,7 @@ namespace lc
 		  m_spawn_count_(1u),
 		  m_has_product_his_particles_(false),
 		  m_has_gravity_(false),
-		  ressource_to_search_(std::make_pair(false, ""))
+		  m_ressource_to_search_(std::make_pair(false, ""))
 	{
 		m_name = "Particles";
 		m_typeName = "Particles";
@@ -219,6 +219,9 @@ namespace lc
 			Particles::s_thread_particles_.clear();
 		}
 
+		if (!m_particles_ressource_.expired())
+			m_particles_ressource_.lock()->isUsedByAComponent() = false;
+
 		m_particles_.clear();
 	}
 
@@ -251,7 +254,7 @@ namespace lc
 	{
 		auto tmp_clone = std::make_shared<lc::Particles>(*this);
 		if (!tmp_clone->m_particles_ressource_.expired())
-			tmp_clone->ressource_to_search_ = std::make_pair(true, tmp_clone->m_particles_ressource_.lock()->getName());
+			tmp_clone->m_ressource_to_search_ = std::make_pair(true, tmp_clone->m_particles_ressource_.lock()->getName());
 		tmp_clone->m_particles_ressource_.reset();
 		tmp_clone->m_particles_.clear();
 		Particles::s_number_of_particle_system_++;
@@ -292,7 +295,7 @@ namespace lc
 			 >> tmp_textureName;
 
 		if (tmp_textureName != "No_Ressource")
-			ressource_to_search_ = std::make_pair(true, tmp_textureName);
+			m_ressource_to_search_ = std::make_pair(true, tmp_textureName);
 		
 		m_particles_type_ = static_cast<ParticlesSystemType>(tmp_ParticlesSystemType);
 		m_spawn_color_ = sf::Color(tmp_Color[0], tmp_Color[1], tmp_Color[2], tmp_Color[3]);
@@ -300,7 +303,7 @@ namespace lc
 
 	void Particles::texture_to_search()
 	{
-		if (ressource_to_search_.first)
+		if (m_ressource_to_search_.first)
 		{
 			for (auto& component : getParent()->getComponents())
 			{
@@ -310,7 +313,7 @@ namespace lc
 
 				if (tmp_ressource)
 				{
-					if (ressource_to_search_.second == fs::path(tmp_ressource->getName()).filename().stem().string())
+					if (m_ressource_to_search_.second == fs::path(tmp_ressource->getName()).filename().stem().string())
 					{
 						m_particles_ressource_ = tmp_ressource;
 						tmp_ressource->isUsedByAComponent() = true;
@@ -319,7 +322,7 @@ namespace lc
 				}
 			}
 
-			ressource_to_search_.first = false;
+			m_ressource_to_search_.first = false;
 		}
 	}
 

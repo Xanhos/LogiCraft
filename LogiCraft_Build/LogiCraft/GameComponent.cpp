@@ -35,11 +35,11 @@ SOFTWARE.
 #include "GameComponent.h"
 
 lc::GameComponent::GameComponent()
-	: m_name(""), m_ID(0u), m_needToBeDeleted(false)
+	: m_needToBeDeleted(false), m_isVisible(true), m_ID(0u)
 {}
 
 lc::GameComponent::GameComponent(std::string _name)
-	: m_name(_name), m_ID(0u), m_needToBeDeleted(false)
+	: m_name(_name), m_needToBeDeleted(false), m_isVisible(true), m_ID(0u)
 {}
 
 lc::GameComponent::~GameComponent()
@@ -67,7 +67,8 @@ void lc::GameComponent::Hierarchie_Draw(unsigned int _parentID, std::list<std::s
 		ImGui::PushStyleColor(ImGuiCol_HeaderActive, ImVec4(0.25882f, 0.5882f, 1.f, 1.f));
 	}
 	if (ImGui::TreeNodeEx(std::string(m_typeName + std::to_string(_parentID) + std::to_string(m_ID)).c_str(),
-		ImGuiTreeNodeFlags_Selected | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth, std::string(m_typeName + "<Name:" + m_name + ">").c_str()))
+		ImGuiTreeNodeFlags_Selected | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_SpanAvailWidth,
+		std::string(m_typeName + ':' + m_name).c_str()))
 	{
 		if (_actComp != std::prev(_compList.end()))
 		{
@@ -96,6 +97,8 @@ void lc::GameComponent::Hierarchie_Draw(unsigned int _parentID, std::list<std::s
 
 		ImGui::SameLine();
 		ImGui::Text("Delete component");
+
+		ImGui::Checkbox(std::string("is Visible##" + std::to_string(m_ID)).c_str(), &m_isVisible);
 
 		if (m_hierarchieInformation)
 			m_hierarchieInformation();

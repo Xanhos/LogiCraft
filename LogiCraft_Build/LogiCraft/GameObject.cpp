@@ -42,18 +42,20 @@ SOFTWARE.
 #include "Event.h"
 #include "Particule.h"
 #include "Animation.h"
+#include "HeatShader.h"
+#include "Shader.h"
 
 
 lc::GameObject::GameObject()
-	: m_name(""), m_depth(0), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
+	: m_ID(m_generalID++), m_depth(0), m_needToBeDeleted(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
 {}
 
 lc::GameObject::GameObject(std::string _name)
-	: m_name(""), m_depth(0), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
+	: m_ID(m_generalID++), m_depth(0), m_needToBeDeleted(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
 {}
 
 lc::GameObject::GameObject(std::string _name, unsigned char _depth)
-	: m_name(_name), m_depth(_depth), m_ID(m_generalID++), m_needToBeRemove(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
+	: m_name(_name), m_ID(m_generalID++), m_depth(_depth), m_needToBeDeleted(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
 {}
 
 lc::GameObject::~GameObject()
@@ -110,7 +112,7 @@ void lc::GameObject::SaveRenderer(sf::RenderTexture& texture, int _depth)
 	if(!getNeedToBeExported())
 		for (auto& components : m_components)
 		{
-				components->SaveRenderer(texture, _depth);
+			components->SaveRenderer(texture, _depth);
 		}
 	for (auto& objects : m_objects)
 	{
@@ -185,10 +187,17 @@ void lc::GameObject::Load(std::ifstream& load)
 		}
 		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::ANIMATION)
 			addComponent(std::make_shared<lc::Animation>())->Load(load);
-
 		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::CONVEX)
 		{			
 			addComponent(std::make_shared<lc::Convex>())->Load(load);
+		}
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::SHADER)
+		{
+			std::string tmp_shader_name;
+			load >> tmp_shader_name;
+
+			if (tmp_shader_name == "Heat Shader")
+				addComponent(std::make_shared<lc::shader::heat_shader>())->Load(load);
 		}
 		check('}');
 	}
@@ -283,8 +292,7 @@ void lc::GameObject::CheckMaxSize()
 void lc::GameObject::UpdateEvent(sf::Event& _event)
 {
 	for (auto& object : m_objects)
-		if (object->isVisible())
-			object->UpdateEvent(_event);
+		object->UpdateEvent(_event);
 
 	for (auto& component : m_components)
 		component->UpdateEvent(_event);
@@ -297,7 +305,7 @@ void lc::GameObject::Update(WindowManager& _window)
 		if(object->get()->m_name != "Background_Holder")
 			(*object)->Update(_window);
 		
-		if ((*object)->hasToBeRemoved())
+		if ((*object)->needToBeDeleted())
 			object = m_objects.erase(object);
 		else
 			object++;
@@ -323,7 +331,8 @@ void lc::GameObject::Draw(WindowManager& _window)
 			object->Draw(_window);
 
 	for (auto& component : m_components)
-		component->Draw(_window);
+		if (component->isVisible())
+			component->Draw(_window);
 }
 
 void lc::GameObject::Draw(sf::RenderTexture& _renderer)
@@ -333,7 +342,8 @@ void lc::GameObject::Draw(sf::RenderTexture& _renderer)
 			object->Draw(_renderer);
 
 	for (auto& component : m_components)
-		component->Draw(_renderer);
+		if (component->isVisible())
+			component->Draw(_renderer);
 }
 
 void lc::GameObject::Draw(sf::RenderTexture& _renderer, unsigned char _depth)
@@ -343,6 +353,21 @@ void lc::GameObject::Draw(sf::RenderTexture& _renderer, unsigned char _depth)
 			object->Draw(_renderer, _depth);
 
 	for (auto& component : m_components)
-		if (m_depth == _depth)
-			component->Draw(_renderer);
+		if (component->isVisible())
+			if (m_depth == _depth)
+				component->Draw(_renderer);
+}
+
+bool lc::GameObject::is_in_window_view(WindowManager& window)
+{
+	auto& tmp_window_view = window.getWindow().getView();
+	return Tools::Collisions::rect_rect({getTransform().getPosition(), getTransform().getSize()},
+		{tmp_window_view.getCenter() - (tmp_window_view.getSize() / 2.f), tmp_window_view.getSize()});
+}
+
+bool lc::GameObject::is_in_window_view(const sf::RenderTexture& window)
+{
+	auto& tmp_window_view = window.getView();
+	return Tools::Collisions::rect_rect({getTransform().getPosition(), getTransform().getSize()},
+		{tmp_window_view.getCenter() - (tmp_window_view.getSize() / 2.f), tmp_window_view.getSize()});
 }

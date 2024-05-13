@@ -114,8 +114,6 @@ namespace lc
 		*/
 		void update_value();
 
-		
-
 		/*
 		* @brief Function and update and spawn the particle when the timer is good.
 		*/
@@ -135,7 +133,6 @@ namespace lc
 		* @brief Function to draw Particle.
 		*/
 		void particle_draw(const std::shared_ptr<Particle>& particle, WindowManager& window);
-
 		
 		/*
 		* @brief Function to update all the particles, so it took less performance.
@@ -207,6 +204,6 @@ namespace lc
 		bool m_has_product_his_particles_;
 		bool m_has_gravity_;
 
-		RessourceToSearch ressource_to_search_;
+		RessourceToSearch m_ressource_to_search_;
 	};
 }

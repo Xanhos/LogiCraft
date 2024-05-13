@@ -150,7 +150,8 @@ namespace lc
 		  m_has_gravity_(false),
 		  m_is_particles_rendered_on_the_viewport_(true),
 		  m_is_window_test_is_open_(false),
-		  ressource_to_search_(std::make_pair(false, ""))
+		  m_ressource_to_search_(std::make_pair(false, "")),
+		  m_want_to_load_anim_(false)
 	{
 		m_name = "Particles";
 		m_typeName = "Particles";
@@ -196,7 +197,7 @@ namespace lc
 		  m_has_gravity_(false),
 		  m_is_particles_rendered_on_the_viewport_(true),
 		  m_is_window_test_is_open_(false),
-		  ressource_to_search_(std::make_pair(false, ""))
+		  m_ressource_to_search_(std::make_pair(false, ""))
 	{
 		m_name = "Particles";
 		m_typeName = "Particles";
@@ -230,6 +231,9 @@ namespace lc
 			Particles::s_update_thread_.join();
 			Particles::s_thread_particles_.clear();
 		}
+
+		if (!m_particles_ressource_.expired())
+			m_particles_ressource_.lock()->isVisible() = true;
 
 		m_particles_.clear();
 	}
@@ -277,7 +281,7 @@ namespace lc
 			static_cast<unsigned int>(m_renderer_.get_size().x), 
 			static_cast<unsigned int>(m_renderer_.get_size().y));
 		if (!tmp_clone->m_particles_ressource_.expired())
-			tmp_clone->ressource_to_search_ = std::make_pair(true, tmp_clone->m_particles_ressource_.lock()->getName());
+			tmp_clone->m_ressource_to_search_ = std::make_pair(true, tmp_clone->m_particles_ressource_.lock()->getName());
 		tmp_clone->m_particles_ressource_.reset();
 		tmp_clone->m_particles_.clear();
 		Particles::s_number_of_particle_system_++;
@@ -312,13 +316,42 @@ namespace lc
 
 			if (ImGui::Button("Open Renderer Window"))
 				m_is_window_test_is_open_ = true;
+			
+			if(ImGui::Button("Load A .ptcl"))
+				m_want_to_load_anim_ = true;
+			
+			if(m_want_to_load_anim_)
+			{
+				ImGui::Begin(("Load particles##" + std::to_string(getID())).c_str(), &m_want_to_load_anim_, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_AlwaysAutoResize);
+					
+				if(Button("Search .ptcl"))
+				{
+					Tools::IG::LoadRessourcesFromFile(m_ptcl_path_,"ptcl");
+				}
+
+				if(!m_ptcl_path_.empty())
+				{
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
+						
+					ImGui::Text(std::string("Path : " + m_ptcl_path_).c_str());	
+				}
+
+				ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
+					
+				if(Button("Load ptcl") and !m_ptcl_path_.empty())
+				{
+					load_particles_file(m_ptcl_path_);
+					m_want_to_load_anim_ = false;
+				}
+				ImGui::End();
+			}
 
 			if (ImGui::Button("Save Animation As A .ptcl"))
-				this->save_animation_file();
+				this->save_particles_file();
 
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
 
-			//Lock of the selected ressource (or not if there not selected ressource)
+			//Lock of the selected ressource (or not if there selected ressource)
 			const auto tmp_ressource = m_particles_ressource_.lock();
 
 			if (ImGui::BeginCombo("Selected Ressource", tmp_ressource ? tmp_ressource->getName().c_str() : "No Ressource Selected"))
@@ -327,10 +360,10 @@ namespace lc
 
 				if (tmp_ressource)
 				{
-					if (ImGui::Selectable(std::string("No Texture ##" + std::to_string(m_ID)).c_str(), tmp_is_selected))
+					if (ImGui::Selectable(std::string("No Resources ##" + std::to_string(m_ID)).c_str(), tmp_is_selected))
 					{
 						if (tmp_ressource)
-							tmp_ressource->isUsedByAComponent() = false;
+							tmp_ressource->isVisible() = false;
 
 						//Reset of the origin to the one for the base shape.
 						m_particles_origin_ = { m_base_shape_radius_, m_base_shape_radius_ };
@@ -348,17 +381,20 @@ namespace lc
 					if (tmp_ressource_component)
 					{
 						//If the ressource is not already use by another component we use it.
-						if (!tmp_ressource_component->isUsedByAComponent())
+						if (tmp_ressource_component->isVisible())
 						{
 							if (ImGui::Selectable(std::string(tmp_ressource_component->getName() + "##" + std::to_string(tmp_ressource_component->getID())).c_str(), tmp_is_selected))
 							{
-								//If there were already a component used on the particles we set it to un use,
+								//If there were already a component used on the particles, we set it to un use,
 								//to replace by the new one.
 								if (tmp_ressource)
-									tmp_ressource->isUsedByAComponent() = false;
+								{
+									tmp_ressource->getShape().setFillColor(sf::Color::White);
+									tmp_ressource->isVisible() = true;
+								}
 
 								//The new ressource is set to use.
-								tmp_ressource_component->isUsedByAComponent() = true;
+								tmp_ressource_component->isVisible() = false;
 								//The weak_ptr of the ressource is set to the new one,
 								//the texture size is change to the new ressource,
 								//and the particles origin is set to the half of the size.
@@ -598,14 +634,60 @@ namespace lc
 			 >> tmp_textureName;
 
 		if (tmp_textureName != "No_Ressource")
-			ressource_to_search_ = std::make_pair(true, tmp_textureName);
+			m_ressource_to_search_ = std::make_pair(true, tmp_textureName);
 		
 		m_particles_type_ = static_cast<ParticlesSystemType>(tmp_ParticlesSystemType);
 		m_spawn_color_ = sf::Color(static_cast<sf::Uint8>(tmp_color[0]), static_cast<sf::Uint8>(tmp_color[1]),
 			static_cast<sf::Uint8>(tmp_color[2]), static_cast<sf::Uint8>(tmp_color[3]));
 	}
 
-	void Particles::save_animation_file(const bool open_file_browser, std::string path) const
+	void Particles::load_particles_file(std::string path)
+	{
+		std::ifstream file(path);
+		if(file.is_open() and fs::path(path).extension() == ".ptcl")
+		{
+			int tmp_key_anim_count;
+			std::string tmp_resources_type, tmp_resources_name;
+			
+			file >> m_typeName >> m_spawn_color_ >> m_texture_size_
+				 >> m_particles_origin_ >> m_has_gravity_ >> m_spawn_angle_
+				 >> m_spawn_timer_ >> m_spawn_speed_ >> m_spawn_spread_
+				 >> m_gravity_force_ >> m_spawn_cooldown_ >> m_rotation_speed_
+				 >> m_life_time_time_ >> m_spawn_rotation_ >> m_despawn_cooldown_
+				 >> m_base_shape_radius_ >> m_spawn_point_extend_size_
+				 >> m_spawn_count_ >> m_base_shape_point_count_;
+			
+			file >> tmp_resources_type >> tmp_resources_name;
+
+			if (tmp_resources_type == "Animation")
+			{
+				std::string tmp_actual_key_name, tmp_animation_texture_name;
+				
+				file >> tmp_actual_key_name >> tmp_animation_texture_name;
+				
+				path = fs::path(path).parent_path().string();
+				path += "/" + tmp_resources_name + ".anim";
+				
+				auto tmp_animation = getParent()->addComponent<lc::Animation>();
+				m_particles_ressource_ = tmp_animation;
+				tmp_animation->load_animation_file(path);
+				tmp_animation->isVisible() = false;
+				if (getParent()->hasComponent(tmp_animation_texture_name))
+				{
+					tmp_animation->get_texture() = getParent()->getComponent<lc::Texture>(tmp_animation_texture_name);
+					if (tmp_actual_key_name != "No_Actual_Key")
+						tmp_animation->select_animation_key(tmp_actual_key_name, false);
+				}
+			}
+			else if (tmp_resources_type == "Texture")
+			{
+				m_ressource_to_search_.first = true;
+				m_ressource_to_search_.second = tmp_resources_name;
+			}
+		}
+	}
+
+	void Particles::save_particles_file(const bool open_file_browser, std::string path) const
 	{
 		std::string tmp_extention_name("ptcl");
 
@@ -645,31 +727,41 @@ namespace lc
 				tmp_save_particles << m_spawn_point_extend_size_ << '\n';
 				tmp_save_particles << m_spawn_count_ << '\n';
 				tmp_save_particles << m_base_shape_point_count_ << '\n';
-				tmp_save_particles << (m_particles_ressource_.expired() ? "No_Ressource" : m_particles_ressource_.lock()->getName()) << '\n';
+				
+				if (!m_particles_ressource_.expired())
+				{
+					if (const auto tmp_animation = std::dynamic_pointer_cast<lc::Animation>(m_particles_ressource_.lock()))
+					{
+						tmp_save_particles
+							<< tmp_animation->getTypeName() << '\n'
+							<< tmp_animation->getName() << '\n'
+							<< (tmp_animation->get_actual_animation_key().expired() ? "No_Actual_Key" : tmp_animation->get_actual_animation_key().lock()->get_name()) << '\n'
+							<< (tmp_animation->get_texture().expired() ? "No_Animation_Texture" : tmp_animation->get_texture().lock()->getName());
+
+						tmp_animation->save_animation_file(false, path + tmp_file_name);
+					}
+					else if (const auto tmp_texture = std::dynamic_pointer_cast<lc::Texture>(m_particles_ressource_.lock()))
+					{
+						tmp_save_particles
+							<< tmp_texture->getTypeName() << '\n'
+							<< tmp_texture->getName() << '\n';
+					}
+				}
+				else
+				{
+					tmp_save_particles
+						<< "No_Type" <<'\n'
+						<< "No_Ressource" << '\n';
+				}
 			}
+			
 			tmp_save_particles.close();
-
-			//And the image is register.
-			if (!m_particles_ressource_.expired())
-			{
-				if (auto tmp_animation = std::dynamic_pointer_cast<lc::Animation>(m_particles_ressource_.lock()))
-				{
-					tmp_animation->save_animation_file(false, path + tmp_file_name);
-
-					if (tmp_animation->get_texture())
-						tmp_animation->get_texture()->getTexture().copyToImage().saveToFile(path + '\\' + tmp_file_name + '\\' + tmp_file_name + ".png");
-				}
-				else if (auto tmp_texture = std::dynamic_pointer_cast<lc::Texture>(m_particles_ressource_.lock()))
-				{
-					tmp_texture->getTexture().copyToImage().saveToFile(path + '\\' + tmp_file_name + '\\' + tmp_file_name + ".png");
-				}
-			}
 		}
 	}
 
 	void Particles::texture_to_search()
 	{
-		if (ressource_to_search_.first)
+		if (m_ressource_to_search_.first)
 		{
 			for (auto& component : getParent()->getComponents())
 			{
@@ -679,16 +771,16 @@ namespace lc
 
 				if (tmp_ressource)
 				{
-					if (ressource_to_search_.second == tmp_ressource->getName())
+					if (m_ressource_to_search_.second == tmp_ressource->getName())
 					{
 						m_particles_ressource_ = tmp_ressource;
-						tmp_ressource->isUsedByAComponent() = true;
+						tmp_ressource->isVisible() = false;
 						break;
 					}
 				}
 			}
 
-			ressource_to_search_.first = false;
+			m_ressource_to_search_.first = false;
 		}
 	}
 

@@ -55,6 +55,12 @@
     <Filter Include="Fichiers d%27en-tête\SOFTWARE UI\CONTENT_BROWSER">
       <UniqueIdentifier>{7aab1ab8-ec4f-4dc1-b7de-56bbcc73a630}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers sources\RESSOURCES\SHADERS">
+      <UniqueIdentifier>{9a228b7c-4ca7-4b1e-bda2-f96e5dd1617d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\RESSOURCES\SHADERS">
+      <UniqueIdentifier>{bf7d23bf-65ea-4aaf-a2ad-7daabb96cd80}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IMGUI\imgui-SFML.cpp">
@@ -75,7 +81,7 @@
     <ClCompile Include="IMGUI\imgui_tables.cpp">
       <Filter>Fichiers sources\IMGUI</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="Main.cpp">
       <Filter>Fichiers sources\CORE</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp">
@@ -152,6 +158,18 @@
     </ClCompile>
     <ClCompile Include="Convex.cpp">
       <Filter>Fichiers sources\RESSOURCES</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Fichiers sources\RESSOURCES\SHADERS</Filter>
+    </ClCompile>
+    <ClCompile Include="HeatShader.cpp">
+      <Filter>Fichiers sources\RESSOURCES\SHADERS</Filter>
+    </ClCompile>
+    <ClCompile Include="LightShader.cpp">
+      <Filter>Fichiers sources\RESSOURCES\SHADERS</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterShader.cpp">
+      <Filter>Fichiers sources\RESSOURCES\SHADERS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -259,6 +277,18 @@
     </ClInclude>
     <ClInclude Include="Convex.h">
       <Filter>Fichiers d%27en-tête\RESSOURCES</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Fichiers d%27en-tête\RESSOURCES\SHADERS</Filter>
+    </ClInclude>
+    <ClInclude Include="WaterShader.h">
+      <Filter>Fichiers d%27en-tête\RESSOURCES\SHADERS</Filter>
+    </ClInclude>
+    <ClInclude Include="LightShader.h">
+      <Filter>Fichiers d%27en-tête\RESSOURCES\SHADERS</Filter>
+    </ClInclude>
+    <ClInclude Include="HeatShader.h">
+      <Filter>Fichiers d%27en-tête\RESSOURCES\SHADERS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

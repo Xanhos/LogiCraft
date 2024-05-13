@@ -42,7 +42,8 @@ Game::Game() : m_windowManager()
 }
 
 Game::Game(int width, int height, std::string title, bool fullscreen) : m_windowManager(width, height, title, fullscreen)
-{}
+{
+}
 
 Game::~Game()
 {
