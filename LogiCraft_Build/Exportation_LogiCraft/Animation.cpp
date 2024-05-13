@@ -85,7 +85,7 @@ namespace lc
 
 	Animation::Animation()
 		: m_base_total_frame_(0), m_base_frame_time_(0.f),
-		 m_animation_is_paused_(false), m_animation_is_reversed_(false)
+		 m_animation_is_paused_(false), m_animation_is_reversed_(false), m_stop_at_last_frame_(false)
 	{
 		m_name = "Animation";
 		m_typeName = "Animation";
@@ -111,7 +111,7 @@ namespace lc
 		{
 			if (const auto tmp_animation_key = m_actual_animation_key_.lock())
 			{
-				if ((!m_animation_is_paused_ and !m_stop_at_last_frame) or (!m_animation_is_paused_ and m_stop_at_last_frame and tmp_animation_key->get_actual_frame() != tmp_animation_key->get_total_frame() - 1))
+				if ((!m_animation_is_paused_ and !m_stop_at_last_frame_) or (!m_animation_is_paused_ and m_stop_at_last_frame_ and tmp_animation_key->get_actual_frame() != tmp_animation_key->get_total_frame() - 1))
 				{
 					tmp_animation_key->get_frame_timer() += Tools::getDeltaTime();
 					if (tmp_animation_key->get_frame_timer() >= tmp_animation_key->get_frame_time())
@@ -240,7 +240,7 @@ namespace lc
 
 	void Animation::set_stop_at_last_frame(const bool& stop_at_last_frame)
 	{
-		m_stop_at_last_frame = stop_at_last_frame;		
+		m_stop_at_last_frame_ = stop_at_last_frame;		
 	}
 
 	std::weak_ptr<AnimationKey> Animation::get_current_animation_key()

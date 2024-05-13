@@ -413,7 +413,7 @@ bt::ActionNode::DamageBox::DamageBox(const std::shared_ptr<lc::GameObject>& agen
 {
 }
 
-void bt::ActionNode::DamageBox::Setup(NodePtr node)
+void bt::ActionNode::DamageBox::setup(NodePtr node)
 {
 	auto agent = m_agent_.lock();
 	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
@@ -460,7 +460,7 @@ bt::ActionNode::CrazyHit::CrazyHit(const std::shared_ptr<lc::GameObject>& agent_
 {
 }
 
-void bt::ActionNode::CrazyHit::Setup(NodePtr node)
+void bt::ActionNode::CrazyHit::setup(NodePtr node)
 {
 	auto agent = m_agent_.lock();
 	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
@@ -507,7 +507,7 @@ bt::ActionNode::LanceHit::LanceHit(const std::shared_ptr<lc::GameObject>& agent_
 {
 }
 
-void bt::ActionNode::LanceHit::Setup(NodePtr node)
+void bt::ActionNode::LanceHit::setup(NodePtr node)
 {
 	auto agent = m_agent_.lock();
 	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
@@ -554,7 +554,7 @@ bt::ActionNode::PickHit::PickHit(const std::shared_ptr<lc::GameObject>& agent_, 
 {
 }
 
-void bt::ActionNode::PickHit::Setup(NodePtr node)
+void bt::ActionNode::PickHit::setup(NodePtr node)
 {
 	auto agent = m_agent_.lock();
 	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
@@ -601,7 +601,7 @@ bt::ActionNode::Hit::Hit(const std::shared_ptr<lc::GameObject>& agent_, const st
 {
 }
 
-void bt::ActionNode::Hit::Setup(NodePtr node)
+void bt::ActionNode::Hit::setup(NodePtr node)
 {
 	auto agent = m_agent_.lock();
 	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
@@ -648,7 +648,7 @@ bt::ActionNode::lanceSpawn::lanceSpawn(const std::shared_ptr<lc::GameObject>& ag
 {
 }
 
-void bt::ActionNode::lanceSpawn::Setup(NodePtr node)
+void bt::ActionNode::lanceSpawn::setup(NodePtr node)
 {
 	auto agent = m_agent_.lock();
 	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
@@ -695,7 +695,7 @@ bt::ActionNode::TestController::TestController(const std::shared_ptr<lc::GameObj
 {
 }
 
-void bt::ActionNode::TestController::Setup(NodePtr node)
+void bt::ActionNode::TestController::setup(NodePtr node)
 {
 	auto agent = m_agent_.lock();
 	if (agent->hasComponent("RigidBody"))
@@ -763,7 +763,7 @@ bool bt::ActionNode::Play_Animation::tick()
 	if(!m_animation_.expired())
 	{
 		auto anim = m_animation_.lock();
-		anim->select_animation_key(m_key_anim_name_,false);
+		anim->select_animation_key(m_key_anim_name_,true);
 		anim->set_stop_at_last_frame(m_stop_at_last_frame_);
 		anim->current_animation_is_reversed(m_reverse_);
 		return true;		
@@ -896,7 +896,7 @@ bool bt::ActionNode::In_Range_Of_Player::tick()
 
 	if(!m_player_.expired())
 	{
-		if(Tools::Vector::getDistance(m_player_.lock()->getTransform().getPosition(),m_owner_.lock()->getTransform().getPosition()))
+		if(Tools::Vector::getDistance(m_player_.lock()->getTransform().getPosition(),m_owner_.lock()->getTransform().getPosition()) < m_range_)
 			return true;
 	}
 
@@ -905,6 +905,7 @@ bool bt::ActionNode::In_Range_Of_Player::tick()
 
 void bt::ActionNode::In_Range_Of_Player::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
 {
+	m_owner_ = owner;
 	file >> m_range_;
 }
 
@@ -921,15 +922,64 @@ bool bt::ActionNode::Attack::tick()
 
 void bt::ActionNode::Attack::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
 {
-	std::string m_attack_name;
-	file >> m_attack_name;	
+	std::string attack_name;
+
+    file >> attack_name;
+
+    auto scene = owner->GetRoot();
+
+    if (attack_name == "damageBox")
+    {
+        m_attack_node_ = bt::Node::New(bt::ActionNode::DamageBox(owner, scene->getObject("player")));
+        std::cout << "damageBox loaded" << std::endl;
+    }
+    else if (attack_name == "lanceHit")
+    {
+        m_attack_node_ = bt::Node::New(bt::ActionNode::LanceHit(owner, scene->getObject("player")));
+        std::cout << "lanceHit loaded" << std::endl;
+    }
+    else if (attack_name == "CrazyHit")
+    {
+        m_attack_node_ = bt::Node::New(bt::ActionNode::CrazyHit(owner, scene->getObject("player")));
+        std::cout << "CrazyHit loaded" << std::endl;
+    }
+    else if (attack_name == "pickHit")
+    {
+        m_attack_node_ = bt::Node::New(bt::ActionNode::PickHit(owner, scene->getObject("player")));
+        std::cout << "pickHit loaded" << std::endl;
+    }
+    else if (attack_name == "protect")
+    {
+        std::cout << "protect loaded" << std::endl;
+    	m_attack_node_ = bt::Node::New(bt::ActionNode::NodeFunc([]{return true;}));
+    }
+    else if (attack_name == "hit")
+    {
+        m_attack_node_ = bt::Node::New(bt::ActionNode::Hit(owner, scene->getObject("player")));
+        std::cout << "hit loaded" << std::endl;
+    }
+    else if (attack_name == "lanceSpawn")
+    {
+        m_attack_node_ = bt::Node::New(bt::ActionNode::lanceSpawn(owner, scene->getObject("player")));
+        std::cout << "lanceSpawn loaded" << std::endl;
+    }
+    else if (attack_name == "controller")
+    {
+        m_attack_node_ = bt::Node::New(bt::ActionNode::TestController(owner));
+        std::cout << "lanceSpawn loaded" << std::endl;
+    }
+    else
+    {
+    	m_attack_node_ = bt::Node::New(bt::ActionNode::NodeFunc([]{return true;}));
+        std::cout << "no attack of this name exist" << std::endl;
+    }
 	
 	m_attack_node_->load(file,owner);
 }
 
 void bt::ActionNode::Attack::setup(std::shared_ptr<Node> node)
 {
-	m_attack_node_->setup(node);
+	m_attack_node_->setup(m_attack_node_);
 }
 
 bool bt::ActionNode::Shot::tick()
@@ -981,8 +1031,6 @@ bt::NodePtr bt::Factory(const node_type& type)
 		return Node::New(ActionNode::Wait());
 	case node_type::DO_ON_ANIM_FRAME:
 		return Node::New(Decorator::Do_On_Anim_Frame());
-	case node_type::ROTATE_TO:
-		break;
 	case node_type::ATTACK:
 		return Node::New(ActionNode::Attack());
 	case node_type::SHOT:

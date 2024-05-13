@@ -49,14 +49,14 @@ namespace bt
 	enum class node_type{
 		SEQUENCE,
 		SELECTOR,
-		INVERSER,
+		INVERSER = 2000,
 		CONDITION,
 		LOOP,
 		COOLDOWN,
 		DIRECTION,
 		DO_ON_ANIM_FRAME,
 		FORCE_SUCCESS,
-		WANDER,
+		WANDER = 5000,
 		MOVE_TO,
 		PLAY_ANIMATION,
 		PLAY_SOUND,
@@ -331,7 +331,7 @@ namespace bt
 		public:
 			DamageBox() : m_agent_(), m_target_(), m_bool_damage_(false) {}
 			DamageBox(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
-			void Setup(NodePtr node);
+			void setup(NodePtr node) override;
 			bool tick() override;
 		};
 
@@ -343,7 +343,7 @@ namespace bt
 		public:
 			CrazyHit() : m_agent_(), m_target_(), m_bool_damage_(false) {}
 			CrazyHit(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
-			void Setup(NodePtr node);
+			void setup(NodePtr node) override;
 			bool tick() override;
 		};
 
@@ -355,7 +355,7 @@ namespace bt
 		public:
 			LanceHit() : m_agent_(), m_target_(), m_bool_damage_(false) {}
 			LanceHit(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
-			void Setup(NodePtr node);
+			void setup(NodePtr node) override;
 			bool tick() override;
 		};
 
@@ -367,7 +367,7 @@ namespace bt
 		public:
 			PickHit() : m_agent_(), m_target_(), m_bool_damage_(false) {}
 			PickHit(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
-			void Setup(NodePtr node);
+			void setup(NodePtr node) override;
 			bool tick() override;
 		};
 
@@ -379,7 +379,7 @@ namespace bt
 		public:
 			Hit() : m_agent_(), m_target_(), m_bool_damage_(false) {}
 			Hit(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
-			void Setup(NodePtr node);
+			void setup(NodePtr node) override;
 			bool tick() override;
 		};
 
@@ -392,7 +392,7 @@ namespace bt
 		public:
 			lanceSpawn() : m_agent_(), m_target_(), m_bool_damage_(false) {}
 			lanceSpawn(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
-			void Setup(NodePtr node);
+			void setup(NodePtr node) override;
 			bool tick() override;
 		};
 
@@ -403,7 +403,7 @@ namespace bt
 		public:
 			TestController() : m_agent_(), m_bool_controller_(false) {}
 			TestController(const std::shared_ptr<lc::GameObject>& agent_);
-			void Setup(NodePtr node);
+			void setup(NodePtr node) override;
 			bool tick() override;
 		};
 

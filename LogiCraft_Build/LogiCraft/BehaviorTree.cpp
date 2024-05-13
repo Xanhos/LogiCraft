@@ -51,13 +51,16 @@ DecoratorCopyMethod PatronNode::s_DecoratorCopyMethod = {};
 
 void PatronNode::SetupAllNode()
 {
-	auto pushNode = [&](std::string name) { s_NodeContainer[name] = s_NodeContainer.size(); };
+	int previous_node = 0;
+	auto pushNode = [&](std::string name) { s_NodeContainer[name] = previous_node++; };
 	auto pushCondition = [&](std::string name) { s_ConditionContainer[name] = s_ConditionContainer.size(); };
 
 	//Here, we declare all the node possible in the behavior tree
 	pushNode("SEQUENCE");
 	pushNode("SELECTOR");
 	pushNode("INVERSER");
+	s_NodeContainer["INVERSER"] = 2000;
+	previous_node = 2001;
 	pushNode("CONDITION");
 	pushNode("LOOP");
 	pushNode("COOLDOWN");
@@ -65,6 +68,8 @@ void PatronNode::SetupAllNode()
 	pushNode("DO ON ANIM FRAME");
 	pushNode("FORCE SUCCESS");
 	pushNode("WANDER");
+	s_NodeContainer["WANDER"] = 5000;
+	previous_node = 5001;
 	pushNode("MOVE TO");
 	pushNode("PLAY ANIMATION");
 	pushNode("PLAY SOUND");
@@ -405,7 +410,7 @@ void PatronNode::SetupAllNode()
 
 	//PLAY_ANIMATION
 	{
-		typedef std::tuple<std::weak_ptr<lc::Animation>, std::string, std::string, bool, bool> bt_anim;
+		typedef std::tuple<std::weak_ptr<lc::Animation>, std::string, std::string, bool, bool, bool> bt_anim;
 		s_DecoratorInitMethod["PLAY ANIMATION"] = [](PatronNode* node) {
 			node->m_decoratorData = bt_anim();
 			};
@@ -476,6 +481,8 @@ void PatronNode::SetupAllNode()
 				{
 					ImGui::Checkbox("Stop at last frame", &std::get<3>(tuple));
 					ImGui::Checkbox("Revert animation", &std::get<4>(tuple));
+					ImGui::Checkbox("Reset animation", &std::get<5>(tuple));
+
 				}				
 			}
 			node->m_decoratorData = tuple;			
