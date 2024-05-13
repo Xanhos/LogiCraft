@@ -186,7 +186,7 @@ void main()
     // Basically performing a floating point modulo 1
     // 1.1 = 0.1, 2.4 = 0.4, 10.3 = 0.3 etc.
 
-    distortionMapCoordinate.t += u_time * u_rise_factor;
+    distortionMapCoordinate.t -= u_time * u_rise_factor;
 
     vec4 distortionMapValue = texture2D(u_distortion_map_texture, distortionMapCoordinate);
 
