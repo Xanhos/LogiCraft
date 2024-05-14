@@ -35,7 +35,7 @@ SOFTWARE.
 #include "AI.h"
 #include "GameObject.h"
 
-lc::AI::AI() : m_root(PatronNode::getNodeType("SEQUENCE"))
+lc::AI::AI() : m_root(PatronNode::GetNodeType("SEQUENCE"))
 {
     m_type = TYPE::IA;
     m_typeName = "IA";
@@ -141,20 +141,22 @@ void lc::AI::UpdateSelectedNode()
 {
     if (m_selectedNode)
     {
-        ImGui::Text("Node Type : %s", PatronNode::getNodeName(m_selectedNode->getType()).c_str());
+        ImGui::Text("Node Type : %s", PatronNode::GetNodeName(m_selectedNode->GetType()).c_str());
 
-        if (m_selectedNode->getType() < PatronNode::getDecoratorNodeStart() or (m_selectedNode->getType() >= PatronNode::getDecoratorNodeStart() and m_selectedNode->getType() < PatronNode::getActionNodeStart() and m_selectedNode->getChildrens().empty())) //if the node if not a leaf node or the decorator node is empty, we can add a node to it
+        if (m_selectedNode->GetType() < PatronNode::GetDecoratorNodeStart() or (m_selectedNode->GetType() >= PatronNode::GetDecoratorNodeStart() and m_selectedNode->GetType() < PatronNode::GetActionNodeStart() and m_selectedNode->GetChildren().empty())) //if the node if not a leaf node or the decorator node is empty, we can add a node to it
         {
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15.f);
 
-            if (ImGui::BeginCombo("Node Type", PatronNode::getNodeName(m_newNodeType).c_str())) //Make a combo with all the node type except the decorator
+            if (ImGui::BeginCombo("Node Type", PatronNode::GetNodeName(m_newNodeType).c_str())) //Make a combo with all the node type except the decorator
             {
                 bool isSelected = false;
 
-                for (int i = 0; i < PatronNode::getNodeContainer().size(); i++)
+                for (int i = 0; i < PatronNode::GetActionNodeEnd(); i++)
                 {
-                    if(i < PatronNode::getDecoratorNodeStart() || i >= PatronNode::getActionNodeStart())
-                        if (ImGui::Selectable(PatronNode::getNodeName(i).c_str(), &isSelected, ImGuiSelectableFlags_SelectOnClick))
+                    if(!PatronNode::DidNodeExist(PatronNode::GetNodeName(i)))
+                        continue;
+                    if(i < PatronNode::GetDecoratorNodeStart() || i >= PatronNode::GetActionNodeStart())
+                        if (ImGui::Selectable(PatronNode::GetNodeName(i).c_str(), &isSelected, ImGuiSelectableFlags_SelectOnClick))
                         {
                             m_newNodeType = i;
                         }
@@ -170,7 +172,7 @@ void lc::AI::UpdateSelectedNode()
             }
         }
 
-        if (m_selectedNode->getParent()) //If the node has a parent, we can remove it (so we can't remove the root node)
+        if (m_selectedNode->GetParent()) //If the node has a parent, we can remove it (so we can't remove the root node)
         {
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15.f);
             if (ImGui::Button("Delete Node"))
@@ -180,13 +182,13 @@ void lc::AI::UpdateSelectedNode()
 
 
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15.f);
-            m_newDecorateType = MakeCombo(PatronNode::getDecoratorNodeStart(), PatronNode::getActionNodeStart(), m_newDecorateType, "Decorator Type"); // Make a combo with all the decorator node type
+            m_newDecorateType = MakeCombo(PatronNode::GetDecoratorNodeStart(), PatronNode::GetDecoratorNodeEnd(), m_newDecorateType, "Decorator Type"); // Make a combo with all the decorator node type
 
             if (ImGui::Button("Add Decorator"))
             {
                 this->AddDecorateNode(m_newDecorateType);
             }
-            if (m_selectedNode->getType() >= PatronNode::getDecoratorNodeStart() && m_selectedNode->getType() < PatronNode::getActionNodeStart())
+            if (m_selectedNode->GetType() >= PatronNode::GetDecoratorNodeStart() && m_selectedNode->GetType() < PatronNode::GetActionNodeStart())
             {
                 ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15.f);
                 if (ImGui::Button("Remove Decorator"))
@@ -196,10 +198,10 @@ void lc::AI::UpdateSelectedNode()
             } 
 
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15.f);
-            auto t = PatronNode::getNodeUpdateMethod();
-            if (t[PatronNode::getNodeName(m_selectedNode->getType())])//Check if the node need an update method
+            auto t = PatronNode::GetNodeUpdateMethod();
+            if (t[PatronNode::GetNodeName(m_selectedNode->GetType())])//Check if the node need an update method
             {
-                t[PatronNode::getNodeName(m_selectedNode->getType())](m_selectedNode);//Update the node with the correct method if they need it
+                t[PatronNode::GetNodeName(m_selectedNode->GetType())](m_selectedNode);//Update the node with the correct method if they need it
 			}
 			
         }
@@ -210,39 +212,39 @@ void lc::AI::AddNode(int type)
 {
     if (m_selectedNode)
     {
-        m_selectedNode->setNewNodeIsAdded(true);
+        m_selectedNode->SetNewNodeIsAdded(true);
 		m_selectedNode->Add(PatronNode(type));
 	}
 }
 
 void lc::AI::RemoveNode()
 {
-    auto NewNode = m_selectedNode->getParent();
-    NewNode->removeChild(m_selectedNode);
+    auto NewNode = m_selectedNode->GetParent();
+    NewNode->RemoveChild(m_selectedNode);
     m_selectedNode = NewNode;
 }
 
 void lc::AI::AddDecorateNode(int type)
 {
     auto nodeDecorated = m_selectedNode;
-    auto parentNode = m_selectedNode->getParent();
+    auto parentNode = m_selectedNode->GetParent();
     m_selectedNode = parentNode->Add(type);
-    m_selectedNode->setNewNodeIsAdded(true);
+    m_selectedNode->SetNewNodeIsAdded(true);
     m_selectedNode->Add(*nodeDecorated);
-    parentNode->removeChild(nodeDecorated);
+    parentNode->RemoveChild(nodeDecorated);
 }
 
 void lc::AI::RemoveDecorateNode()
 {
-    if (m_selectedNode->getParent())
+    if (m_selectedNode->GetParent())
     {
-        auto NewNode = m_selectedNode->getParent();
-        auto children = m_selectedNode->getChildrens();
+        auto NewNode = m_selectedNode->GetParent();
+        auto children = m_selectedNode->GetChildren();
         for (auto& i : children)
         {
             NewNode->Add(i);
         }
-        NewNode->removeChild(m_selectedNode);
+        NewNode->RemoveChild(m_selectedNode);
         m_selectedNode = NewNode;
     }
 }
@@ -280,7 +282,7 @@ void lc::AI::CopyTreeNode(std::shared_ptr<lc::GameObject> _game_object)
             m_root = m_copiedNode.second->Clone();
             std::function<void(PatronNode*)> reparenting = [&](PatronNode* node)
             {
-            	for (auto& i : node->getChildrens())
+            	for (auto& i : node->GetChildren())
             	{
                     i->SetParent(node);
 					reparenting(i);
@@ -299,13 +301,13 @@ void lc::AI::CopyTreeNode(std::shared_ptr<lc::GameObject> _game_object)
 int lc::AI::MakeCombo(int start, int end, int DefaultValue, std::string name)
 {
     int type = DefaultValue;
-    if (ImGui::BeginCombo(name.c_str(), PatronNode::getNodeName(DefaultValue).c_str()))
+    if (ImGui::BeginCombo(name.c_str(), PatronNode::GetNodeName(DefaultValue).c_str()))
     {
         bool isSelected = false;
 
         for (int i = start; i < end; i++)
         {
-            if (ImGui::Selectable(PatronNode::getNodeName(i).c_str(), &isSelected, ImGuiSelectableFlags_SelectOnClick))
+            if (ImGui::Selectable(PatronNode::GetNodeName(i).c_str(), &isSelected, ImGuiSelectableFlags_SelectOnClick))
             {
                 type = i;
             }
