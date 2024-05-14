@@ -49,14 +49,14 @@ namespace bt
 	enum class node_type{
 		SEQUENCE,
 		SELECTOR,
-		INVERSER,
+		INVERSER = 2000,
 		CONDITION,
 		LOOP,
 		COOLDOWN,
 		DIRECTION,
 		DO_ON_ANIM_FRAME,
 		FORCE_SUCCESS,
-		WANDER,
+		WANDER = 5000,
 		MOVE_TO,
 		PLAY_ANIMATION,
 		PLAY_SOUND,
@@ -323,13 +323,97 @@ namespace bt
 			bool tick() override;
 		};
 
+		class DamageBox : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			std::weak_ptr<lc::GameObject> m_target_;
+			bool m_bool_damage_;
+		public:
+			DamageBox() : m_agent_(), m_target_(), m_bool_damage_(false) {}
+			DamageBox(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
+
+		class CrazyHit : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			std::weak_ptr<lc::GameObject> m_target_;
+			bool m_bool_damage_;
+		public:
+			CrazyHit() : m_agent_(), m_target_(), m_bool_damage_(false) {}
+			CrazyHit(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
+
+		class LanceHit : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			std::weak_ptr<lc::GameObject> m_target_;
+			bool m_bool_damage_;
+		public:
+			LanceHit() : m_agent_(), m_target_(), m_bool_damage_(false) {}
+			LanceHit(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
+
+		class PickHit : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			std::weak_ptr<lc::GameObject> m_target_;
+			bool m_bool_damage_;
+		public:
+			PickHit() : m_agent_(), m_target_(), m_bool_damage_(false) {}
+			PickHit(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
+
+		class Hit : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			std::weak_ptr<lc::GameObject> m_target_;
+			bool m_bool_damage_;
+		public:
+			Hit() : m_agent_(), m_target_(), m_bool_damage_(false) {}
+			Hit(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
+
+
+		class lanceSpawn : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			std::weak_ptr<lc::GameObject> m_target_;
+			bool m_bool_damage_;
+		public:
+			lanceSpawn() : m_agent_(), m_target_(), m_bool_damage_(false) {}
+			lanceSpawn(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
+
+		class TestController : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			bool m_bool_controller_;
+		public:
+			TestController() : m_agent_(), m_bool_controller_(false) {}
+			TestController(const std::shared_ptr<lc::GameObject>& agent_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
+
 		class Wander : public Node
 		{
 			std::weak_ptr<lc::GameObject> m_agent_;
 			bool m_bool_wander_;
 			bool m_bool_direction_; //false mean left, true mean right;
 			float m_speed_;
-			public:
+		public:
 			Wander() : m_agent_(), m_bool_wander_(false), m_bool_direction_(false), m_speed_(0.f) {}
 			Wander(const std::shared_ptr<lc::GameObject>& agent_);
 			void setup(NodePtr node) override;

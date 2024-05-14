@@ -114,7 +114,7 @@ namespace lc
 
 		bool m_animation_is_paused_;
 		bool m_animation_is_reversed_;
-		bool m_stop_at_last_frame;
+		bool m_stop_at_last_frame_;
 		
 
 		std::weak_ptr<lc::Texture> m_texture_;
