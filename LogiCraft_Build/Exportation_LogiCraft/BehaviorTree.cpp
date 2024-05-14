@@ -549,7 +549,7 @@ bool bt::ActionNode::In_Range_Of_Player::tick()
 {
 	if(m_player_.expired() and !m_owner_.expired())
 	{
-		auto scene = m_owner_.lock()->GetRoot();
+		auto scene = lc::GameObject::GetRoot(m_owner_.lock());
 		if(scene->hasObject("PLAYER"))
 			m_player_ = scene->getObject("PLAYER");
 	}

@@ -47,14 +47,11 @@ namespace lc
 	public:
 		enum class TYPE { NONE = -1, TEXTURE, IA, BUTTON, FONT, MUSIC, SOUND, ANIMATION, RIGIDBODY, EVENT, PARTICULES, CONVEX, SHADER };
 	protected:
-		sf::RectangleShape m_renderer;//Renderer of the ressource
 		bool m_displayThumbnail;
 		sf::Vector2f m_thumbnailSize;
 		sf::Vector2f m_relativePosition;//Relative position to the parent
 		sf::Color m_filterColor;//Color of the filter in the content browser
 	public:
-		TYPE m_type;
-
 		Ressource();
 		virtual ~Ressource();
 
@@ -80,6 +77,9 @@ namespace lc
 		void setPosition(const sf::Vector2f& position) { m_renderer.setPosition(position); }
 		void setSize(const sf::Vector2f& size) { m_thumbnailSize = size; }
 		sf::Vector2f getMaximumSize() { return  m_relativePosition + sf::Vector2f{m_renderer.getSize().x * m_renderer.getScale().x, m_renderer.getSize().y * m_renderer.getScale().y}; }
+
+		TYPE m_type;
+		sf::RectangleShape m_renderer;//Renderer of the ressource
 	};
 }
 

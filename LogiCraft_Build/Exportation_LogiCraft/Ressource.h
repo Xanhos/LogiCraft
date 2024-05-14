@@ -46,12 +46,12 @@ namespace lc
 	{
 	public:
 		enum class TYPE { NONE = -1, TEXTURE, IA, BUTTON, FONT, MUSIC, SOUND, ANIMATION, RIGIDBODY, EVENT, PARTICULES };
-		protected:
+	protected:
 		sf::RectangleShape m_renderer;//Renderer of the ressource
 		sf::Vector2f m_relativePosition;//Relative position to the parent
+		TYPE m_type;
 
 	public:
-		TYPE m_type;
 		Ressource();
 		virtual ~Ressource();
 
@@ -67,8 +67,8 @@ namespace lc
 		sf::Vector2f getRelativePosition() const { return m_relativePosition; }
 		
 		void setRelativePosition(const sf::Vector2f& position) { m_relativePosition = position; }
-		void setPosition(sf::Vector2f position) { m_renderer.setPosition(position); }
-		sf::Vector2f getMaximumSize() { return  m_relativePosition + sf::Vector2f{m_renderer.getSize().x * m_renderer.getScale().x, m_renderer.getSize().y * m_renderer.getScale().y}; }
+		void setPosition(const sf::Vector2f& position) { m_renderer.setPosition(position); }
+		sf::Vector2f getMaximumSize() const { return  m_relativePosition + sf::Vector2f{m_renderer.getSize().x * m_renderer.getScale().x, m_renderer.getSize().y * m_renderer.getScale().y}; }
 
 	};
 }

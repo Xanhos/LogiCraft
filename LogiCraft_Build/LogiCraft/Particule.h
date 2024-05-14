@@ -159,36 +159,12 @@ namespace lc
 		bool particles_his_rendered() const;
 
 		/*
-		* @brief Function to update all the particles, so it took less performance.
-		*/
-		void thread_update();
-
-		/*
-		* @brief Function to restart the clock of the thread.
-		*/
-		static void restart_thread_clock();
-
-		/*
-		* @brief Function to return delta time of the thread.
-		* 
-		* @return Return the delta time.
-		*/
-		static float get_thread_delta_time();
-
-		/*
 		* @brief Take the _centerPosition and Rotate it from the angle.
 		* 
 		* @return Return the Vector2f that as been modified. 
 		*/
 		sf::Vector2f get_extend_spawn_point(const sf::Vector2f& center_position) const;
 	private:
-		static std::list<std::shared_ptr<Particle>> s_thread_particles_;
-		static bool s_thread_update_is_on_;
-		static int s_number_of_particle_system_;
-		static std::thread s_update_thread_;
-		static sf::Clock s_update_clock_;
-		static sf::Time s_update_time_;
-
 		Tools::Renderer m_renderer_;
 
 		ParticlesSystemType m_particles_type_;

@@ -121,21 +121,27 @@ namespace lc
 		* @brief Its use when you call AddComponent from the class GameObject.
 		* @see GameObject()
 		*/
-		inline void setParent(const std::shared_ptr<lc::GameObject> _parent) { m_wptrParent = _parent; }
+		void setParent(const std::shared_ptr<lc::GameObject> _parent) { m_wptrParent = _parent; }
 
 		/*
 		* @brief This function just return the shared_ptr of the parent.
 		*/
-		inline std::shared_ptr<lc::GameObject> getParent() { return m_wptrParent.lock(); }
+		std::shared_ptr<lc::GameObject> getParent() { return m_wptrParent.lock(); }
 
 		std::string& getName() { return m_name; }
 		std::string& getTypeName() { return m_typeName; }
 
-		unsigned int& getID() { return m_ID; }
+		void setID(const unsigned int& ID) { m_ID = ID; }
+		unsigned int getID() const { return m_ID; }
 		
-		bool& needToBeDeleted() { return m_needToBeDeleted; }
-		bool& isVisible() { return m_isVisible; }
-		bool& isUpdated() { return m_isVisible; }
+		void hasToBeDeleted(const bool& needToBeDeleted) { m_needToBeDeleted = needToBeDeleted; }
+		bool needToBeDeleted() const { return m_needToBeDeleted; }
+
+		void isVisible(const bool& isVisible) { m_isVisible = isVisible; }
+		bool isVisible() const { return m_isVisible; }
+
+		void isUpdated(const bool& isUpdated) { m_isUpdated = isUpdated; }
+		bool isUpdated() const { return m_isUpdated; }
 
 		static unsigned int& getGeneralID() { return m_generalID; }
 

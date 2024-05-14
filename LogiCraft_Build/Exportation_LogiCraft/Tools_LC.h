@@ -100,6 +100,8 @@ std::ostream& operator<<(std::ostream& os, const sf::Rect<T>& rect)
 	return os << rect.left << " " << rect.top << " " << rect.width << " " << rect.height;
 }
 
+std::ostream& operator<<(std::ostream& os, const sf::Color& color);
+
 template<typename T>
 std::istream& operator>>(std::istream& is, sf::Vector2<T>& vec)
 {
@@ -112,17 +114,4 @@ std::istream& operator>>(std::istream& is, sf::Rect<T>& rect)
 	return is >> rect.left >> rect.top >> rect.width >> rect.height;
 }
 
-std::ostream& operator<<(std::ostream& os, const sf::Color& color)
-{
-	return os << static_cast<int>(color.r) << " " << static_cast<int>(color.g) << " "
-			  << static_cast<int>(color.b) << " " << static_cast<int>(color.a);
-}
-
-std::istream& operator>>(std::istream& is, sf::Color& color)
-{
-	int tmp_tab[4]{ 0, 0, 0, 0 };
-	is >> tmp_tab[0] >> tmp_tab[1] >> tmp_tab[2] >> tmp_tab[3];
-	color = sf::Color(static_cast<sf::Uint8>(tmp_tab[0]), static_cast<sf::Uint8>(tmp_tab[1]),
-		static_cast<sf::Uint8>(tmp_tab[2]), static_cast<sf::Uint8>(tmp_tab[3]));
-	return is;
-}
+std::istream& operator>>(std::istream& is, sf::Color& color);

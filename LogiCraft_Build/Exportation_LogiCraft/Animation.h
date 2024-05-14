@@ -61,7 +61,8 @@ namespace lc
 		void create_frames_rect();
 
 		void update_animation_key(const std::shared_ptr<lc::Texture>& texture, 
-			const bool& animation_is_paused, const bool& animation_is_reversed);
+			const bool& animation_is_paused, const bool& animation_is_reversed,
+			const bool& stop_at_last_frame);
 	private:
 		std::string m_name_;
 
@@ -96,7 +97,10 @@ namespace lc
 
 		virtual sf::RectangleShape& getShape() override;
 
-		void select_animation_key(const std::string& name, const int& start_frame = 0u, const float start_frame_timer = 0.f, const bool reset_last_anim_key = false);
+		void select_animation_key(
+			const std::string& name, const int& start_frame = 0u, const float start_frame_timer = 0.f,
+			const bool reset_last_anim_key = false
+		);
 		
 		void select_animation_key(const std::string& name, const bool reset_last_anim_key = false);
 

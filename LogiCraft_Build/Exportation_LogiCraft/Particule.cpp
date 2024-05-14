@@ -38,18 +38,6 @@ SOFTWARE.
 
 namespace lc
 {
-	std::list<std::shared_ptr<Particle>> Particles::s_thread_particles_;
-
-	bool Particles::s_thread_update_is_on_ = true;
-
-	int Particles::s_number_of_particle_system_ = 0;
-
-	std::thread Particles::s_update_thread_;
-
-	sf::Clock Particles::s_update_clock_;
-
-	sf::Time Particles::s_update_time_;
-
 	Particle::Particle()
 		: m_despawn_cooldown_(0.f), m_despawn_time_(0.f), m_gravity_force_(0.f), m_rotation_speed_(0.f), 
 		m_has_gravity_(false), m_need_to_be_deleted_(false)
@@ -74,7 +62,7 @@ namespace lc
 		m_transform_.getPosition() = spawn_position_in_viewport;
 		m_transform_.getOrigin() = spawn_origin;
 
-		m_velocity_ = sf::Vector2f(std::cos(spawn_angle * (3.14159265358f / 180)) * speed, std::sin(spawn_angle * (3.14159265358f / 180)) * speed);
+		m_velocity_ = sf::Vector2f(std::cosf(spawn_angle * (3.14159265358f / 180.f)) * speed, std::sinf(spawn_angle * (3.14159265358f / 180.f)) * speed);
 	}
 
 	Particle::~Particle()
@@ -159,10 +147,6 @@ namespace lc
 
 		m_base_shape_ = sf::CircleShape(m_base_shape_radius_, m_base_shape_point_count_);
 		m_particles_origin_ = sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_);
-
-		s_number_of_particle_system_++;
-		if (s_number_of_particle_system_ == 1)
-			Particles::s_update_thread_ = std::thread(&Particles::thread_update, this);
 	}
 
 	Particles::Particles(const ParticlesSystemType type)
@@ -202,25 +186,12 @@ namespace lc
 
 		m_base_shape_ = sf::CircleShape(m_base_shape_radius_, m_base_shape_point_count_);
 		m_particles_origin_ = sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_);
-
-		s_number_of_particle_system_++;
-		if (s_number_of_particle_system_ == 1)
-			Particles::s_update_thread_ = std::thread(&Particles::thread_update, this);
 	}
 
 	Particles::~Particles()
 	{
-		//Join the thread if no more particles system is used.
-		s_number_of_particle_system_--;
-		if (s_number_of_particle_system_ == 0)
-		{
-			Particles::s_thread_update_is_on_ = false;
-			Particles::s_update_thread_.join();
-			Particles::s_thread_particles_.clear();
-		}
-
 		if (!m_particles_ressource_.expired())
-			m_particles_ressource_.lock()->isVisible() = true;
+			m_particles_ressource_.lock()->isVisible(true);
 
 		m_particles_.clear();
 	}
@@ -254,7 +225,6 @@ namespace lc
 			tmp_clone->m_ressource_to_search_ = std::make_pair(true, tmp_clone->m_particles_ressource_.lock()->getName());
 		tmp_clone->m_particles_ressource_.reset();
 		tmp_clone->m_particles_.clear();
-		Particles::s_number_of_particle_system_++;
 		return tmp_clone;
 	}
 
@@ -263,17 +233,11 @@ namespace lc
 	{
 		int tmp_ParticlesSystemType(0);
 		std::string tmp_textureName;
-		int tmp_color[4]{ 0, 0, 0, 0 };
 
 		load >> tmp_ParticlesSystemType
-			 >> tmp_color[0]
-			 >> tmp_color[1]
-			 >> tmp_color[2]
-			 >> tmp_color[3]
-			 >> m_texture_size_.x
-			 >> m_texture_size_.y
-			 >> m_particles_origin_.x
-			 >> m_particles_origin_.y
+			 >> m_spawn_color_
+			 >> m_texture_size_
+			 >> m_particles_origin_
 			 >> m_spawn_point_extend_size_
 			 >> m_spawn_cooldown_
 			 >> m_despawn_cooldown_
@@ -294,8 +258,6 @@ namespace lc
 			m_ressource_to_search_ = std::make_pair(true, tmp_textureName);
 		
 		m_particles_type_ = static_cast<ParticlesSystemType>(tmp_ParticlesSystemType);
-		m_spawn_color_ = sf::Color(static_cast<sf::Uint8>(tmp_color[0]), static_cast<sf::Uint8>(tmp_color[1]),
-			static_cast<sf::Uint8>(tmp_color[2]), static_cast<sf::Uint8>(tmp_color[3]));
 	}
 
 	void Particles::load_particles_file(std::string path)
@@ -328,7 +290,7 @@ namespace lc
 				auto tmp_animation = getParent()->addComponent<lc::Animation>();
 				m_particles_ressource_ = tmp_animation;
 				tmp_animation->load_animation_file(path);
-				tmp_animation->isVisible() = false;
+				tmp_animation->isVisible(false);
 				if (getParent()->hasComponent(tmp_animation_texture_name))
 				{
 					tmp_animation->get_texture() = getParent()->getComponent<lc::Texture>(tmp_animation_texture_name);
@@ -359,7 +321,7 @@ namespace lc
 					if (m_ressource_to_search_.second == fs::path(tmp_ressource->getName()).filename().stem().string())
 					{
 						m_particles_ressource_ = tmp_ressource;
-						tmp_ressource->isVisible() = false;
+						tmp_ressource->isVisible(false);
 						break;
 					}
 				}
@@ -422,7 +384,6 @@ namespace lc
 					tmp_spawn_position, m_particles_origin_);
 
 				m_particles_.push_back(tmp_particle);
-				Particles::s_thread_particles_.push_back(tmp_particle);
 			}
 
 			m_spawn_timer_ = 0.f;
@@ -447,7 +408,7 @@ namespace lc
 		{
 			this->particle_draw(*particle, window);
 
-			if ((*particle)->need_to_be_deleted())
+			if ((*particle)->get_despawn_time() > (*particle)->get_despawn_cooldown())
 				particle = m_particles_.erase(particle);
 			else
 				++particle;
@@ -457,7 +418,15 @@ namespace lc
 	void Particles::particle_draw(const std::shared_ptr<Particle>& particle, WindowManager& window)
 	{
 		const auto tmp_ressource = m_particles_ressource_.lock();
-		
+
+		if (particle->has_gravity())
+			particle->get_velocity().y += particle->get_gravity_force() * Tools::getDeltaTime();
+
+		particle->get_transform().getPosition() += particle->get_velocity() * Tools::getDeltaTime();
+		particle->get_transform().getRotation() += particle->get_rotation_speed() * Tools::getDeltaTime();
+
+		particle->get_despawn_time() += Tools::getDeltaTime();
+
 		tmp_ressource ? tmp_ressource->getShape().setFillColor(m_spawn_color_) : m_base_shape_.setFillColor(m_spawn_color_);
 		tmp_ressource ? tmp_ressource->getShape().setOrigin(particle->get_transform().getOrigin()) : m_base_shape_.setOrigin(particle->get_transform().getOrigin());
 		
@@ -495,41 +464,5 @@ namespace lc
 		}
 
 		return {};
-	}
-
-	void Particles::thread_update()
-	{
-		while (s_number_of_particle_system_)
-		{
-			Particles::restart_thread_clock();
-
-			for (auto particle = Particles::s_thread_particles_.begin(); particle != Particles::s_thread_particles_.end();)
-			{
-				if ((*particle)->has_gravity())
-					(*particle)->get_velocity().y += (*particle)->get_gravity_force() * Particles::get_thread_delta_time();
-
-				(*particle)->get_transform().getPosition() += (*particle)->get_velocity() * Particles::get_thread_delta_time();
-				(*particle)->get_transform().getRotation() += (*particle)->get_rotation_speed() * Particles::get_thread_delta_time();
-
-				(*particle)->get_despawn_time() += Particles::get_thread_delta_time();
-				if ((*particle)->get_despawn_time() > (*particle)->get_despawn_cooldown() || (*particle)->need_to_be_deleted())
-				{
-					(*particle)->need_to_be_deleted() = true;
-					particle = Particles::s_thread_particles_.erase(particle);
-				}
-				else
-					++particle;
-			}
-		}
-	}
-
-	void Particles::restart_thread_clock()
-	{
-		Particles::s_update_time_ = Particles::s_update_clock_.restart();
-	}
-
-	float Particles::get_thread_delta_time()
-	{
-		return Particles::s_update_time_.asSeconds();
 	}
 }

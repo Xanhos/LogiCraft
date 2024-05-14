@@ -82,9 +82,11 @@ namespace lc
 	}
 
 	void AnimationKey::update_animation_key(const std::shared_ptr<lc::Texture>& texture, 
-		const bool& animation_is_paused, const bool& animation_is_reversed)
+	const bool& animation_is_paused, const bool& animation_is_reversed,
+	const bool& stop_at_last_frame)
 	{
-		if (!animation_is_paused)
+		if ((!animation_is_paused && !stop_at_last_frame) || (!animation_is_paused && stop_at_last_frame
+			&& m_actual_frame_ != m_total_frame_ - 1))
 		{
 			m_frame_timer_ += Tools::getDeltaTime();
 			if (m_frame_timer_ >= m_frame_time_)
@@ -127,6 +129,7 @@ namespace lc
 		m_type = TYPE::ANIMATION;
 
 		m_texture_ = used_texture;
+		used_texture->isVisible(false);
 
 		m_texture_to_search_ = std::make_pair(false, "");
 	}
@@ -134,7 +137,7 @@ namespace lc
 	Animation::~Animation()
 	{
 		if (!m_texture_.expired())
-			m_texture_.lock()->isVisible() = true;
+			m_texture_.lock()->isVisible(true);
 	}
 
 	void Animation::UpdateEvent(sf::Event& event)
@@ -147,7 +150,7 @@ namespace lc
 
 		if (const auto tmp_texture = m_texture_.lock())
 			if (const auto tmp_animation_key = m_actual_animation_key_.lock())
-				tmp_animation_key->update_animation_key(tmp_texture, m_animation_is_paused_, m_animation_is_reversed_);
+				tmp_animation_key->update_animation_key(tmp_texture, m_animation_is_paused_, m_animation_is_reversed_, m_stop_at_last_frame_);
 	}
 
 	void Animation::Draw(WindowManager& window)
@@ -267,11 +270,6 @@ namespace lc
 		m_animation_is_reversed_ = reversed;
 	}
 
-	void Animation::set_stop_at_last_frame(const bool& stop_at_last_frame)
-	{
-		m_stop_at_last_frame_ = stop_at_last_frame;		
-	}
-
 	void Animation::load_animation_file(const std::string& path)
 	{
 		std::ifstream file(path);
@@ -295,6 +293,11 @@ namespace lc
 				m_animation_keys_.emplace(tmp_key_anim.get_name(), std::make_shared<AnimationKey>(tmp_key_anim));
 			}
 		}
+	}
+
+	void Animation::set_stop_at_last_frame(const bool& stop_at_last_frame)
+	{
+		m_stop_at_last_frame_ = stop_at_last_frame;		
 	}
 
 	void Animation::add_animation_key(
@@ -321,7 +324,7 @@ namespace lc
 					if (m_texture_to_search_.second + ".png" == tmp_texture->getName())
 					{
 						m_texture_ = tmp_texture;
-						tmp_texture->isVisible() = false;
+						tmp_texture->isVisible(false);
 						break;
 					}
 				}
