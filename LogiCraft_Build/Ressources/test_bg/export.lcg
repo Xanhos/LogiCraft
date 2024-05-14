@@ -222,11 +222,10 @@ hiding 0 828 232 168 0 6 0.082 6
 0 1
 1 2
 2001 1 0 263
-5002 0 Animation walking 1 0
+5002 0 Animation hiding 1 0
 0 2
-2005 1 walking Animation 0
-5002 0 Animation walking 0 0
 5000 0
+5002 0 Animation walking 0 0
 
 }
 Objects
