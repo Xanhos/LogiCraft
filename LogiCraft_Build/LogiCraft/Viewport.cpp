@@ -234,7 +234,7 @@ void Viewports::clearViewport()
 void Viewports::clearScreenZone()
 {
 	m_screenZones.clear();
-	m_screenZoneUnused = 16;
+	m_screenZoneUnused = SCREEN_LIMIT;
 	ScreenZone tmp_SZ(sf::Vector2i(0, 0));
 	this->setScreenZoneToUse(tmp_SZ);
 	m_screenZones.push_back(tmp_SZ);
