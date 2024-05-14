@@ -113,14 +113,14 @@ namespace lc
 		{
 			if (const auto tmp_animation_key = m_actual_animation_key_.lock())
 			{
-				if ((!m_animation_is_paused_ and !m_stop_at_last_frame_) or (!m_animation_is_paused_ and m_stop_at_last_frame_ and tmp_animation_key->get_actual_frame() != tmp_animation_key->get_total_frame() - 1))
+				if ((!m_animation_is_paused_ and !m_stop_at_last_frame_ and !m_animation_is_reversed_) or (!m_animation_is_paused_ and m_stop_at_last_frame_ and !m_animation_is_reversed_ and tmp_animation_key->get_actual_frame() != tmp_animation_key->get_total_frame() - 1) or (!m_animation_is_paused_ and m_stop_at_last_frame_ and m_animation_is_reversed_ and tmp_animation_key->get_actual_frame() > 0))
 				{
 					tmp_animation_key->get_frame_timer() += Tools::getDeltaTime();
 					if (tmp_animation_key->get_frame_timer() >= tmp_animation_key->get_frame_time())
 					{
 						m_animation_is_reversed_ ? tmp_animation_key->get_actual_frame()-- : tmp_animation_key->get_actual_frame()++;
 
-						if (tmp_animation_key->get_actual_frame() <= 0 && m_animation_is_reversed_)
+						if (tmp_animation_key->get_actual_frame() <= 0 && m_animation_is_reversed_ && !m_stop_at_last_frame_)
 							tmp_animation_key->get_actual_frame() = tmp_animation_key->get_total_frame() - 1;
 						else if (tmp_animation_key->get_actual_frame() > tmp_animation_key->get_total_frame() - 1 && !m_animation_is_reversed_)
 							tmp_animation_key->get_actual_frame() = 0;
