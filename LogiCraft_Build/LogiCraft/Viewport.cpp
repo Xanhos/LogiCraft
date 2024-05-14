@@ -74,9 +74,9 @@ ScreenZone::ScreenZone()
 ScreenZone::ScreenZone(sf::Vector2i _screenIndex)
 	: m_isUsed(false), m_screenIndex(_screenIndex)
 {
-	m_screenShape.setSize(screenSize);
+	m_screenShape.setSize(SCREEN_SIZE);
 	m_screenShape.setTexture(&GET_MANAGER->getTexture("Unused_Screen_Zone"), true);
-	m_screenShape.setPosition(sf::Vector2f(screenSize.x * _screenIndex.x, screenSize.y * _screenIndex.y));
+	m_screenShape.setPosition(sf::Vector2f(SCREEN_SIZE.x * _screenIndex.x, SCREEN_SIZE.y * _screenIndex.y));
 }
 
 ScreenZone::~ScreenZone()
@@ -97,7 +97,7 @@ void ScreenZone::setScreenToUnused()
 
 Viewports::Viewports()
 	: m_optionIsOpen(false), m_isMovementsLocked(false), m_isViewportsLocked(false), m_isZoomsLocked(false), m_hasGrabbedAnObject(false), m_wantToPlaceAnObject(false), 
-	m_screenZoneUnused(screenLimit), m_actualSelectedObjectNumber(0u), m_selectedTimer(0.f), m_selection_rect_()
+	m_screenZoneUnused(SCREEN_LIMIT), m_actualSelectedObjectNumber(0u), m_selectedTimer(0.f), m_selection_rect_()
 {
 	ScreenZone tmp_SZ(sf::Vector2i(0, 0));
 	this->setScreenZoneToUse(tmp_SZ);
@@ -234,7 +234,7 @@ void Viewports::clearViewport()
 void Viewports::clearScreenZone()
 {
 	m_screenZones.clear();
-	m_screenZoneUnused = 16;
+	m_screenZoneUnused = SCREEN_LIMIT;
 	ScreenZone tmp_SZ(sf::Vector2i(0, 0));
 	this->setScreenZoneToUse(tmp_SZ);
 	m_screenZones.push_back(tmp_SZ);

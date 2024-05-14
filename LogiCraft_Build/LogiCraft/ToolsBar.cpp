@@ -279,16 +279,20 @@ void ToolsBar::Export(std::shared_ptr<lc::GameObject> _game_object, Viewports& _
 			thread_list.push_back(std::thread([&]
 			{
 				sf::RenderTexture render_texture_thread;				
-				render_texture_thread.create(screenSize.x, screenSize.y);
-				render_texture_thread.setView(sf::View(sf::Vector2f(screenSize.x / 2.f + (screenSize.x * screen.getScreenIndex().x), screenSize.y / 2.f + (screenSize.y * screen.getScreenIndex().y)), sf::Vector2f(screenSize.x, screenSize.y)));
-				for (int depth = 0; depth <= s_layers.size(); depth++)
+				render_texture_thread.create(static_cast<unsigned int>(SCREEN_SIZE.x), static_cast<unsigned int>(SCREEN_SIZE.y));
+				render_texture_thread.setView(sf::View(sf::Vector2f(SCREEN_SIZE.x / 2.f + (SCREEN_SIZE.x * screen.getScreenIndex().x), SCREEN_SIZE.y / 2.f + (SCREEN_SIZE.y * screen.getScreenIndex().y)), sf::Vector2f(SCREEN_SIZE.x, SCREEN_SIZE.y)));
+				for (int depth = 0; depth <= static_cast<int>(s_layers.size()); depth++)
 				{
 					render_texture_thread.clear(sf::Color::Transparent);
-					_game_object->SaveRenderer(render_texture_thread, depth);
-					sf::Image image;
-					image = render_texture_thread.getTexture().copyToImage();
-					image.flipVertically();
-					image.saveToFile("../Ressources/" + std::string(m_path) + "/" + std::string(std::to_string(screen.getScreenIndex().x) + "_" + std::to_string(screen.getScreenIndex().y)) + "_" + std::string(m_path) + "_layer_" + std::to_string(depth) + ".png");
+					bool need_to_export_png = false;
+					_game_object->SaveRenderer(render_texture_thread, depth,need_to_export_png, sf::FloatRect({SCREEN_SIZE.x * screen.getScreenIndex().x,SCREEN_SIZE.y * screen.getScreenIndex().y},SCREEN_SIZE));
+					if(need_to_export_png)
+					{
+						sf::Image image;
+					   image = render_texture_thread.getTexture().copyToImage();
+					   image.flipVertically();
+					   image.saveToFile("../Ressources/" + std::string(m_path) + "/" + std::string(std::to_string(screen.getScreenIndex().x) + "_" + std::to_string(screen.getScreenIndex().y)) + "_" + std::string(m_path) + "_layer_" + std::to_string(depth) + ".png");
+					}
 				}
 			}));
 		}
