@@ -60,16 +60,12 @@ void lc::AI::Load(std::ifstream& load)
         node->getParent() = parent;
         node->load(load,getParent());
         node->setup(node);        
-        if (type_cast == bt::node_type::ATTACK)
+        /*if (type_cast == bt::node_type::ATTACK)
         {
-            std::string garbage;
-            load >> garbage;
-        }
-        else if (type_cast == bt::node_type::SHOT)
-        {
-            std::string garbage;
-            load >> garbage;
-        }
+            
+
+
+        }*/
         if(child_size)
         {
             if(auto decorator_node = std::dynamic_pointer_cast<bt::Decorator::Decorator>(node))

@@ -60,7 +60,11 @@ void bt::ActionNode::MoveTo::setup(std::shared_ptr<Node> node)
 				auto node_cast = std::dynamic_pointer_cast<MoveTo>(node);
 				if (node_cast->m_bool_go_to_)
 				{
-					rigid_body->getVelocity().x = Tools::Vector::normalize(node_cast->m_target_.lock()->getTransform().getPosition() - node_cast->m_agent_.lock()->getTransform().getPosition()).x * node_cast->m_speed_;
+					if (!node_cast->m_target_.expired())
+					{
+						rigid_body->getVelocity().x = Tools::Vector::normalize((node_cast->m_target_.lock()->getTransform().getPosition() + node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize()/2.f)
+							- (node_cast->m_agent_.lock()->getTransform().getPosition() + rigid_body->getCollider().getSize()/2.f)).x * node_cast->m_speed_;
+					}
 					node_cast->m_bool_go_to_ = false;
 				}
 				else rigid_body->getVelocity().x = 0.f;
@@ -184,6 +188,15 @@ void bt::ActionNode::Wander::setup(NodePtr node)
 				if (!is_on_a_platform or has_hit_a_wall)
 				{
 					node_cast->m_bool_direction_ = !node_cast->m_bool_direction_;
+					/*rigid_body->getParent()->getTransform().getScale().x = -rigid_body->getParent()->getTransform().getScale().x;
+					if (!node_cast->m_bool_direction_)
+					{
+						rigid_body->getParent()->getTransform().getOrigin() = sf::Vector2f();
+					}
+					else
+					{
+						rigid_body->getParent()->getTransform().getOrigin() = sf::Vector2f(rigid_body->getParent()->getTransform().getSize().x, 0);
+					}*/
 				}
 			}
 			else rigid_body->getVelocity().x = 0.f;
@@ -395,6 +408,333 @@ bool bt::ActionNode::Jump::tick()
 	return m_need_to_jump_;
 }
 
+
+bt::ActionNode::DamageBox::DamageBox(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_) : m_agent_(agent_), m_target_(target_), m_bool_damage_(false)
+{
+}
+
+void bt::ActionNode::DamageBox::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
+	{
+		auto rba = agent->getComponent<lc::RigidBody>("RigidBody");
+		auto rbt = agent->getComponent<lc::RigidBody>("RigidBody");
+
+		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+				
+				
+				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::DamageBox>(node);
+
+
+				if (node_cast->m_target_.lock() != nullptr)
+				{
+					auto rbt = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody");
+					if (node_cast->m_bool_damage_)
+					{
+						if (Tools::Collisions::rect_rect(sf::FloatRect(rigid_body->getCollider().getPosition().x - rigid_body->getVelocity().x * Tools::getDeltaTime(), rigid_body->getCollider().getPosition().y - rigid_body->getVelocity().y * Tools::getDeltaTime(), rigid_body->getCollider().getSize().x + rigid_body->getVelocity().x * Tools::getDeltaTime(), rigid_body->getCollider().getSize().y + rigid_body->getVelocity().y * Tools::getDeltaTime()), rbt->getCollider()))
+						{
+							std::cout << "col damage" << std::endl;
+							node_cast->m_target_.lock()->needToBeRemoved(true);
+						}
+						node_cast->m_bool_damage_ = false;
+					}
+				}
+
+				
+			});
+	}
+}
+
+bool bt::ActionNode::DamageBox::tick()
+{
+	if (!m_agent_.expired() and !m_target_.expired())
+	{
+		m_bool_damage_ = true;
+	}
+	return m_bool_damage_;
+}
+
+bt::ActionNode::CrazyHit::CrazyHit(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_) : m_agent_(agent_), m_target_(target_), m_bool_damage_(false)
+{
+}
+
+void bt::ActionNode::CrazyHit::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
+	{
+		auto rba = agent->getComponent<lc::RigidBody>("RigidBody");
+		auto rbt = agent->getComponent<lc::RigidBody>("RigidBody");
+
+		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+
+
+				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::CrazyHit>(node);
+
+
+				if (node_cast->m_target_.lock() != nullptr)
+				{
+					auto rbt = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody");
+					if (node_cast->m_bool_damage_)
+					{
+						if (Tools::Collisions::rect_rect(sf::FloatRect(rigid_body->getCollider().getPosition().x - rigid_body->getVelocity().x * Tools::getDeltaTime(), rigid_body->getCollider().getPosition().y - rigid_body->getVelocity().y * Tools::getDeltaTime(), rigid_body->getCollider().getSize().x + rigid_body->getVelocity().x * Tools::getDeltaTime(), rigid_body->getCollider().getSize().y + rigid_body->getVelocity().y * Tools::getDeltaTime()), rbt->getCollider()))
+						{
+							std::cout << "col damage" << std::endl;
+							node_cast->m_target_.lock()->needToBeRemoved(true);
+						}
+						node_cast->m_bool_damage_ = false;
+					}
+				}
+
+
+			});
+	}
+}
+
+bool bt::ActionNode::CrazyHit::tick()
+{
+	if(!m_agent_.expired() and !m_target_.expired())
+	{
+		m_bool_damage_ = true;
+	}
+	return m_bool_damage_;
+}
+
+bt::ActionNode::LanceHit::LanceHit(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_) : m_agent_(agent_), m_target_(target_), m_bool_damage_(false)
+{
+}
+
+void bt::ActionNode::LanceHit::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
+	{
+		auto rba = agent->getComponent<lc::RigidBody>("RigidBody");
+		auto rbt = agent->getComponent<lc::RigidBody>("RigidBody");
+
+		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+
+
+				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::LanceHit>(node);
+
+				
+				if (node_cast->m_target_.lock() != nullptr)
+				{
+					auto rbt = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody");
+					if (node_cast->m_bool_damage_)
+					{
+						if (Tools::Collisions::rect_rect(sf::FloatRect(rigid_body->getCollider().getPosition().x - rigid_body->getVelocity().x * Tools::getDeltaTime(), rigid_body->getCollider().getPosition().y - rigid_body->getVelocity().y * Tools::getDeltaTime(), rigid_body->getCollider().getSize().x + rigid_body->getVelocity().x * Tools::getDeltaTime(), rigid_body->getCollider().getSize().y + rigid_body->getVelocity().y * Tools::getDeltaTime()), rbt->getCollider()))
+						{
+							std::cout << "col damage" << std::endl;
+							node_cast->m_target_.lock()->needToBeRemoved(true);
+						}
+						node_cast->m_bool_damage_ = false;
+					}
+				}
+
+
+			});
+	}
+}
+
+bool bt::ActionNode::LanceHit::tick()
+{
+	if (!m_agent_.expired() and !m_target_.expired())
+	{
+		m_bool_damage_ = true;
+	}
+	return m_bool_damage_;
+}
+
+bt::ActionNode::PickHit::PickHit(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_) : m_agent_(agent_), m_target_(target_), m_bool_damage_(false)
+{
+}
+
+void bt::ActionNode::PickHit::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
+	{
+		auto rba = agent->getComponent<lc::RigidBody>("RigidBody");
+		auto rbt = agent->getComponent<lc::RigidBody>("RigidBody");
+
+		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+
+
+				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::PickHit>(node);
+
+
+				if (node_cast->m_target_.lock() != nullptr)
+				{
+					auto rbt = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody");
+					if (node_cast->m_bool_damage_)
+					{
+						if (Tools::Collisions::rect_rect(sf::FloatRect(rigid_body->getCollider().getPosition().x - rigid_body->getVelocity().x * Tools::getDeltaTime(), rigid_body->getCollider().getPosition().y - rigid_body->getVelocity().y * Tools::getDeltaTime(), rigid_body->getCollider().getSize().x + rigid_body->getVelocity().x * Tools::getDeltaTime(), rigid_body->getCollider().getSize().y + rigid_body->getVelocity().y * Tools::getDeltaTime()), rbt->getCollider()))
+						{
+							std::cout << "col damage" << std::endl;
+							node_cast->m_target_.lock()->needToBeRemoved(true);
+						}
+						node_cast->m_bool_damage_ = false;
+					}
+				}
+
+
+			});
+	}
+}
+
+bool bt::ActionNode::PickHit::tick()
+{
+	if (!m_agent_.expired() and !m_target_.expired())
+	{
+		m_bool_damage_ = true;
+	}
+	return m_bool_damage_;
+}
+
+bt::ActionNode::Hit::Hit(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_) : m_agent_(agent_), m_target_(target_), m_bool_damage_(false)
+{
+}
+
+void bt::ActionNode::Hit::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
+	{
+		auto rba = agent->getComponent<lc::RigidBody>("RigidBody");
+		auto rbt = agent->getComponent<lc::RigidBody>("RigidBody");
+
+		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+
+
+				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::Hit>(node);
+
+
+				if (node_cast->m_target_.lock() != nullptr)
+				{
+					auto rbt = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody");
+					if (node_cast->m_bool_damage_)
+					{
+						if (Tools::Collisions::rect_rect(sf::FloatRect(rigid_body->getCollider().getPosition().x - rigid_body->getVelocity().x * Tools::getDeltaTime(), rigid_body->getCollider().getPosition().y - rigid_body->getVelocity().y * Tools::getDeltaTime(), rigid_body->getCollider().getSize().x + rigid_body->getVelocity().x * Tools::getDeltaTime(), rigid_body->getCollider().getSize().y + rigid_body->getVelocity().y * Tools::getDeltaTime()), rbt->getCollider()))
+						{
+							std::cout << "col damage" << std::endl;
+							node_cast->m_target_.lock()->needToBeRemoved(true);
+						}
+						node_cast->m_bool_damage_ = false;
+					}
+				}
+
+
+			});
+	}
+}
+
+bool bt::ActionNode::Hit::tick()
+{
+	if (!m_agent_.expired() and !m_target_.expired())
+	{
+		m_bool_damage_ = true;
+	}
+	return m_bool_damage_;
+}
+
+bt::ActionNode::lanceSpawn::lanceSpawn(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_) : m_agent_(agent_), m_target_(target_), m_bool_damage_(false)
+{
+}
+
+void bt::ActionNode::lanceSpawn::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
+	{
+		auto rba = agent->getComponent<lc::RigidBody>("RigidBody");
+		auto rbt = agent->getComponent<lc::RigidBody>("RigidBody");
+
+		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+
+
+				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::lanceSpawn>(node);
+
+
+				if (node_cast->m_target_.lock() != nullptr)
+				{
+					auto rbt = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody");
+					if (node_cast->m_bool_damage_)
+					{
+						if (Tools::Collisions::rect_rect(sf::FloatRect(rigid_body->getCollider().getPosition().x - rigid_body->getVelocity().x * Tools::getDeltaTime(), rigid_body->getCollider().getPosition().y - rigid_body->getVelocity().y * Tools::getDeltaTime(), rigid_body->getCollider().getSize().x + rigid_body->getVelocity().x * Tools::getDeltaTime(), rigid_body->getCollider().getSize().y + rigid_body->getVelocity().y * Tools::getDeltaTime()), rbt->getCollider()))
+						{
+							std::cout << "col damage" << std::endl;
+							node_cast->m_target_.lock()->needToBeRemoved(true);
+						}
+						node_cast->m_bool_damage_ = false;
+					}
+				}
+
+
+			});
+	}
+}
+
+bool bt::ActionNode::lanceSpawn::tick()
+{
+	if (!m_agent_.expired() and !m_target_.expired())
+	{
+		m_bool_damage_ = true;
+	}
+	return m_bool_damage_;
+}
+
+bt::ActionNode::TestController::TestController(const std::shared_ptr<lc::GameObject>& agent_) : m_agent_(agent_), m_bool_controller_(false)
+{
+}
+
+void bt::ActionNode::TestController::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody"))
+	{
+		auto rba = agent->getComponent<lc::RigidBody>("RigidBody");
+
+		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+
+
+				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::lanceSpawn>(node);
+
+				if (KEY(Right))
+				{
+					rigid_body->getParent()->getTransform().getPosition().x += 500 * Tools::getDeltaTime();
+				}
+				if (KEY(Left))
+				{
+					rigid_body->getParent()->getTransform().getPosition().x -= 500 * Tools::getDeltaTime();
+				}
+				if (KEY(Up))
+				{
+					rigid_body->getVelocity().y = -500;
+				}
+
+
+			});
+	}
+}
+
+bool bt::ActionNode::TestController::tick()
+{
+	if (!m_agent_.expired() )
+	{
+		m_bool_controller_ = true;
+	}
+	return m_bool_controller_;
+}
+
 bt::ActionNode::Play_Animation::Play_Animation(const std::weak_ptr<lc::GameObject>& owner,const std::string& anim_name,
 	const std::string& key_anim_name, const bool& stop_at_last_frame, const bool& reverse)
 : m_owner_(owner), m_anim_name_(anim_name), m_key_anim_name_(key_anim_name), m_stop_at_last_frame_(stop_at_last_frame),m_reverse_(reverse)
@@ -423,7 +763,7 @@ bool bt::ActionNode::Play_Animation::tick()
 	if(!m_animation_.expired())
 	{
 		auto anim = m_animation_.lock();
-		anim->select_animation_key(m_key_anim_name_,false);
+		anim->select_animation_key(m_key_anim_name_,m_key_anim_name_ == anim->get_current_animation_key().lock()->get_name() ? false : true);
 		anim->set_stop_at_last_frame(m_stop_at_last_frame_);
 		anim->current_animation_is_reversed(m_reverse_);
 		return true;		
@@ -556,7 +896,7 @@ bool bt::ActionNode::In_Range_Of_Player::tick()
 
 	if(!m_player_.expired())
 	{
-		if(Tools::Vector::getDistance(m_player_.lock()->getTransform().getPosition(),m_owner_.lock()->getTransform().getPosition()))
+		if(Tools::Vector::getDistance(m_player_.lock()->getTransform().getPosition(),m_owner_.lock()->getTransform().getPosition()) < m_range_)
 			return true;
 	}
 
@@ -565,6 +905,7 @@ bool bt::ActionNode::In_Range_Of_Player::tick()
 
 void bt::ActionNode::In_Range_Of_Player::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
 {
+	m_owner_ = owner;
 	file >> m_range_;
 }
 
@@ -581,15 +922,64 @@ bool bt::ActionNode::Attack::tick()
 
 void bt::ActionNode::Attack::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
 {
-	std::string m_attack_name;
-	file >> m_attack_name;	
+	std::string attack_name;
+
+    file >> attack_name;
+
+    auto scene = owner->GetRoot();
+
+    if (attack_name == "damageBox")
+    {
+        m_attack_node_ = bt::Node::New(bt::ActionNode::DamageBox(owner, scene->getObject("player")));
+        std::cout << "damageBox loaded" << std::endl;
+    }
+    else if (attack_name == "lanceHit")
+    {
+        m_attack_node_ = bt::Node::New(bt::ActionNode::LanceHit(owner, scene->getObject("player")));
+        std::cout << "lanceHit loaded" << std::endl;
+    }
+    else if (attack_name == "CrazyHit")
+    {
+        m_attack_node_ = bt::Node::New(bt::ActionNode::CrazyHit(owner, scene->getObject("player")));
+        std::cout << "CrazyHit loaded" << std::endl;
+    }
+    else if (attack_name == "pickHit")
+    {
+        m_attack_node_ = bt::Node::New(bt::ActionNode::PickHit(owner, scene->getObject("player")));
+        std::cout << "pickHit loaded" << std::endl;
+    }
+    else if (attack_name == "protect")
+    {
+        std::cout << "protect loaded" << std::endl;
+    	m_attack_node_ = bt::Node::New(bt::ActionNode::NodeFunc([]{return true;}));
+    }
+    else if (attack_name == "hit")
+    {
+        m_attack_node_ = bt::Node::New(bt::ActionNode::Hit(owner, scene->getObject("player")));
+        std::cout << "hit loaded" << std::endl;
+    }
+    else if (attack_name == "lanceSpawn")
+    {
+        m_attack_node_ = bt::Node::New(bt::ActionNode::lanceSpawn(owner, scene->getObject("player")));
+        std::cout << "lanceSpawn loaded" << std::endl;
+    }
+    else if (attack_name == "controller")
+    {
+        m_attack_node_ = bt::Node::New(bt::ActionNode::TestController(owner));
+        std::cout << "lanceSpawn loaded" << std::endl;
+    }
+    else
+    {
+    	m_attack_node_ = bt::Node::New(bt::ActionNode::NodeFunc([]{return true;}));
+        std::cout << "no attack of this name exist" << std::endl;
+    }
 	
 	m_attack_node_->load(file,owner);
 }
 
 void bt::ActionNode::Attack::setup(std::shared_ptr<Node> node)
 {
-	m_attack_node_->setup(node);
+	m_attack_node_->setup(m_attack_node_);
 }
 
 bool bt::ActionNode::Shot::tick()
@@ -641,8 +1031,6 @@ bt::NodePtr bt::Factory(const node_type& type)
 		return Node::New(ActionNode::Wait());
 	case node_type::DO_ON_ANIM_FRAME:
 		return Node::New(Decorator::Do_On_Anim_Frame());
-	case node_type::ROTATE_TO:
-		break;
 	case node_type::ATTACK:
 		return Node::New(ActionNode::Attack());
 	case node_type::SHOT:

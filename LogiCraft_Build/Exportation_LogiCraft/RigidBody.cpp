@@ -107,6 +107,10 @@ void lc::RigidBody::Update(WindowManager& _window)
 
 	else m_velocity = { 0.f,0.f };
 
+
+
+
+
 	if (m_isKinetic)
 		if (getParent())
 		{
@@ -117,6 +121,24 @@ void lc::RigidBody::Update(WindowManager& _window)
 		m_collider.left = getParent()->getTransform().getPosition().x + m_relativePosition.x;
 		m_collider.top = getParent()->getTransform().getPosition().y + m_relativePosition.y;
 	}
+
+
+	if (m_velocity.x < 0)
+	{
+		if (getParent()->getTransform().getScale().x < 0)
+			getParent()->getTransform().getScale().x = -getParent()->getTransform().getScale().x;
+
+		getParent()->getTransform().getOrigin() = sf::Vector2f();
+	}
+	else if (m_velocity.x > 0)
+	{
+		if (getParent()->getTransform().getScale().x > 0)
+			getParent()->getTransform().getScale().x = -getParent()->getTransform().getScale().x;
+
+		getParent()->getTransform().getOrigin().x = m_collider.getSize().x;
+		//std::cout << getParent()->getTransform().getOrigin().x << std::endl;
+	}
+
 }
 
 void lc::RigidBody::Draw(WindowManager& _window)
@@ -152,6 +174,7 @@ bool lc::RigidBody::CheckAllObject(std::shared_ptr<lc::GameObject> _object)
 					if (Tools::Collisions::lineRect({  m_collider.getPosition() + sf::Vector2f{0.f,m_collider.getSize().y} + sf::Vector2f{0.f,m_velocity.y} *Tools::getDeltaTime(), {{m_collider.getPosition() + m_collider.getSize() + sf::Vector2f{0.f,m_velocity.y}*Tools::getDeltaTime() }} }, { rb->m_collider.getPosition(), rb->m_collider.getSize()}))
 					{
 						m_velocity.y = 0.f;
+						getParent()->getTransform().getPosition().y = rb->getCollider().getPosition().y - m_collider.getSize().y;
 					}
 				}
 				else if (m_velocity.y < 0.f)
