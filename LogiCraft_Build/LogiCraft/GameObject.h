@@ -40,8 +40,6 @@ SOFTWARE.
 #include "GameComponent.h"
 #include "Transform.h"
 
-class Ressources;
-
 namespace lc
 {
 	class GameObject : public std::enable_shared_from_this<GameObject>
@@ -64,6 +62,9 @@ namespace lc
 		virtual void Draw(WindowManager& _window);
 		virtual void Draw(sf::RenderTexture& _renderer);
 		virtual void Draw(sf::RenderTexture& _renderer, unsigned char _depth);
+
+		bool is_in_window_view(WindowManager& window);
+		bool is_in_window_view(const sf::RenderTexture& window);
 #pragma region STATIC
 		/*
 		* @brief A function to create a GameObject.
@@ -327,9 +328,8 @@ namespace lc
 
 		void setID(unsigned int _ID) { m_ID = _ID; }
 		unsigned int getID() const { return m_ID; }
-
-		void needToBeRemoved(bool _state) { m_needToBeRemove = _state; }
-		bool hasToBeRemoved() const { return m_needToBeRemove; }
+		
+		bool& needToBeDeleted() { return m_needToBeDeleted; }
 
 		bool& isLock() { return m_isLock; }
 
@@ -348,7 +348,7 @@ namespace lc
 		unsigned int m_ID;
 		unsigned char m_depth;
 
-		bool m_needToBeRemove;
+		bool m_needToBeDeleted;
 		bool m_isLock;
 		bool m_isVisible;
 		bool m_Saved = false;

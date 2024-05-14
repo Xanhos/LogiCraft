@@ -152,6 +152,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="HeatShader.cpp" />
     <ClCompile Include="Hierarchie.cpp" />
     <ClCompile Include="IMGUI\imgui-SFML.cpp" />
     <ClCompile Include="IMGUI\imgui.cpp" />
@@ -160,17 +161,20 @@
     <ClCompile Include="IMGUI\imgui_tables.cpp" />
     <ClCompile Include="IMGUI\imgui_widgets.cpp" />
     <ClCompile Include="imnodes.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="LightShader.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="Particule.cpp" />
     <ClCompile Include="Ressource.cpp" />
     <ClCompile Include="RigidBody.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="State.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="ToolsBar.cpp" />
     <ClCompile Include="tools_imgui.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Viewport.cpp" />
+    <ClCompile Include="WaterShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI.h" />
@@ -186,6 +190,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="HeatShader.h" />
     <ClInclude Include="Hierarchie.h" />
     <ClInclude Include="IMGUI\imconfig-SFML.h" />
     <ClInclude Include="IMGUI\imconfig.h" />
@@ -198,16 +203,19 @@
     <ClInclude Include="IMGUI\imstb_truetype.h" />
     <ClInclude Include="imnodes.h" />
     <ClInclude Include="imnodes_internal.h" />
+    <ClInclude Include="LightShader.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="Particule.h" />
     <ClInclude Include="Ressource.h" />
     <ClInclude Include="RigidBody.h" />
+    <ClInclude Include="Shader.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="ToolsBar.h" />
     <ClInclude Include="tools_imgui.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Viewport.h" />
+    <ClInclude Include="WaterShader.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="LogiCraft.licenseheader" />

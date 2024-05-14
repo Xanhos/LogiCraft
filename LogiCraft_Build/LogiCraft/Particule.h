@@ -109,10 +109,11 @@ namespace lc
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int depth) override;
 		virtual void SaveRenderer(sf::RenderTexture& texture, int depth) override {};
-		void Export(std::ofstream& exportation) override;
+		virtual void Export(std::ofstream& exportation) override;
 		virtual void Load(std::ifstream& load) override;
 
-		void save_animation_file(const bool open_file_browser = true, std::string path = "") const;
+		void load_particles_file(std::string path = "");
+		void save_particles_file(const bool open_file_browser = true, std::string path = "") const;
 	private:
 		/*
 		* @brief When the particles system is load by a save it can have a texture,
@@ -230,6 +231,9 @@ namespace lc
 		bool m_is_particles_rendered_on_the_viewport_;
 		bool m_is_window_test_is_open_;
 
-		RessourceToSearch ressource_to_search_;
+		RessourceToSearch m_ressource_to_search_;
+
+		std::string m_ptcl_path_;
+		bool m_want_to_load_anim_;
 	};
 }

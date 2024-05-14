@@ -94,6 +94,8 @@ namespace lc
 
 	Animation::~Animation()
 	{
+		if (!m_texture_.expired())
+			m_texture_.lock()->isUsedByAComponent() = false;
 	}
 
 	void Animation::UpdateEvent(sf::Event& event)
@@ -145,9 +147,6 @@ namespace lc
 
 	void Animation::Draw(sf::RenderTexture& window)
 	{
-
-		
-
 	}
 
 	void Animation::Load(std::ifstream& load)
