@@ -629,7 +629,7 @@ bool PatronNode::DidNodeExist(const std::string _name)
 {
 	if(_name == "NONE")
 		return false;
-	if(s_node_container_[_name])
+	if(s_node_container_[_name] || s_node_container_[_name] == 0)
 		return true;
 	return false;
 }
