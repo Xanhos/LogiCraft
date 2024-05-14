@@ -41,8 +41,8 @@ SOFTWARE.
 #include "tools_imgui.h"
 #include "GameObject.h"
 
-const sf::Vector2f screenSize(3840.f, 2160.f);
-const unsigned short screenLimit = 32;
+const sf::Vector2f SCREEN_SIZE(3840.f, 2160.f);
+constexpr unsigned short SCREEN_LIMIT = 32;
 
 class Viewport
 {
