@@ -36,6 +36,9 @@ SOFTWARE.
 
 #include <tuple>
 #include <tuple>
+#include <tuple>
+#include <tuple>
+#include <tuple>
 #include "Animation.h"
 
 std::unordered_map<std::string, int> PatronNode::s_NodeContainer = {};
@@ -48,19 +51,25 @@ DecoratorCopyMethod PatronNode::s_DecoratorCopyMethod = {};
 
 void PatronNode::SetupAllNode()
 {
-	auto pushNode = [&](std::string name) { s_NodeContainer[name] = s_NodeContainer.size(); };
+	int previous_node = 0;
+	auto pushNode = [&](std::string name) { s_NodeContainer[name] = previous_node++; };
 	auto pushCondition = [&](std::string name) { s_ConditionContainer[name] = s_ConditionContainer.size(); };
 
 	//Here, we declare all the node possible in the behavior tree
 	pushNode("SEQUENCE");
 	pushNode("SELECTOR");
 	pushNode("INVERSER");
+	s_NodeContainer["INVERSER"] = 2000;
+	previous_node = 2001;
 	pushNode("CONDITION");
 	pushNode("LOOP");
 	pushNode("COOLDOWN");
+	pushNode("DIRECTION");
+	pushNode("DO ON ANIM FRAME");
 	pushNode("FORCE SUCCESS");
-	pushNode("KEEP IN CONE");
 	pushNode("WANDER");
+	s_NodeContainer["WANDER"] = 5000;
+	previous_node = 5001;
 	pushNode("MOVE TO");
 	pushNode("PLAY ANIMATION");
 	pushNode("PLAY SOUND");
@@ -77,6 +86,7 @@ void PatronNode::SetupAllNode()
 	/*Different condition for the Condition decorator Node*/
 	pushCondition("IN_RANGE_OF_PLAYER");
 	pushCondition("IS_PLAYER_IN_SIGHT");
+	pushCondition("CUSTOM");
 
 
 	//Here, we declare all the method for the node who need more data (like loop number, cooldown timer, etc...)
@@ -96,7 +106,7 @@ void PatronNode::SetupAllNode()
 		//Save method save the data in the file
 		s_DecoratorSaveMethod["LOOP"] = [](PatronNode* node, std::ofstream& file) {
 			int loopNumber = std::any_cast<int>(node->m_decoratorData);
-			file << loopNumber << std::endl;
+			file << loopNumber;
 			};
 		//Load method load the data from the file
 		s_DecoratorLoadMethod["LOOP"] = [](PatronNode* node, std::ifstream& file) {
@@ -106,6 +116,170 @@ void PatronNode::SetupAllNode()
 			};
 	}
 
+	//CUSTOM
+	{
+		//Init method set the std::any to the default value
+		s_DecoratorInitMethod["CUSTOM"] = [](PatronNode* node) {
+			node->m_decoratorData = std::string();
+		};
+		s_DecoratorCopyMethod["CUSTOM"] = [](PatronNode* node, PatronNode* copied_node)		{
+			node->m_decoratorData = std::any_cast<std::string>(copied_node->m_decoratorData);
+		};
+		//Update method display the data and set the std::any to the new value
+		s_DecoratorUpdateMethod["CUSTOM"] = [](PatronNode* node) {
+			auto customCondition = std::any_cast<std::string>(node->m_decoratorData);
+			ImGui::InputText("Loop Number", customCondition,100);
+			Tools::ReplaceCharacter(customCondition,' ','_');
+			node->m_decoratorData = customCondition;
+		};
+		//Save method save the data in the file
+		s_DecoratorSaveMethod["CUSTOM"] = [](PatronNode* node, std::ofstream& file) {
+			std::string customCondition = std::any_cast<std::string>(node->m_decoratorData);
+			file << customCondition;
+		};
+		//Load method load the data from the file
+		s_DecoratorLoadMethod["CUSTOM"] = [](PatronNode* node, std::ifstream& file) {
+			std::string customCondition;
+			file >> customCondition;
+			node->m_decoratorData = customCondition;
+		};
+	}
+	//DO ON ANIM FRAME
+	{
+		//Init method set the std::any to the default value
+		typedef std::tuple<std::weak_ptr<lc::Animation>, std::string, std::string, int> onframe_anim;
+		s_DecoratorInitMethod["DO ON ANIM FRAME"] = [](PatronNode* node) {
+			node->m_decoratorData = onframe_anim(std::weak_ptr<lc::Animation>(),"","",-1);
+			
+		};
+		//Update method display the data and set the std::any to the new value
+		s_DecoratorUpdateMethod["DO ON ANIM FRAME"] = [](PatronNode* node) {
+			onframe_anim tuple = std::any_cast<onframe_anim>(node->m_decoratorData);
+
+			if(std::get<0>(tuple).expired() and !std::get<2>(tuple).empty())
+			{
+				if(!node->m_game_object_.expired())
+				{
+					auto object = node->m_game_object_.lock();
+					for (const auto& component : object->getComponents())
+					{
+						if(auto anim = std::dynamic_pointer_cast<lc::Animation>(component))
+						{
+							if(anim->getName() == std::get<2>(tuple))
+							{
+								std::get<0>(tuple) = anim;
+								std::get<2>(tuple) = anim->getName();
+							}
+						}					
+					}
+				}
+			}
+			
+			if(!node->m_game_object_.expired())
+			{
+				auto object = node->m_game_object_.lock();
+				if(ImGui::BeginCombo("Choose Animation", std::get<0>(tuple).expired() ? "Select Animation" : std::get<0>(tuple).lock()->getName().c_str()))
+				{
+					bool is_selected = false;
+					for (const auto& component : object->getComponents())
+					{
+						if(auto anim = std::dynamic_pointer_cast<lc::Animation>(component))
+						{
+							if(ImGui::Selectable(anim->getName().c_str(),&is_selected,ImGuiSelectableFlags_SelectOnClick))
+							{
+								std::get<0>(tuple) = anim;
+								std::get<2>(tuple) = anim->getName();
+							}
+						}					
+					}
+					ImGui::EndCombo();
+				}
+
+				if(!std::get<0>(tuple).expired())
+				{
+					auto anim = std::get<0>(tuple).lock();
+					if(ImGui::BeginCombo("Choose Key Animation", std::get<1>(tuple).empty() ? "Select Key Animation" : std::get<1>(tuple).c_str()))
+					{
+						bool is_selected = false;					
+						for(auto& key_anim : anim->get_all_key_animation()){
+							if(ImGui::Selectable(key_anim.first.c_str(),&is_selected,ImGuiSelectableFlags_SelectOnClick))
+							{
+								std::get<1>(tuple) = key_anim.first;
+							}
+						}					
+						
+						ImGui::EndCombo();
+					}				
+				}
+
+				if(!std::get<1>(tuple).empty())
+				{
+					auto anim = std::get<0>(tuple).lock();
+					if(ImGui::BeginCombo("Choose Key Frame", std::get<3>(tuple) == -1 ? "Select Key Frame" : std::to_string(std::get<3>(tuple)).c_str()))
+					{		
+						for(auto& key_anim : anim->get_all_key_animation()){
+							if(key_anim.first == std::get<1>(tuple))
+								for(int frame = 0; frame < key_anim.second->get_total_frame(); frame++)
+									if(ImGui::Selectable(std::to_string(frame).c_str(), false,ImGuiSelectableFlags_SelectOnClick))
+									{
+										std::get<3>(tuple) = frame;
+									}
+						}					
+						
+						ImGui::EndCombo();
+					}
+				}				
+			}
+			node->m_decoratorData = tuple;	
+		};
+		//Save method save the data in the file
+		s_DecoratorSaveMethod["DO ON ANIM FRAME"] = [](PatronNode* node, std::ofstream& file) {
+			auto tuple = std::any_cast<onframe_anim>(node->m_decoratorData);
+			file << std::get<1>(tuple) << " " << std::get<2>(tuple) << " " << std::get<3>(tuple);
+		};
+		//Load method load the data from the file
+		s_DecoratorLoadMethod["DO ON ANIM FRAME"] = [](PatronNode* node, std::ifstream& file) {
+			std::string anim_name,key_name;
+			int frame;
+			file >> key_name >> anim_name >> frame;
+			node->m_decoratorData = onframe_anim(std::weak_ptr<lc::Animation>(),key_name,anim_name,frame);
+		};
+	}
+
+	//DIRECTION
+	{
+		//Init method set the std::any to the default value
+		s_DecoratorInitMethod["DIRECTION"] = [](PatronNode* node) {
+			node->m_decoratorData = -1;
+		};
+		//Update method display the data and set the std::any to the new value
+		s_DecoratorUpdateMethod["DIRECTION"] = [](PatronNode* node) {
+			int dir = std::any_cast<int>(node->m_decoratorData);
+			std::vector<std::string> direction {"Left", "Right"};
+			if(BeginCombo("Direction",dir == -1 ? "Chose a direction" : direction[dir].c_str()))
+			{
+				for(int i = 0;i < direction.size();i++)
+				{
+					if(Selectable(direction[i].c_str()))
+						dir = i;
+				}
+				EndCombo();
+			}
+			node->m_decoratorData = dir;
+		};
+		//Save method save the data in the file
+		s_DecoratorSaveMethod["DIRECTION"] = [](PatronNode* node, std::ofstream& file) {
+			int dir = std::any_cast<int>(node->m_decoratorData);
+			file << dir;
+		};
+		//Load method load the data from the file
+		s_DecoratorLoadMethod["DIRECTION"] = [](PatronNode* node, std::ifstream& file) {
+			int dir;
+			file >> dir;
+			node->m_decoratorData = dir;
+		};
+	}
+	
 	//COOLDOWN
 	{
 		s_DecoratorInitMethod["COOLDOWN"] = [](PatronNode* node) {
@@ -236,7 +410,7 @@ void PatronNode::SetupAllNode()
 
 	//PLAY_ANIMATION
 	{
-		typedef std::tuple<std::weak_ptr<lc::Animation>, std::string, std::string> bt_anim;
+		typedef std::tuple<std::weak_ptr<lc::Animation>, std::string, std::string, bool, bool, bool> bt_anim;
 		s_DecoratorInitMethod["PLAY ANIMATION"] = [](PatronNode* node) {
 			node->m_decoratorData = bt_anim();
 			};
@@ -302,16 +476,24 @@ void PatronNode::SetupAllNode()
 						ImGui::EndCombo();
 					}				
 				}
+
+				if(!std::get<1>(tuple).empty())
+				{
+					ImGui::Checkbox("Stop at last frame", &std::get<3>(tuple));
+					ImGui::Checkbox("Revert animation", &std::get<4>(tuple));
+					ImGui::Checkbox("Reset animation", &std::get<5>(tuple));
+
+				}				
 			}
 			node->m_decoratorData = tuple;			
 			};
 		s_DecoratorSaveMethod["PLAY ANIMATION"] = [](PatronNode* node, std::ofstream& file) {
 			auto tuple = std::any_cast<bt_anim>(node->m_decoratorData);
-			file << std::get<2>(tuple) << " " << std::get<1>(tuple);
+			file << std::get<2>(tuple) << " " << std::get<1>(tuple) << " " << std::get<3>(tuple) << " " << std::get<4>(tuple);
 			};
 		s_DecoratorLoadMethod["PLAY ANIMATION"] = [](PatronNode* node, std::ifstream& file) {
 			auto tuple = bt_anim();
-			file >> std::get<2>(tuple) >> std::get<1>(tuple);
+			file >> std::get<2>(tuple) >> std::get<1>(tuple) >> std::get<3>(tuple) >> std::get<4>(tuple);
 			node->m_decoratorData = tuple;
 			};
 	}
@@ -381,7 +563,7 @@ void PatronNode::SetupAllNode()
 			};
 		s_DecoratorSaveMethod["WAIT"] = [](PatronNode* node, std::ofstream& file) {
 			float timer = std::any_cast<float>(node->m_decoratorData);
-			file << timer << std::endl;
+			file << timer;
 			};
 		s_DecoratorLoadMethod["WAIT"] = [](PatronNode* node, std::ifstream& file) {
 			float timer;
@@ -405,7 +587,7 @@ void PatronNode::SetupAllNode()
 		};
 		s_DecoratorSaveMethod["ATTACK"] = [](PatronNode* node, std::ofstream& file) {
 			std::string	attack_name = std::any_cast<std::string>(node->m_decoratorData);
-			file << attack_name << std::endl;
+			file << attack_name;
 		};
 		s_DecoratorLoadMethod["ATTACK"] = [](PatronNode* node, std::ifstream& file) {
 			std::string attack_name;
@@ -429,7 +611,7 @@ void PatronNode::SetupAllNode()
 		};
 		s_DecoratorSaveMethod["SHOT"] = [](PatronNode* node, std::ofstream& file) {
 			std::string	attack_name = std::any_cast<std::string>(node->m_decoratorData);
-			file << attack_name << std::endl;
+			file << attack_name;
 		};
 		s_DecoratorLoadMethod["SHOT"] = [](PatronNode* node, std::ifstream& file) {
 			std::string attack_name;

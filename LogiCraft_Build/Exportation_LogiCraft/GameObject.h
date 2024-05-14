@@ -16,7 +16,7 @@ This software utilizes code from the following GitHub repositories, which are al
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sellF
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
@@ -75,7 +75,7 @@ namespace lc
 
 		static std::shared_ptr<GameObject> LoadScene(std::string _SceneToLoad, WindowManager& window_);
 
-		static std::shared_ptr<GameObject> GetRoot(std::shared_ptr<GameObject> object);
+		std::shared_ptr<GameObject> GetRoot();
 #pragma endregion
 
 #pragma region TEMPLATE
@@ -190,12 +190,21 @@ namespace lc
 		bool hasComponent(std::string _name)
 		{
 			for (auto& component : m_components)
-				if (component->getName() == _name)
+				if (Tools::ToLower(component->getName()) == Tools::ToLower(_name))
 					return true;
 
 			return false;
 		}
 
+
+		bool hasObject(std::string _name)
+		{
+			for (auto& object : m_objects)
+				if (Tools::ToLower(object->getName()) == Tools::ToLower(_name))
+					return true;
+
+			return false;
+		}
 		/*
 		* @brief Just a function to return one of the wanted component.
 		*
@@ -206,7 +215,7 @@ namespace lc
 		std::shared_ptr<GameObject> getObject(std::string _name)
 		{
 			for (auto& object : m_objects)
-				if (object->getName() == _name)
+				if (Tools::ToLower(object->getName()) == Tools::ToLower(_name))
 					return object;
 
 			throw std::runtime_error("Object not found.");

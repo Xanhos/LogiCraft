@@ -57,196 +57,32 @@ void lc::AI::Load(std::ifstream& load)
         load >> type >> child_size;
 		const auto type_cast = static_cast<bt::node_type>(type);
         node = bt::Factory(type_cast);
-        if(type_cast == bt::node_type::MOVE_TO)
+        node->getParent() = parent;
+        node->load(load,getParent());
+        node->setup(node);        
+        /*if (type_cast == bt::node_type::ATTACK)
         {
-            std::string target;
-			load >> target;
-            auto scene = getParent();
-            while(scene->getParent())
-			{
-				scene = scene->getParent();
-			}
-
-            node = bt::Node::New(bt::ActionNode::MoveTo(getParent(),scene->getObject(target),100.f));
-            std::dynamic_pointer_cast<bt::ActionNode::MoveTo>(node)->Setup(node);
-		}
-        else if (type_cast == bt::node_type::ATTACK)
-        {
-            std::string attack_name;
-            load >> attack_name;
-
-            auto scene = getParent();
-            while (scene->getParent())
-            {
-                scene = scene->getParent();
-            }
-
-            if (attack_name == "damageBox")
-            {
-                node = bt::Node::New(bt::ActionNode::DamageBox(getParent(), scene->getObject("cible")));
-                std::dynamic_pointer_cast<bt::ActionNode::DamageBox>(node)->Setup(node);
-                std::cout << "damageBox loaded" << std::endl;
-            }
-            else if (attack_name == "lanceHit")
-            {
-                node = bt::Node::New(bt::ActionNode::LanceHit(getParent(), scene->getObject("cible")));
-                std::dynamic_pointer_cast<bt::ActionNode::LanceHit>(node)->Setup(node);
-                std::cout << "lanceHit loaded" << std::endl;
-            }
-            else if (attack_name == "CrazyHit")
-            {
-                node = bt::Node::New(bt::ActionNode::CrazyHit(getParent(), scene->getObject("cible")));
-                std::dynamic_pointer_cast<bt::ActionNode::CrazyHit>(node)->Setup(node);
-                std::cout << "CrazyHit loaded" << std::endl;
-            }
-
-            else if (attack_name == "pickHit")
-            {
-                node = bt::Node::New(bt::ActionNode::PickHit(getParent(), scene->getObject("cible")));
-                std::dynamic_pointer_cast<bt::ActionNode::PickHit>(node)->Setup(node);
-                std::cout << "pickHit loaded" << std::endl;
-            }
-            else if (attack_name == "protect")
-            {
-                std::cout << "protect loaded" << std::endl;
-            }
-            else if (attack_name == "hit")
-            {
-                node = bt::Node::New(bt::ActionNode::Hit(getParent(), scene->getObject("cible")));
-                std::dynamic_pointer_cast<bt::ActionNode::Hit>(node)->Setup(node);
-                std::cout << "hit loaded" << std::endl;
-            }
-            else if (attack_name == "lanceSpawn")
-            {
-                node = bt::Node::New(bt::ActionNode::lanceSpawn(getParent(), scene->getObject("cible")));
-                std::dynamic_pointer_cast<bt::ActionNode::lanceSpawn>(node)->Setup(node);
-                std::cout << "lanceSpawn loaded" << std::endl;
-            }
-            else if (attack_name == "controller")
-            {
-                node = bt::Node::New(bt::ActionNode::TestController(getParent()));
-                std::dynamic_pointer_cast<bt::ActionNode::TestController>(node)->Setup(node);
-                std::cout << "lanceSpawn loaded" << std::endl;
-            }
-            else
-            {
-                std::cout << "no attack of this name exist" << std::endl;
-            }
-
-
-        }
-        else if (type_cast == bt::node_type::SHOT)
-        {
-            std::string garbage;
-            load >> garbage;
-        }
-        else if (type_cast == bt::node_type::JUMP)
-        {
-            float jump_height;
-            load >> jump_height;
-            node = bt::Node::New(bt::ActionNode::Jump(jump_height,getParent()));
-            std::dynamic_pointer_cast<bt::ActionNode::Jump>(node)->Setup(node);            
-        }
-        else if (type_cast == bt::node_type::PLAY_SOUND)
-        {
-            std::string sound_name;
-            bool new_sound = false;
-            float attenuation(0.f), minDistance(0.f);
-            load >> sound_name >> new_sound >> attenuation >> minDistance;
             
-            node = bt::Node::New(bt::ActionNode::Play_Sound(sound_name,new_sound,getParent(),attenuation,minDistance));
-            std::dynamic_pointer_cast<bt::ActionNode::Play_Sound>(node)->Setup(node);
-        }
-        else if (type_cast == bt::node_type::PLAY_ANIMATION)
-        {
-            std::string anim_name, key_anim_name;
-            load >> anim_name >> key_anim_name;
 
-            node = bt::Node::New(bt::ActionNode::Play_Animation(getParent(),anim_name,key_anim_name));
-        }
-        else if(type_cast == bt::node_type::WANDER)
+
+        }*/
+        if(child_size)
         {
-            node = bt::Node::New(bt::ActionNode::Wander(getParent()));
-            std::dynamic_pointer_cast<bt::ActionNode::Wander>(node)->Setup(node);
-        }
-        else if(type_cast == bt::node_type::CONDITION)
-        {
-            int condition_type;
-            load >> condition_type;
-            if(condition_type == 0)
+            if(auto decorator_node = std::dynamic_pointer_cast<bt::Decorator::Decorator>(node))
             {
-                float detection_range;
-                load >> detection_range;
-                auto scene = getParent();
-                while(scene->getParent())
-                    scene = scene->getParent();
-                std::weak_ptr<GameObject> player = scene->getObject("cible"), agent = getParent();
-                std::dynamic_pointer_cast<bt::Decorator::Condition>(node)->setCondition([player, agent, detection_range]
+                decorator_node->setTask(bt::Node::New(bt::Composite::Sequence()));
+                load_node_and_child(decorator_node->getTask(), parent);
+            }
+            else if (auto composite_node = std::dynamic_pointer_cast<bt::Composite::CompositeNode>(node))
+            {
+                for (int i = 0; i < child_size; i++)
                 {
-                    if(!player.expired() and !agent.expired() and player.lock() != nullptr and agent.lock() != nullptr)
-                    { 
-                        return Tools::Vector::getDistance(player.lock()->getTransform().getPosition() + (player.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() /2.f),
-                            agent.lock()->getTransform().getPosition() + (agent.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() / 2.f)) < detection_range;
-                    }
-                    return false;
-                });
-                if(child_size)
-                {
-                    std::dynamic_pointer_cast<bt::Decorator::Condition>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
-                    load_node_and_child(std::dynamic_pointer_cast<bt::Decorator::Condition>(node)->getTask(), parent);
+                    composite_node->addChild(bt::Node::New(bt::Composite::Sequence()));
                 }
-            }
-            
-        }
-        else if(type_cast == bt::node_type::COOLDOWN)
-        {
-        	float time;
-			load >> time;
-			node = bt::Node::New(bt::Decorator::Cooldown());
-            std::dynamic_pointer_cast<bt::Decorator::Cooldown>(node)->setTimer(time);
-            if(child_size)
-            {
-                std::dynamic_pointer_cast<bt::Decorator::Cooldown>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
-                load_node_and_child(std::dynamic_pointer_cast<bt::Decorator::Cooldown>(node)->getTask(), parent);
-			}
-        }
-        else if (type_cast == bt::node_type::LOOP)
-        {
-            int loop;
-            load >> loop;
-            node = bt::Node::New(bt::Decorator::Loop());
-            std::dynamic_pointer_cast<bt::Decorator::Loop>(node)->setLoop(loop);
-            if (child_size)
-            {
-                std::dynamic_pointer_cast<bt::Decorator::Loop>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
-                load_node_and_child(std::dynamic_pointer_cast<bt::Decorator::Loop>(node)->getTask(), parent);
-            }
-        }
-        else if (type_cast == bt::node_type::WAIT)
-        {
-            float timer;
-            load >> timer;
-            node = bt::Node::New(bt::ActionNode::Wait());
-            std::dynamic_pointer_cast<bt::ActionNode::Wait>(node)->setTimer(timer);
-            std::dynamic_pointer_cast<bt::ActionNode::Wait>(node)->Setup(std::dynamic_pointer_cast<bt::ActionNode::Wait>(node), parent, m_root_);
-        }
-        else if (type_cast == bt::node_type::INVERSER or type_cast == bt::node_type::FORCE_SUCCESS)
-        {
-            if (child_size)
-            {
-                type_cast == bt::node_type::INVERSER ? std::dynamic_pointer_cast<bt::Decorator::Inverser>(node)->setTask(bt::Node::New(bt::Composite::Sequence())) : std::dynamic_pointer_cast<bt::Decorator::ForceSuccess>(node)->setTask(bt::Node::New(bt::Composite::Sequence()));
-                load_node_and_child(type_cast == bt::node_type::INVERSER ? std::dynamic_pointer_cast<bt::Decorator::Inverser>(node)->getTask() : std::dynamic_pointer_cast<bt::Decorator::ForceSuccess>(node)->getTask(), parent);
-            }
-        }
-        else if (type_cast < bt::node_type::INVERSER)
-        {
-        	for (int i = 0; i < child_size; i++)
-			{
-                dynamic_cast<bt::Composite::CompositeNode*>(node.get())->addChild(bt::Node::New(bt::Composite::Sequence()));
-			}
-            for (auto& i : dynamic_cast<bt::Composite::CompositeNode*>(node.get())->getChilds())
-            {
-                load_node_and_child(i, parent);
+                for (auto& i : composite_node->getChilds())
+                {
+                    load_node_and_child(i, parent);
+                }
             }
         }
 	};

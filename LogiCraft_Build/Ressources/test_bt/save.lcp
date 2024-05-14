@@ -14,8 +14,7 @@ Components
 
 1 IA
 0 1
-14 0 controller
-
+5006 0 controller
 
 }
 Objects
@@ -34,10 +33,9 @@ Walking 0 0 221 157 0 5 0.156 5
 
 1 IA
 0 2
-8 0
-6 1
-14 0 damageBox
-
+5000 0
+2006 1
+5006 0 damageBox
 
 }
 Objects
@@ -54,13 +52,12 @@ Components
 1 IA
 0 1
 1 2
-3 1 0 1500
+2001 1 0 1500
 1 2
-3 1 0 100
-14 0 lanceHit
-
-9 0 cible
-8 0
+2001 1 0 100
+5006 0 lanceHit
+5001 0 cible
+5000 0
 
 }
 Objects
@@ -77,16 +74,15 @@ Components
 1 IA
 0 1
 1 2
-3 1 0 1500
+2001 1 0 1500
 1 2
-3 1 0 995
+2001 1 0 995
 1 2
-3 1 0 100
-14 0 hit
-
-9 0 cible
-9 0 cible
-8 0
+2001 1 0 100
+5006 0 hit
+5001 0 cible
+5001 0 cible
+5000 0
 
 }
 Objects
@@ -103,10 +99,9 @@ Components
 1 IA
 0 1
 1 2
-3 1 0 1000
-14 0 shoot
-
-8 0
+2001 1 0 1000
+5006 0 shoot
+5000 0
 
 }
 Objects
@@ -123,18 +118,16 @@ Components
 1 IA
 0 1
 1 2
-3 1 0 1000
+2001 1 0 1000
 1 2
-3 1 0 100
+2001 1 0 100
 1 2
-5 1 5.2
+2003 1 5.2
 
-14 0 protect
-
-14 0 lanceHit
-
-9 0 cible
-8 0
+5006 0 protect
+5006 0 lanceHit
+5001 0 cible
+5000 0
 
 }
 Objects
@@ -151,13 +144,12 @@ Components
 1 IA
 0 1
 1 2
-3 1 0 1000
+2001 1 0 1000
 1 2
-3 1 0 298
-14 0 lanceSpawn
-
-9 0 cible
-8 0
+2001 1 0 298
+5006 0 lanceSpawn
+5001 0 cible
+5000 0
 
 }
 Objects
@@ -176,10 +168,9 @@ swimming 0 0 358 156 0 8 0.147 8
 
 1 IA
 0 2
-8 0
-6 1
-14 0 damageBox
-
+5000 0
+2006 1
+5006 0 damageBox
 
 }
 Objects
@@ -199,19 +190,17 @@ Idle 0 0 1617 1029 0 7 0.15 4
 1 IA
 0 1
 1 2
-3 1 0 1000
+2001 1 0 1000
 1 2
-5 1 30.5
+2003 1 30.5
 
-14 0 CrazyHit
-
+5006 0 CrazyHit
 0 2
-10 0 Animation Idle
-14 0 pickHit
-
+5002 0 Animation Idle 0 0
+5006 0 pickHit
 0 2
-10 0 Animation Idle
-9 0 cible
+5002 0 Animation Idle 0 0
+5001 0 cible
 
 }
 Objects
@@ -232,11 +221,11 @@ hiding 0 828 232 168 0 6 0.082 6
 1 IA
 0 1
 1 2
-3 1 0 204
-10 0 Animation hiding
+2001 1 0 204
+5002 0 Animation hiding 0 0
 0 2
-10 0 Animation walking
-8 0
+5002 0 Animation walking 0 0
+5000 0
 
 }
 Objects
