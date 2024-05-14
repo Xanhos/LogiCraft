@@ -81,7 +81,7 @@ void lc::GameObject::Save(std::ofstream& save, std::ofstream& exportation,sf::Re
 	{
 		save << std::endl;
 		if(getNeedToBeExported() or !getParent())
-		exportation << std::endl;
+			exportation << std::endl;
 		component->Save(save, texture, _depth);
 		if(getNeedToBeExported() or !getParent())
 			component->Export(exportation);
@@ -92,33 +92,37 @@ void lc::GameObject::Save(std::ofstream& save, std::ofstream& exportation,sf::Re
 	save << std::endl << "}" << std::endl;
 	
 	if(getNeedToBeExported() or !getParent())
-	exportation << "Objects" << std::endl << "{";
+		exportation << "Objects" << std::endl << "{";
 	
 	save << "Objects" << std::endl << "{";
 	for (auto& object : getObjects())
 	{
 		save << std::endl;
-		if(getNeedToBeExported() or !getParent())
+		if(getNeedToBeExported())
 			exportation << std::endl;
 		object->Save(save, exportation, texture, _depth);
 	}
 	save << std::endl << "}" << std::endl;
 	if(getNeedToBeExported() or !getParent())
-	exportation << std::endl << "}" << std::endl;
+		exportation << std::endl << "}" << std::endl;
 }
 
-void lc::GameObject::SaveRenderer(sf::RenderTexture& texture, int _depth)
+void lc::GameObject::SaveRenderer(sf::RenderTexture& texture, int _depth, bool& _object_has_been_drew, const sf::FloatRect& _view_rect)
 {
 	if(!getNeedToBeExported())
-		for (auto& components : m_components)
-		{
-			components->SaveRenderer(texture, _depth);
-		}
+	{
+		if(Tools::Collisions::rect_rect(_view_rect,{getTransform().getPosition(),getTransform().getSize()}))
+			for (auto& components : m_components)
+			{
+				components->SaveRenderer(texture, _depth);
+				_object_has_been_drew = true;
+			}
+	}
 	for (auto& objects : m_objects)
 	{
 		if (objects->getDepth() == _depth)
 		{
-			objects->SaveRenderer(texture, _depth);
+			objects->SaveRenderer(texture, _depth, _object_has_been_drew,_view_rect);
 		}
 	}
 }

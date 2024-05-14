@@ -51,7 +51,7 @@ namespace lc
 		~GameObject();
 
 		virtual void Save(std::ofstream& save, std::ofstream& exportation,sf::RenderTexture& texture, int _depth);
-		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth);
+		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth, bool& _object_has_been_drew,const sf::FloatRect& _view_rect);
 		virtual void Load(std::ifstream& load);
 		
 		void NeedToBeExported(std::list<std::string> ComponentToCheck);
