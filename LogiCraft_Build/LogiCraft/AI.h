@@ -55,7 +55,7 @@ namespace lc
 		PatronNode* m_selectedNode = nullptr;
 		std::pair<std::weak_ptr<GameObject>, PatronNode*> m_copiedNode = {};
 		int m_newNodeType = 0;
-		int m_newDecorateType = PatronNode::getDecoratorNodeStart();
+		int m_newDecorateType = PatronNode::GetDecoratorNodeStart();
 		bool m_isEditionBehaviorTree = false;
 		bool m_wantToCopyATreeNode = false;
 

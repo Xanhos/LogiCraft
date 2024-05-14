@@ -53,8 +53,8 @@ class PatronNode
 {
 	int m_type_;
 	int m_condition_type_;
-	std::list <PatronNode*> m_child_;
-	PatronNode* m_parent_;
+	std::list <PatronNode*> m_child_list_;
+	PatronNode* m_p_parent_;
 	int m_id_;
 	bool m_is_open_ = false;
 	bool m_new_node_is_added_ = false;
@@ -91,43 +91,43 @@ public:
 	/**
 	 * @brief Static method, return the name of the node
 	 * 
-	 * \param type Type of the node asociated with the name
+	 * \param _type Type of the node asociated with the name
 	 * \return the node name
 	 */
-	static std::string getNodeName(int type);
+	static std::string GetNodeName(int _type);
 
 	/**
 	*@brief Static method, return the name of the condition
 	* 
-	* \param type Type of the condition associed with the name
+	* \param _type Type of the condition associed with the name
 	* \return the condition name
 	*/
-	static std::string getConditionName(int type);
+	static std::string GetConditionName(int _type);
 
 	/**
 	 * @brief Static method, return the type of the node
 	 * 
-	 * \param name Name of the node asociated with the type
+	 * \param _name Name of the node asociated with the type
 	 * \return the node type
 	 */
-	static int getNodeType(std::string name) { return s_node_container_[name]; }
+	static int GetNodeType(std::string _name) { return s_node_container_[_name]; }
 
 	/**
 	*@brief Static method, return the container of all the nodes
 	* 
 	*/
-	static const std::unordered_map< std::string, int>& getNodeContainer() { return s_node_container_; } ;
+	static const std::unordered_map< std::string, int>& GetNodeContainer() { return s_node_container_; } ;
 
 	/**
 	 * @brief Static method, return the container of all the decorator update method
 	 */
-	static const DecoratorMethod& getNodeUpdateMethod() { return s_decorator_update_method_; };
+	static const DecoratorMethod& GetNodeUpdateMethod() { return s_decorator_update_method_; };
 
 
-	static int getActionNodeStart() { return s_action_node_start_; }
-	static int getDecoratorNodeStart() { return s_decorator_node_start_; }
-	static int getActionNodeEnd() { return s_action_node_end_; }
-	static int getDecoratorNodeEnd() { return s_decorator_node_end_; }
+	static int GetActionNodeStart() { return s_action_node_start_; }
+	static int GetDecoratorNodeStart() { return s_decorator_node_start_; }
+	static int GetActionNodeEnd() { return s_action_node_end_; }
+	static int GetDecoratorNodeEnd() { return s_decorator_node_end_; }
 
 	/**
 	 * @brief Clone a node and all its children
@@ -137,67 +137,67 @@ public:
 	PatronNode Clone();
 
 
-	PatronNode(int type);
-	PatronNode(const PatronNode& node, bool invoke_copy = false);
-	PatronNode(PatronNode&& node);
+	PatronNode(int _type);
+	PatronNode(const PatronNode& _node, bool _invoke_copy = false);
+	PatronNode(PatronNode&& _node);
 
-	PatronNode& operator=(const PatronNode& node) = default;
+	PatronNode& operator=(const PatronNode& _node) = default;
 
 
 	/**
 	 * @brief Create a new node and add it to the current node
 	 * 
-	 * \param node Node to add
+	 * \param _node Node to add
 	 * \return Node added
 	 */
-	PatronNode* Add(const PatronNode& node, bool invoke_copy = false);
+	PatronNode* Add(const PatronNode& _node, bool _invoke_copy = false);
 	/**
 	 * @brief Add a existing node to the current node
 	 * 
-	 * \param node Node to add
+	 * \param _node Node to add
 	 * \return Node added
 	 */
-	PatronNode* Add(PatronNode* node);
+	PatronNode* Add(PatronNode* _node);
 
-	int getType() { return m_type_; }
+	int GetType() const { return m_type_; }
 
-	std::list<PatronNode*>& getChildrens() { return m_child_; }
+	std::list<PatronNode*>& GetChildren() { return m_child_list_; }
 
-	PatronNode* getChild(int index) { return *std::next(m_child_.begin(), index); }
+	PatronNode* GetChild(int _index) { return *std::next(m_child_list_.begin(), _index); }
 
-	PatronNode* getParent() { return m_parent_; }
+	PatronNode* GetParent() const { return m_p_parent_; }
 
-	void SetParent(PatronNode* parent) { m_parent_ = parent; }
+	void SetParent(PatronNode* _parent) { m_p_parent_ = _parent; }
 
-	void removeChild(PatronNode* node);
+	void RemoveChild(PatronNode* _node);
 
-	void removeChild(int node_id);
+	void RemoveChild(int _node_id);
 
 	/**
 	 * @brief Set the node as open
 	 * 
-	 * \param isAdded true if you want to open the tree
+	 * \param _is_added true if you want to open the tree
 	 */
-	void setNewNodeIsAdded(bool isAdded) { m_new_node_is_added_ = isAdded; }
+	void SetNewNodeIsAdded(bool _is_added) { m_new_node_is_added_ = _is_added; }
 
 	/**
 	 * @brief Return if the node is a child of the current node
 	 * 
-	 * \param id Id of the node to check
+	 * \param _id Id of the node to check
 	 * \return nullptr if the node does not exist, the node if it exist
 	 */
-	PatronNode* CheckIfNodeIsAChild(int id);
+	PatronNode* CheckIfNodeIsAChild(int _id);
 
-	void Save(std::ofstream& save);
-	void Load(std::ifstream& load);
+	void Save(std::ofstream& _file);
+	void Load(std::ifstream& _file);
 
 	/**
 	 * @brief Display the node and all its children using ImGUI TreeNode and window.
 	 * This function must be called inside a ImGUI window
 	 * 
-	 * \param selectedNode Node selected by the user in the tree
+	 * \param _selected_node Node selected by the user in the tree
 	 * \param executionOrder Execution order of the node, 0 mean its the root node
 	 * \return 
 	 */
-	ImRect Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObject> game_object,int executionOrder = 0);
+	ImRect Display(PatronNode** _selected_node, std::weak_ptr<lc::GameObject> _game_object, int _execution_order = 0);
 };

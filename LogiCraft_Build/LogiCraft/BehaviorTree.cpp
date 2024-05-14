@@ -312,7 +312,7 @@ void PatronNode::SetupAllNode()
 			};
 		s_decorator_update_method_["CONDITION"] = [](PatronNode* node) {
 
-			if(ImGui::BeginCombo("Condition Type", PatronNode::getConditionName(node->m_condition_type_).c_str()))
+			if(ImGui::BeginCombo("Condition Type", PatronNode::GetConditionName(node->m_condition_type_).c_str()))
 			{
 				for (auto& i : s_condition_container_)
 				{
@@ -320,26 +320,26 @@ void PatronNode::SetupAllNode()
 					if (ImGui::Selectable(i.first.c_str(), isSelected))
 					{
 						node->m_condition_type_ = i.second;
-						if (s_decorator_init_method_[getConditionName(i.second)])
-							s_decorator_init_method_[getConditionName(i.second)](node);
+						if (s_decorator_init_method_[GetConditionName(i.second)])
+							s_decorator_init_method_[GetConditionName(i.second)](node);
 					}
 				}
 				ImGui::EndCombo();
 			}
 
-			if (s_decorator_update_method_[getConditionName(node->m_condition_type_)])
-				s_decorator_update_method_[getConditionName(node->m_condition_type_)](node);
+			if (s_decorator_update_method_[GetConditionName(node->m_condition_type_)])
+				s_decorator_update_method_[GetConditionName(node->m_condition_type_)](node);
 
 			};
 		s_decorator_save_method_["CONDITION"] = [](PatronNode* node, std::ofstream& file) {
 			file << node->m_condition_type_ << " ";
-			if (s_decorator_save_method_[getConditionName(node->m_condition_type_)])
-				s_decorator_save_method_[getConditionName(node->m_condition_type_)](node, file);
+			if (s_decorator_save_method_[GetConditionName(node->m_condition_type_)])
+				s_decorator_save_method_[GetConditionName(node->m_condition_type_)](node, file);
 			};
 		s_decorator_load_method_["CONDITION"] = [](PatronNode* node, std::ifstream& file) {
 			file >> node->m_condition_type_;
-			if (s_decorator_load_method_[getConditionName(node->m_condition_type_)])
-				s_decorator_load_method_[getConditionName(node->m_condition_type_)](node, file);
+			if (s_decorator_load_method_[GetConditionName(node->m_condition_type_)])
+				s_decorator_load_method_[GetConditionName(node->m_condition_type_)](node, file);
 			};
 	}
 
@@ -634,20 +634,20 @@ bool PatronNode::DidNodeExist(const std::string _name)
 	return false;
 }
 
-std::string PatronNode::getNodeName(int type)
+std::string PatronNode::GetNodeName(int _type)
 {
 	 for (auto& i : s_node_container_)
 	 { 
-		 if (i.second == type)
+		 if (i.second == _type)
 			 return i.first; 
 	 } return "NONE";
 }
 
-std::string PatronNode::getConditionName(int type)
+std::string PatronNode::GetConditionName(int _type)
 {
 	for (auto& i : s_condition_container_)
 	{
-		if (i.second == type)
+		if (i.second == _type)
 			return i.first;
 	} return "NONE";
 }
@@ -657,68 +657,68 @@ PatronNode PatronNode::Clone()
 	return  PatronNode(*this,true);
 }
 
-PatronNode::PatronNode(int type) : m_type_(type), m_id_(s_id_++), m_parent_(nullptr)
+PatronNode::PatronNode(int _type) : m_type_(_type), m_id_(s_id_++), m_p_parent_(nullptr)
 {
 	m_condition_type_ = -1;
-	if (s_decorator_init_method_[getNodeName(m_type_)])
-		s_decorator_init_method_[getNodeName(m_type_)](this);
+	if (s_decorator_init_method_[GetNodeName(m_type_)])
+		s_decorator_init_method_[GetNodeName(m_type_)](this);
 	
 }
 
-PatronNode::PatronNode(const PatronNode& node, bool invoke_copy)
+PatronNode::PatronNode(const PatronNode& _node, bool _invoke_copy)
 {
-	m_type_ = node.m_type_;
-	m_condition_type_ = node.m_condition_type_;
-	m_decorator_data_ = node.m_decorator_data_;
+	m_type_ = _node.m_type_;
+	m_condition_type_ = _node.m_condition_type_;
+	m_decorator_data_ = _node.m_decorator_data_;
 	m_id_ = s_id_++;
-	m_is_open_ = node.m_is_open_;
-	m_new_node_is_added_ = node.m_new_node_is_added_;
-	m_parent_ = nullptr;
-	m_child_.clear();
-	for (auto& i : node.m_child_)
+	m_is_open_ = _node.m_is_open_;
+	m_new_node_is_added_ = _node.m_new_node_is_added_;
+	m_p_parent_ = nullptr;
+	m_child_list_.clear();
+	for (auto& i : _node.m_child_list_)
 	{
-		Add(*i,invoke_copy);
+		Add(*i,_invoke_copy);
 	}
 
-	if(!invoke_copy)
+	if(!_invoke_copy)
 	{
-		if (s_decorator_init_method_[getNodeName(m_type_)])		
-			s_decorator_init_method_[getNodeName(m_type_)](this);
+		if (s_decorator_init_method_[GetNodeName(m_type_)])		
+			s_decorator_init_method_[GetNodeName(m_type_)](this);
 	}
 	else
 	{
-		if (s_decorator_copy_method_[getNodeName(m_type_)])
-			s_decorator_copy_method_[getNodeName(m_type_)](this, const_cast<PatronNode*>(&node));
+		if (s_decorator_copy_method_[GetNodeName(m_type_)])
+			s_decorator_copy_method_[GetNodeName(m_type_)](this, const_cast<PatronNode*>(&_node));
 	}
 }
 
-PatronNode::PatronNode(PatronNode&& node)
+PatronNode::PatronNode(PatronNode&& _node)
 {
-	m_type_ = node.m_type_;
-	m_condition_type_ = node.m_condition_type_;
-	m_decorator_data_ = node.m_decorator_data_;
+	m_type_ = _node.m_type_;
+	m_condition_type_ = _node.m_condition_type_;
+	m_decorator_data_ = _node.m_decorator_data_;
 	m_id_ = s_id_++;
-	m_is_open_ = node.m_is_open_;
-	m_new_node_is_added_ = node.m_new_node_is_added_;
-	m_parent_ = nullptr;
-	m_child_.clear();
-	for (auto& i : node.m_child_)
+	m_is_open_ = _node.m_is_open_;
+	m_new_node_is_added_ = _node.m_new_node_is_added_;
+	m_p_parent_ = nullptr;
+	m_child_list_.clear();
+	for (auto& i : _node.m_child_list_)
 	{
 		Add(*i);
 	}
 
-	if (s_decorator_copy_method_[getNodeName(m_type_)])
-		s_decorator_copy_method_[getNodeName(m_type_)](this, &node);
+	if (s_decorator_copy_method_[GetNodeName(m_type_)])
+		s_decorator_copy_method_[GetNodeName(m_type_)](this, &_node);
 }
 
-PatronNode* PatronNode::Add(const PatronNode& node, bool invoke_copy)
+PatronNode* PatronNode::Add(const PatronNode& _node, bool _invoke_copy)
 {
 
-	if (node.m_type_ >= 0 and this->m_type_ < s_action_node_start_)
+	if (_node.m_type_ >= 0 and this->m_type_ < s_action_node_start_)
 	{
-		m_child_.push_back(new PatronNode(node,invoke_copy));
-		m_child_.back()->m_parent_ = this;
-		return m_child_.back();
+		m_child_list_.push_back(new PatronNode(_node,_invoke_copy));
+		m_child_list_.back()->m_p_parent_ = this;
+		return m_child_list_.back();
 	}
 	else
 	{
@@ -727,13 +727,13 @@ PatronNode* PatronNode::Add(const PatronNode& node, bool invoke_copy)
 	}
 }
 
-PatronNode* PatronNode::Add(PatronNode* node)
+PatronNode* PatronNode::Add(PatronNode* _node)
 {
-	if (node->m_type_ >= 0 and this->m_type_ < s_action_node_start_)
+	if (_node->m_type_ >= 0 and this->m_type_ < s_action_node_start_)
 	{
-		m_child_.push_back(node);
-		m_child_.back()->m_parent_ = this;
-		return m_child_.back();
+		m_child_list_.push_back(_node);
+		m_child_list_.back()->m_p_parent_ = this;
+		return m_child_list_.back();
 	}
 	else
 	{
@@ -743,29 +743,29 @@ PatronNode* PatronNode::Add(PatronNode* node)
 }
 
 
-void PatronNode::removeChild(PatronNode* node)
+void PatronNode::RemoveChild(PatronNode* _node)
 {
-	m_child_.remove_if([&](PatronNode*& node_) {return node_ == node; });	
+	m_child_list_.remove_if([&](PatronNode*& node_) {return node_ == _node; });	
 }
 
-void PatronNode::removeChild(int node_id)
+void PatronNode::RemoveChild(int _node_id)
 {
-	m_child_.remove_if([&](PatronNode*& node_) {return node_->m_id_ == node_id; });
+	m_child_list_.remove_if([&](PatronNode*& node_) {return node_->m_id_ == _node_id; });
 }
 
 
 
-PatronNode* PatronNode::CheckIfNodeIsAChild(int id)
+PatronNode* PatronNode::CheckIfNodeIsAChild(int _id)
 {
-	for (auto& i : m_child_)
+	for (auto& i : m_child_list_)
 	{
-		if (i->m_id_ == id)
+		if (i->m_id_ == _id)
 			return i;
 	}
 
-	for (auto& i : m_child_)
+	for (auto& i : m_child_list_)
 	{
-		auto tmp = i->CheckIfNodeIsAChild(id);
+		auto tmp = i->CheckIfNodeIsAChild(_id);
 		if (tmp)
 			return tmp;
 	}
@@ -773,43 +773,43 @@ PatronNode* PatronNode::CheckIfNodeIsAChild(int id)
 	return nullptr;
 }
 
-void PatronNode::Save(std::ofstream& save)
+void PatronNode::Save(std::ofstream& _file)
 {
-	save << m_type_ << " " << static_cast<int>(m_child_.size());
-	if(s_decorator_save_method_[getNodeName(m_type_)])
+	_file << m_type_ << " " << static_cast<int>(m_child_list_.size());
+	if(s_decorator_save_method_[GetNodeName(m_type_)])
 	{
-		save << " ";
-		s_decorator_save_method_[getNodeName(m_type_)](this, save);
+		_file << " ";
+		s_decorator_save_method_[GetNodeName(m_type_)](this, _file);
 	}
-	save << std::endl;
-	for (auto& i : m_child_)
+	_file << std::endl;
+	for (auto& i : m_child_list_)
 	{
-		i->Save(save);
+		i->Save(_file);
 	}
 }
 
-void PatronNode::Load(std::ifstream& load)
+void PatronNode::Load(std::ifstream& _file)
 {
 	int size;
-	load >> m_type_ >> size;
-	if (s_decorator_load_method_[getNodeName(m_type_)])
-		s_decorator_load_method_[getNodeName(m_type_)](this, load);
+	_file >> m_type_ >> size;
+	if (s_decorator_load_method_[GetNodeName(m_type_)])
+		s_decorator_load_method_[GetNodeName(m_type_)](this, _file);
 	for (int i = 0; i < size; i++)
 	{
 		PatronNode tmp(0);
-		tmp.Load(load);
-		m_child_.push_back(new PatronNode(tmp, true));
-		m_child_.back()->m_parent_ = this;
+		tmp.Load(_file);
+		m_child_list_.push_back(new PatronNode(tmp, true));
+		m_child_list_.back()->m_p_parent_ = this;
 	}
 }
 
-ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObject> game_object,int executionOrder)
+ImRect PatronNode::Display(PatronNode** _selected_node, std::weak_ptr<lc::GameObject> _game_object, int _execution_order)
 {
 	if(m_game_object_.expired())
 	{
-		m_game_object_ = game_object;		
+		m_game_object_ = _game_object;		
 	}
-	if (*selectedNode == this)//If the node is selected, change the color of the node
+	if (*_selected_node == this)//If the node is selected, change the color of the node
 	{
 		ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(31 / 255.f, 57 / 255.f, 88.f / 255.f, 1.f));
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.f, 1.f, 1.f, 1.f));
@@ -821,7 +821,7 @@ ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObje
 	}
 
 
-	if (ImGui::TreeNodeEx((PatronNode::getNodeName(m_type_) + (executionOrder ? " " + std::to_string(executionOrder) : "") + "## " + std::to_string(m_id_)).c_str(),
+	if (ImGui::TreeNodeEx((PatronNode::GetNodeName(m_type_) + (_execution_order ? " " + std::to_string(_execution_order) : "") + "## " + std::to_string(m_id_)).c_str(),
 		ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_AllowItemOverlap))
 	{
 		m_is_open_ = true;
@@ -829,7 +829,7 @@ ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObje
 
 	if(m_new_node_is_added_)//Automatically open the tree if a new node is added
 	{
-		ImGui::TreeNodeSetOpen(ImGui::GetID((PatronNode::getNodeName(m_type_) + (executionOrder ? " " + std::to_string(executionOrder) : "") + "## " + std::to_string(m_id_)).c_str()), true);
+		ImGui::TreeNodeSetOpen(ImGui::GetID((PatronNode::GetNodeName(m_type_) + (_execution_order ? " " + std::to_string(_execution_order) : "") + "## " + std::to_string(m_id_)).c_str()), true);
 		m_new_node_is_added_ = false;
 	}
 
@@ -837,26 +837,26 @@ ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObje
 
 	if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
 	{
-		*selectedNode = this;
+		*_selected_node = this;
 	}
 
-	if(executionOrder != 0)//If the node is not the root node, the user can drag and drop the node
+	if(_execution_order != 0)//If the node is not the root node, the user can drag and drop the node
 	{
 		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
 		{
 			auto tmp = this;
 			ImGui::SetDragDropPayload("TREE_NODE", &tmp, sizeof(this));
-			ImGui::Text(PatronNode::getNodeName(m_type_).c_str());
+			ImGui::Text(PatronNode::GetNodeName(m_type_).c_str());
 			ImGui::EndDragDropSource();
 		}
 
-		if (this != *std::prev(getParent()->getChildrens().end()))
+		if (this != *std::prev(GetParent()->GetChildren().end()))
 		{
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2.f);
 			ImGui::SameLine();
 			if(ImGui::ArrowButtonEx(std::string("Down##" + std::to_string(m_id_)).c_str(),ImGuiDir_Down,sf::Vector2f(15.f, 13.f)))
 			{
-				auto patron_node = std::find_if(getParent()->getChildrens().begin(), getParent()->getChildrens().end(), [&](PatronNode*& node_)
+				auto patron_node = std::find_if(GetParent()->GetChildren().begin(), GetParent()->GetChildren().end(), [&](PatronNode*& node_)
 					{
 						return (node_->m_id_ == this->m_id_);
 					});
@@ -866,12 +866,12 @@ ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObje
 				*std::next(patron_node) = tmp_changePN;
 			}			
 		}
-		if(this != *getParent()->getChildrens().begin())
+		if(this != *GetParent()->GetChildren().begin())
 		{
 			ImGui::SameLine();
 			if(ImGui::ArrowButtonEx(std::string("Up##" + std::to_string(m_id_)).c_str(),ImGuiDir_Up,sf::Vector2f(15.f, 13.f)))
 			{
-				auto patron_node = std::find_if(getParent()->getChildrens().begin(), getParent()->getChildrens().end(), [&](PatronNode*& node_)
+				auto patron_node = std::find_if(GetParent()->GetChildren().begin(), GetParent()->GetChildren().end(), [&](PatronNode*& node_)
 					{
 						return (node_->m_id_ == this->m_id_);
 					});
@@ -882,13 +882,13 @@ ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObje
 			}
 		}
 	}
-	if (m_type_ < s_decorator_node_start_ or (m_type_ >= PatronNode::getDecoratorNodeStart() and m_type_ < PatronNode::getActionNodeStart() and getChildrens().empty())) //if the node if not a leaf node or the decorator node is empty, we can drop the node dragged into it
+	if (m_type_ < s_decorator_node_start_ or (m_type_ >= PatronNode::GetDecoratorNodeStart() and m_type_ < PatronNode::GetActionNodeStart() and GetChildren().empty())) //if the node if not a leaf node or the decorator node is empty, we can drop the node dragged into it
 		if (BeginDragDropTarget())
 		{
 			if (auto tmp_playLoad = ImGui::AcceptDragDropPayload("TREE_NODE"))
 				if (auto node = reinterpret_cast<PatronNode**>(tmp_playLoad->Data))
 				{
-					auto parent = (*node)->m_parent_;
+					auto parent = (*node)->m_p_parent_;
 					if (this->CheckIfNodeIsAChild(m_id_))
 					{
 						if(m_is_open_)
@@ -902,10 +902,10 @@ ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObje
 
 					if(this != parent)
 					{
-						parent->removeChild((*node)->m_id_);
-						this->Add((*node))->setNewNodeIsAdded(true);
-						this->setNewNodeIsAdded(true);
-						*selectedNode = this;
+						parent->RemoveChild((*node)->m_id_);
+						this->Add((*node))->SetNewNodeIsAdded(true);
+						this->SetNewNodeIsAdded(true);
+						*_selected_node = this;
 					}
 				}
 			ImGui::EndDragDropTarget();
@@ -925,10 +925,10 @@ ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObje
 		ImVec2 verticalLineEnd = verticalLineStart;
 		
 		int index = 1;
-		for (auto child : m_child_)
+		for (auto child : m_child_list_)
 		{
 			const float HorizontalTreeLineSize = 10.0f; //chosen arbitrarily
-			const ImRect childRect = child->Display(selectedNode, game_object,index);
+			const ImRect childRect = child->Display(_selected_node, _game_object,index);
 			const float midpoint = (childRect.Min.y + childRect.Max.y) / 2.0f - 1.f;
 			drawList->AddLine(ImVec2(verticalLineStart.x, midpoint), ImVec2(verticalLineStart.x + HorizontalTreeLineSize, midpoint), TreeLineColor);
 			verticalLineEnd.y = midpoint;
