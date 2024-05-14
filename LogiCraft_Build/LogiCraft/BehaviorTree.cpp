@@ -41,25 +41,25 @@ SOFTWARE.
 #include <tuple>
 #include "Animation.h"
 
-std::unordered_map<std::string, int> PatronNode::s_NodeContainer = {};
-std::unordered_map<std::string, int> PatronNode::s_ConditionContainer = {};
-DecoratorSaveMethod PatronNode::s_DecoratorSaveMethod = {};
-DecoratorLoadMethod PatronNode::s_DecoratorLoadMethod = {};
-DecoratorMethod PatronNode::s_DecoratorInitMethod = {};
-DecoratorMethod PatronNode::s_DecoratorUpdateMethod = {};
-DecoratorCopyMethod PatronNode::s_DecoratorCopyMethod = {};
+std::unordered_map<std::string, int> PatronNode::s_node_container_ = {};
+std::unordered_map<std::string, int> PatronNode::s_condition_container_ = {};
+DecoratorSaveMethod PatronNode::s_decorator_save_method_ = {};
+DecoratorLoadMethod PatronNode::s_decorator_load_method_ = {};
+DecoratorMethod PatronNode::s_decorator_init_method_ = {};
+DecoratorMethod PatronNode::s_decorator_update_method_ = {};
+DecoratorCopyMethod PatronNode::s_decorator_copy_method_ = {};
 
 void PatronNode::SetupAllNode()
 {
 	int previous_node = 0;
-	auto pushNode = [&](std::string name) { s_NodeContainer[name] = previous_node++; };
-	auto pushCondition = [&](std::string name) { s_ConditionContainer[name] = s_ConditionContainer.size(); };
+	auto pushNode = [&](std::string name) { s_node_container_[name] = previous_node++; };
+	auto pushCondition = [&](std::string name) { s_condition_container_[name] = s_condition_container_.size(); };
 
 	//Here, we declare all the node possible in the behavior tree
 	pushNode("SEQUENCE");
 	pushNode("SELECTOR");
 	pushNode("INVERSER");
-	s_NodeContainer["INVERSER"] = 2000;
+	s_node_container_["INVERSER"] = 2000;
 	previous_node = 2001;
 	pushNode("CONDITION");
 	pushNode("LOOP");
@@ -68,7 +68,7 @@ void PatronNode::SetupAllNode()
 	pushNode("DO ON ANIM FRAME");
 	pushNode("FORCE SUCCESS");
 	pushNode("WANDER");
-	s_NodeContainer["WANDER"] = 5000;
+	s_node_container_["WANDER"] = 5000;
 	previous_node = 5001;
 	pushNode("MOVE TO");
 	pushNode("PLAY ANIMATION");
@@ -80,9 +80,13 @@ void PatronNode::SetupAllNode()
 	pushNode("JUMP");
 	
 
-	s_decoratorNodeStart = s_NodeContainer["INVERSER"];//Were the decorator node start
-	s_actionNodeStart = s_NodeContainer["WANDER"];//Were the action node start and were the decorator node stop (leaf node)
+	s_decorator_node_start_ = s_node_container_["INVERSER"];//Were the decorator node start
+	s_action_node_start_ = s_node_container_["WANDER"];//Were the action node start and were the decorator node stop (leaf node)
+	s_decorator_node_end_ = s_node_container_["FORCE SUCCESS"] + 1;
+	s_action_node_end_ = s_node_container_["JUMP"] + 1;
+	
 
+	
 	/*Different condition for the Condition decorator Node*/
 	pushCondition("IN_RANGE_OF_PLAYER");
 	pushCondition("IS_PLAYER_IN_SIGHT");
@@ -93,68 +97,68 @@ void PatronNode::SetupAllNode()
 	//LOOP
 	{
 		//Init method set the std::any to the default value
-		s_DecoratorInitMethod["LOOP"] = [](PatronNode* node) {
-			node->m_decoratorData = 0;
+		s_decorator_init_method_["LOOP"] = [](PatronNode* node) {
+			node->m_decorator_data_ = 0;
 			};
 		//Update method display the data and set the std::any to the new value
-		s_DecoratorUpdateMethod["LOOP"] = [](PatronNode* node) {
-			int loopNumber = std::any_cast<int>(node->m_decoratorData);
+		s_decorator_update_method_["LOOP"] = [](PatronNode* node) {
+			int loopNumber = std::any_cast<int>(node->m_decorator_data_);
 			ImGui::InputInt("Loop Number", &loopNumber, 1,100);
 			(loopNumber <= 0) ? loopNumber = 1 : loopNumber;
-			node->m_decoratorData = loopNumber;
+			node->m_decorator_data_ = loopNumber;
 			};
 		//Save method save the data in the file
-		s_DecoratorSaveMethod["LOOP"] = [](PatronNode* node, std::ofstream& file) {
-			int loopNumber = std::any_cast<int>(node->m_decoratorData);
+		s_decorator_save_method_["LOOP"] = [](PatronNode* node, std::ofstream& file) {
+			int loopNumber = std::any_cast<int>(node->m_decorator_data_);
 			file << loopNumber;
 			};
 		//Load method load the data from the file
-		s_DecoratorLoadMethod["LOOP"] = [](PatronNode* node, std::ifstream& file) {
+		s_decorator_load_method_["LOOP"] = [](PatronNode* node, std::ifstream& file) {
 			int loopNumber;
 			file >> loopNumber;
-			node->m_decoratorData = loopNumber;
+			node->m_decorator_data_ = loopNumber;
 			};
 	}
 
 	//CUSTOM
 	{
 		//Init method set the std::any to the default value
-		s_DecoratorInitMethod["CUSTOM"] = [](PatronNode* node) {
-			node->m_decoratorData = std::string();
+		s_decorator_init_method_["CUSTOM"] = [](PatronNode* node) {
+			node->m_decorator_data_ = std::string();
 		};
-		s_DecoratorCopyMethod["CUSTOM"] = [](PatronNode* node, PatronNode* copied_node)		{
-			node->m_decoratorData = std::any_cast<std::string>(copied_node->m_decoratorData);
+		s_decorator_copy_method_["CUSTOM"] = [](PatronNode* node, PatronNode* copied_node)		{
+			node->m_decorator_data_ = std::any_cast<std::string>(copied_node->m_decorator_data_);
 		};
 		//Update method display the data and set the std::any to the new value
-		s_DecoratorUpdateMethod["CUSTOM"] = [](PatronNode* node) {
-			auto customCondition = std::any_cast<std::string>(node->m_decoratorData);
+		s_decorator_update_method_["CUSTOM"] = [](PatronNode* node) {
+			auto customCondition = std::any_cast<std::string>(node->m_decorator_data_);
 			ImGui::InputText("Loop Number", customCondition,100);
 			Tools::ReplaceCharacter(customCondition,' ','_');
-			node->m_decoratorData = customCondition;
+			node->m_decorator_data_ = customCondition;
 		};
 		//Save method save the data in the file
-		s_DecoratorSaveMethod["CUSTOM"] = [](PatronNode* node, std::ofstream& file) {
-			std::string customCondition = std::any_cast<std::string>(node->m_decoratorData);
+		s_decorator_save_method_["CUSTOM"] = [](PatronNode* node, std::ofstream& file) {
+			std::string customCondition = std::any_cast<std::string>(node->m_decorator_data_);
 			file << customCondition;
 		};
 		//Load method load the data from the file
-		s_DecoratorLoadMethod["CUSTOM"] = [](PatronNode* node, std::ifstream& file) {
+		s_decorator_load_method_["CUSTOM"] = [](PatronNode* node, std::ifstream& file) {
 			std::string customCondition;
 			file >> customCondition;
-			node->m_decoratorData = customCondition;
+			node->m_decorator_data_ = customCondition;
 		};
 	}
 	//DO ON ANIM FRAME
 	{
 		//Init method set the std::any to the default value
 		typedef std::tuple<std::weak_ptr<lc::Animation>, std::string, std::string, int> onframe_anim;
-		s_DecoratorInitMethod["DO ON ANIM FRAME"] = [](PatronNode* node) {
-			node->m_decoratorData = onframe_anim(std::weak_ptr<lc::Animation>(),"","",-1);
+		s_decorator_init_method_["DO ON ANIM FRAME"] = [](PatronNode* node) {
+			node->m_decorator_data_ = onframe_anim(std::weak_ptr<lc::Animation>(),"","",-1);
 			
 		};
 		//Update method display the data and set the std::any to the new value
-		s_DecoratorUpdateMethod["DO ON ANIM FRAME"] = [](PatronNode* node) {
-			onframe_anim tuple = std::any_cast<onframe_anim>(node->m_decoratorData);
+		s_decorator_update_method_["DO ON ANIM FRAME"] = [](PatronNode* node) {
+			onframe_anim tuple = std::any_cast<onframe_anim>(node->m_decorator_data_);
 
 			if(std::get<0>(tuple).expired() and !std::get<2>(tuple).empty())
 			{
@@ -230,31 +234,31 @@ void PatronNode::SetupAllNode()
 					}
 				}				
 			}
-			node->m_decoratorData = tuple;	
+			node->m_decorator_data_ = tuple;	
 		};
 		//Save method save the data in the file
-		s_DecoratorSaveMethod["DO ON ANIM FRAME"] = [](PatronNode* node, std::ofstream& file) {
-			auto tuple = std::any_cast<onframe_anim>(node->m_decoratorData);
+		s_decorator_save_method_["DO ON ANIM FRAME"] = [](PatronNode* node, std::ofstream& file) {
+			auto tuple = std::any_cast<onframe_anim>(node->m_decorator_data_);
 			file << std::get<1>(tuple) << " " << std::get<2>(tuple) << " " << std::get<3>(tuple);
 		};
 		//Load method load the data from the file
-		s_DecoratorLoadMethod["DO ON ANIM FRAME"] = [](PatronNode* node, std::ifstream& file) {
+		s_decorator_load_method_["DO ON ANIM FRAME"] = [](PatronNode* node, std::ifstream& file) {
 			std::string anim_name,key_name;
 			int frame;
 			file >> key_name >> anim_name >> frame;
-			node->m_decoratorData = onframe_anim(std::weak_ptr<lc::Animation>(),key_name,anim_name,frame);
+			node->m_decorator_data_ = onframe_anim(std::weak_ptr<lc::Animation>(),key_name,anim_name,frame);
 		};
 	}
 
 	//DIRECTION
 	{
 		//Init method set the std::any to the default value
-		s_DecoratorInitMethod["DIRECTION"] = [](PatronNode* node) {
-			node->m_decoratorData = -1;
+		s_decorator_init_method_["DIRECTION"] = [](PatronNode* node) {
+			node->m_decorator_data_ = -1;
 		};
 		//Update method display the data and set the std::any to the new value
-		s_DecoratorUpdateMethod["DIRECTION"] = [](PatronNode* node) {
-			int dir = std::any_cast<int>(node->m_decoratorData);
+		s_decorator_update_method_["DIRECTION"] = [](PatronNode* node) {
+			int dir = std::any_cast<int>(node->m_decorator_data_);
 			std::vector<std::string> direction {"Left", "Right"};
 			if(BeginCombo("Direction",dir == -1 ? "Chose a direction" : direction[dir].c_str()))
 			{
@@ -265,145 +269,145 @@ void PatronNode::SetupAllNode()
 				}
 				EndCombo();
 			}
-			node->m_decoratorData = dir;
+			node->m_decorator_data_ = dir;
 		};
 		//Save method save the data in the file
-		s_DecoratorSaveMethod["DIRECTION"] = [](PatronNode* node, std::ofstream& file) {
-			int dir = std::any_cast<int>(node->m_decoratorData);
+		s_decorator_save_method_["DIRECTION"] = [](PatronNode* node, std::ofstream& file) {
+			int dir = std::any_cast<int>(node->m_decorator_data_);
 			file << dir;
 		};
 		//Load method load the data from the file
-		s_DecoratorLoadMethod["DIRECTION"] = [](PatronNode* node, std::ifstream& file) {
+		s_decorator_load_method_["DIRECTION"] = [](PatronNode* node, std::ifstream& file) {
 			int dir;
 			file >> dir;
-			node->m_decoratorData = dir;
+			node->m_decorator_data_ = dir;
 		};
 	}
 	
 	//COOLDOWN
 	{
-		s_DecoratorInitMethod["COOLDOWN"] = [](PatronNode* node) {
-			node->m_decoratorData = 0.f;
+		s_decorator_init_method_["COOLDOWN"] = [](PatronNode* node) {
+			node->m_decorator_data_ = 0.f;
 			};
-		s_DecoratorUpdateMethod["COOLDOWN"] = [](PatronNode* node) {
-			float timer = std::any_cast<float>(node->m_decoratorData);
+		s_decorator_update_method_["COOLDOWN"] = [](PatronNode* node) {
+			float timer = std::any_cast<float>(node->m_decorator_data_);
 			ImGui::DragFloat("Timer of cooldown", &timer, 0.1f);
-			node->m_decoratorData = timer;
+			node->m_decorator_data_ = timer;
 			};
-		s_DecoratorSaveMethod["COOLDOWN"] = [](PatronNode* node, std::ofstream& file) {
-			float timer = std::any_cast<float>(node->m_decoratorData);
+		s_decorator_save_method_["COOLDOWN"] = [](PatronNode* node, std::ofstream& file) {
+			float timer = std::any_cast<float>(node->m_decorator_data_);
 			file << timer << std::endl;
 			};
-		s_DecoratorLoadMethod["COOLDOWN"] = [](PatronNode* node, std::ifstream& file) {
+		s_decorator_load_method_["COOLDOWN"] = [](PatronNode* node, std::ifstream& file) {
 			float timer;
 			file >> timer;
-			node->m_decoratorData = timer;
+			node->m_decorator_data_ = timer;
 			};
 	}
 
 	//CONDITION
 	{
-		s_DecoratorInitMethod["CONDITION"] = [](PatronNode* node) {
-			node->m_conditionType = -1;
+		s_decorator_init_method_["CONDITION"] = [](PatronNode* node) {
+			node->m_condition_type_ = -1;
 			};
-		s_DecoratorUpdateMethod["CONDITION"] = [](PatronNode* node) {
+		s_decorator_update_method_["CONDITION"] = [](PatronNode* node) {
 
-			if(ImGui::BeginCombo("Condition Type", PatronNode::getConditionName(node->m_conditionType).c_str()))
+			if(ImGui::BeginCombo("Condition Type", PatronNode::getConditionName(node->m_condition_type_).c_str()))
 			{
-				for (auto& i : s_ConditionContainer)
+				for (auto& i : s_condition_container_)
 				{
 					bool isSelected = false;
 					if (ImGui::Selectable(i.first.c_str(), isSelected))
 					{
-						node->m_conditionType = i.second;
-						if (s_DecoratorInitMethod[getConditionName(i.second)])
-							s_DecoratorInitMethod[getConditionName(i.second)](node);
+						node->m_condition_type_ = i.second;
+						if (s_decorator_init_method_[getConditionName(i.second)])
+							s_decorator_init_method_[getConditionName(i.second)](node);
 					}
 				}
 				ImGui::EndCombo();
 			}
 
-			if (s_DecoratorUpdateMethod[getConditionName(node->m_conditionType)])
-				s_DecoratorUpdateMethod[getConditionName(node->m_conditionType)](node);
+			if (s_decorator_update_method_[getConditionName(node->m_condition_type_)])
+				s_decorator_update_method_[getConditionName(node->m_condition_type_)](node);
 
 			};
-		s_DecoratorSaveMethod["CONDITION"] = [](PatronNode* node, std::ofstream& file) {
-			file << node->m_conditionType << " ";
-			if (s_DecoratorSaveMethod[getConditionName(node->m_conditionType)])
-				s_DecoratorSaveMethod[getConditionName(node->m_conditionType)](node, file);
+		s_decorator_save_method_["CONDITION"] = [](PatronNode* node, std::ofstream& file) {
+			file << node->m_condition_type_ << " ";
+			if (s_decorator_save_method_[getConditionName(node->m_condition_type_)])
+				s_decorator_save_method_[getConditionName(node->m_condition_type_)](node, file);
 			};
-		s_DecoratorLoadMethod["CONDITION"] = [](PatronNode* node, std::ifstream& file) {
-			file >> node->m_conditionType;
-			if (s_DecoratorLoadMethod[getConditionName(node->m_conditionType)])
-				s_DecoratorLoadMethod[getConditionName(node->m_conditionType)](node, file);
+		s_decorator_load_method_["CONDITION"] = [](PatronNode* node, std::ifstream& file) {
+			file >> node->m_condition_type_;
+			if (s_decorator_load_method_[getConditionName(node->m_condition_type_)])
+				s_decorator_load_method_[getConditionName(node->m_condition_type_)](node, file);
 			};
 	}
 
 	//MOVE TO
 	{
-		s_DecoratorInitMethod["MOVE TO"] = [](PatronNode* node) {
-			node->m_decoratorData = std::string();
+		s_decorator_init_method_["MOVE TO"] = [](PatronNode* node) {
+			node->m_decorator_data_ = std::string();
 		};
-		s_DecoratorCopyMethod["MOVE TO"] = [](PatronNode* node, PatronNode* node_copied) {
-			node->m_decoratorData = std::any_cast<std::string>(node_copied->m_decoratorData);
+		s_decorator_copy_method_["MOVE TO"] = [](PatronNode* node, PatronNode* node_copied) {
+			node->m_decorator_data_ = std::any_cast<std::string>(node_copied->m_decorator_data_);
 		};
-		s_DecoratorUpdateMethod["MOVE TO"] = [](PatronNode* node) {
-			auto TAG = std::any_cast<std::string>(node->m_decoratorData);
+		s_decorator_update_method_["MOVE TO"] = [](PatronNode* node) {
+			auto TAG = std::any_cast<std::string>(node->m_decorator_data_);
 			ImGui::InputText("TAG", TAG, 100);
-			node->m_decoratorData = TAG;
+			node->m_decorator_data_ = TAG;
 		};
-		s_DecoratorSaveMethod["MOVE TO"] = [](PatronNode* node, std::ofstream& file) {
-			auto tag = std::any_cast<std::string>(node->m_decoratorData);
+		s_decorator_save_method_["MOVE TO"] = [](PatronNode* node, std::ofstream& file) {
+			auto tag = std::any_cast<std::string>(node->m_decorator_data_);
 			file << tag;
 		};
-		s_DecoratorLoadMethod["MOVE TO"] = [](PatronNode* node, std::ifstream& file){
+		s_decorator_load_method_["MOVE TO"] = [](PatronNode* node, std::ifstream& file){
 			std::string tag;
 			file >> tag;
-			node->m_decoratorData = tag;
+			node->m_decorator_data_ = tag;
 		};
 	}
 
 	//IN_RANGE_OF_PLAYER
     	{
-    		s_DecoratorInitMethod["IN_RANGE_OF_PLAYER"] = [](PatronNode* node) {
-    			node->m_decoratorData = 100;
+    		s_decorator_init_method_["IN_RANGE_OF_PLAYER"] = [](PatronNode* node) {
+    			node->m_decorator_data_ = 100;
     			};
-    		s_DecoratorUpdateMethod["IN_RANGE_OF_PLAYER"] = [](PatronNode* node) {
-    			int range = std::any_cast<int>(node->m_decoratorData);
+    		s_decorator_update_method_["IN_RANGE_OF_PLAYER"] = [](PatronNode* node) {
+    			int range = std::any_cast<int>(node->m_decorator_data_);
     			ImGui::SliderInt("Range", &range, 100, 1500);
-    			node->m_decoratorData = range;
+    			node->m_decorator_data_ = range;
     			};
-    		s_DecoratorSaveMethod["IN_RANGE_OF_PLAYER"] = [](PatronNode* node, std::ofstream& file) {
-    			int range = std::any_cast<int>(node->m_decoratorData);
+    		s_decorator_save_method_["IN_RANGE_OF_PLAYER"] = [](PatronNode* node, std::ofstream& file) {
+    			int range = std::any_cast<int>(node->m_decorator_data_);
     			file << range;
     
     			};
-    		s_DecoratorLoadMethod["IN_RANGE_OF_PLAYER"] = [](PatronNode* node, std::ifstream& file) {
+    		s_decorator_load_method_["IN_RANGE_OF_PLAYER"] = [](PatronNode* node, std::ifstream& file) {
     			int range;
     			file >> range;
-    			node->m_decoratorData = range;
+    			node->m_decorator_data_ = range;
     			};
     	}
 
 	//JUMP
 	{
-		s_DecoratorInitMethod["JUMP"] = [](PatronNode* node) {
-			node->m_decoratorData = 100.f;
+		s_decorator_init_method_["JUMP"] = [](PatronNode* node) {
+			node->m_decorator_data_ = 100.f;
 			};
-		s_DecoratorUpdateMethod["JUMP"] = [](PatronNode* node) {
-			auto jump_height = std::any_cast<float>(node->m_decoratorData);
+		s_decorator_update_method_["JUMP"] = [](PatronNode* node) {
+			auto jump_height = std::any_cast<float>(node->m_decorator_data_);
 			ImGui::DragFloat("Jump Height", &jump_height);
-			node->m_decoratorData = jump_height;
+			node->m_decorator_data_ = jump_height;
 			};
-		s_DecoratorSaveMethod["JUMP"] = [](PatronNode* node, std::ofstream& file) {
-			auto jump_height = std::any_cast<float>(node->m_decoratorData);
+		s_decorator_save_method_["JUMP"] = [](PatronNode* node, std::ofstream& file) {
+			auto jump_height = std::any_cast<float>(node->m_decorator_data_);
 			file << jump_height;
 
 			};
-		s_DecoratorLoadMethod["JUMP"] = [](PatronNode* node, std::ifstream& file) {
+		s_decorator_load_method_["JUMP"] = [](PatronNode* node, std::ifstream& file) {
 			float jump_height;
 			file >> jump_height;
-			node->m_decoratorData = jump_height;
+			node->m_decorator_data_ = jump_height;
 			};
 	}
 
@@ -411,15 +415,15 @@ void PatronNode::SetupAllNode()
 	//PLAY_ANIMATION
 	{
 		typedef std::tuple<std::weak_ptr<lc::Animation>, std::string, std::string, bool, bool, bool> bt_anim;
-		s_DecoratorInitMethod["PLAY ANIMATION"] = [](PatronNode* node) {
-			node->m_decoratorData = bt_anim();
+		s_decorator_init_method_["PLAY ANIMATION"] = [](PatronNode* node) {
+			node->m_decorator_data_ = bt_anim();
 			};
-		s_DecoratorCopyMethod["PLAY ANIMATION"] = [](PatronNode* node, PatronNode* node_copied) {
-			node->m_decoratorData = std::any_cast<bt_anim>(node_copied->m_decoratorData);
+		s_decorator_copy_method_["PLAY ANIMATION"] = [](PatronNode* node, PatronNode* node_copied) {
+			node->m_decorator_data_ = std::any_cast<bt_anim>(node_copied->m_decorator_data_);
 			
 			};
-		s_DecoratorUpdateMethod["PLAY ANIMATION"] = [](PatronNode* node) {			
-			bt_anim tuple = std::any_cast<bt_anim>(node->m_decoratorData);
+		s_decorator_update_method_["PLAY ANIMATION"] = [](PatronNode* node) {			
+			bt_anim tuple = std::any_cast<bt_anim>(node->m_decorator_data_);
 
 			if(std::get<0>(tuple).expired() and !std::get<2>(tuple).empty())
 			{
@@ -485,145 +489,154 @@ void PatronNode::SetupAllNode()
 
 				}				
 			}
-			node->m_decoratorData = tuple;			
+			node->m_decorator_data_ = tuple;			
 			};
-		s_DecoratorSaveMethod["PLAY ANIMATION"] = [](PatronNode* node, std::ofstream& file) {
-			auto tuple = std::any_cast<bt_anim>(node->m_decoratorData);
+		s_decorator_save_method_["PLAY ANIMATION"] = [](PatronNode* node, std::ofstream& file) {
+			auto tuple = std::any_cast<bt_anim>(node->m_decorator_data_);
 			file << std::get<2>(tuple) << " " << std::get<1>(tuple) << " " << std::get<3>(tuple) << " " << std::get<4>(tuple);
 			};
-		s_DecoratorLoadMethod["PLAY ANIMATION"] = [](PatronNode* node, std::ifstream& file) {
+		s_decorator_load_method_["PLAY ANIMATION"] = [](PatronNode* node, std::ifstream& file) {
 			auto tuple = bt_anim();
 			file >> std::get<2>(tuple) >> std::get<1>(tuple) >> std::get<3>(tuple) >> std::get<4>(tuple);
-			node->m_decoratorData = tuple;
+			node->m_decorator_data_ = tuple;
 			};
 	}
 
 	//PLAY_SOUND
 	{
-		s_DecoratorInitMethod["PLAY SOUND"] = [](PatronNode* node) {
-			node->m_decoratorData = std::tuple<std::string,bool,float,float>();
+		s_decorator_init_method_["PLAY SOUND"] = [](PatronNode* node) {
+			node->m_decorator_data_ = std::tuple<std::string,bool,float,float>();
 			};
-		s_DecoratorCopyMethod["PLAY SOUND"] = [](PatronNode* node, PatronNode* node_copied) {
-				node->m_decoratorData = std::any_cast<std::tuple<std::string,bool,float,float>>(node_copied->m_decoratorData);
+		s_decorator_copy_method_["PLAY SOUND"] = [](PatronNode* node, PatronNode* node_copied) {
+				node->m_decorator_data_ = std::any_cast<std::tuple<std::string,bool,float,float>>(node_copied->m_decorator_data_);
 				};
-		s_DecoratorUpdateMethod["PLAY SOUND"] = [](PatronNode* node) {
-			auto tuple = std::any_cast<std::tuple<std::string,bool,float,float>>(node->m_decoratorData);
+		s_decorator_update_method_["PLAY SOUND"] = [](PatronNode* node) {
+			auto tuple = std::any_cast<std::tuple<std::string,bool,float,float>>(node->m_decorator_data_);
 			ImGui::InputText("Sound Name", std::get<0>(tuple), 100);
 			ImGui::Checkbox("Start New Sound", &std::get<1>(tuple));
 			ImGui::DragFloat("Attenuation", &std::get<2>(tuple));
 			ImGui::DragFloat("Minimum Distance", &std::get<3>(tuple));
-			node->m_decoratorData = tuple;
+			node->m_decorator_data_ = tuple;
 			};
-		s_DecoratorSaveMethod["PLAY SOUND"] = [](PatronNode* node, std::ofstream& file) {
-			auto tuple = std::any_cast<std::tuple<std::string,bool,float,float>>(node->m_decoratorData);
+		s_decorator_save_method_["PLAY SOUND"] = [](PatronNode* node, std::ofstream& file) {
+			auto tuple = std::any_cast<std::tuple<std::string,bool,float,float>>(node->m_decorator_data_);
 			file << std::get<0>(tuple) << " " << std::get<1>(tuple) << " " << std::get<2>(tuple) << " " << std::get<3>(tuple);
 
 			};
-		s_DecoratorLoadMethod["PLAY SOUND"] = [](PatronNode* node, std::ifstream& file) {
+		s_decorator_load_method_["PLAY SOUND"] = [](PatronNode* node, std::ifstream& file) {
 			std::tuple<std::string,bool,float,float> tuple;
 			file >> std::get<0>(tuple) >> std::get<1>(tuple) >> std::get<2>(tuple) >> std::get<3>(tuple);
-			node->m_decoratorData = tuple;
+			node->m_decorator_data_ = tuple;
 			};
 	}
 
 	//ROTATE_TO
 	{
-		s_DecoratorInitMethod["ROTATE TO"] = [](PatronNode* node) {
-			node->m_decoratorData = std::string();
+		s_decorator_init_method_["ROTATE TO"] = [](PatronNode* node) {
+			node->m_decorator_data_ = std::string();
 			};
-		s_DecoratorCopyMethod["ROTATE TO"] = [](PatronNode* node, PatronNode* node_copied) {
-			node->m_decoratorData = std::any_cast<std::string>(node_copied->m_decoratorData);
+		s_decorator_copy_method_["ROTATE TO"] = [](PatronNode* node, PatronNode* node_copied) {
+			node->m_decorator_data_ = std::any_cast<std::string>(node_copied->m_decorator_data_);
 			};
-		s_DecoratorUpdateMethod["ROTATE TO"] = [](PatronNode* node) {
-			auto TAG = std::any_cast<std::string>(node->m_decoratorData);
+		s_decorator_update_method_["ROTATE TO"] = [](PatronNode* node) {
+			auto TAG = std::any_cast<std::string>(node->m_decorator_data_);
 			ImGui::InputText("TAG", TAG, 100);
-			node->m_decoratorData = TAG;
+			node->m_decorator_data_ = TAG;
 			};
-		s_DecoratorSaveMethod["ROTATE TO"] = [](PatronNode* node, std::ofstream& file) {
-			auto tag = std::any_cast<std::string>(node->m_decoratorData);
+		s_decorator_save_method_["ROTATE TO"] = [](PatronNode* node, std::ofstream& file) {
+			auto tag = std::any_cast<std::string>(node->m_decorator_data_);
 			file << tag;
 
 			};
-		s_DecoratorLoadMethod["ROTATE TO"] = [](PatronNode* node, std::ifstream& file) {
+		s_decorator_load_method_["ROTATE TO"] = [](PatronNode* node, std::ifstream& file) {
 			std::string tag;
 			file >> tag;
-			node->m_decoratorData = tag;
+			node->m_decorator_data_ = tag;
 			};
 	}
 
 	//WAIT
 	{
-		s_DecoratorInitMethod["WAIT"] = [](PatronNode* node) {
-			node->m_decoratorData = float(0.f);
+		s_decorator_init_method_["WAIT"] = [](PatronNode* node) {
+			node->m_decorator_data_ = float(0.f);
 			};
-		s_DecoratorUpdateMethod["WAIT"] = [](PatronNode* node) {
-			float timer = std::any_cast<float>(node->m_decoratorData);
+		s_decorator_update_method_["WAIT"] = [](PatronNode* node) {
+			float timer = std::any_cast<float>(node->m_decorator_data_);
 			ImGui::DragFloat("Timer of wait", &timer, 0.1f);
-			node->m_decoratorData = timer;
+			node->m_decorator_data_ = timer;
 			};
-		s_DecoratorSaveMethod["WAIT"] = [](PatronNode* node, std::ofstream& file) {
-			float timer = std::any_cast<float>(node->m_decoratorData);
+		s_decorator_save_method_["WAIT"] = [](PatronNode* node, std::ofstream& file) {
+			float timer = std::any_cast<float>(node->m_decorator_data_);
 			file << timer;
 			};
-		s_DecoratorLoadMethod["WAIT"] = [](PatronNode* node, std::ifstream& file) {
+		s_decorator_load_method_["WAIT"] = [](PatronNode* node, std::ifstream& file) {
 			float timer;
 			file >> timer;
-			node->m_decoratorData = timer;
+			node->m_decorator_data_ = timer;
 			};
 	}
 
 	//ATTACK
 	{
-		s_DecoratorInitMethod["ATTACK"] = [](PatronNode* node) {
-			node->m_decoratorData = std::string();
+		s_decorator_init_method_["ATTACK"] = [](PatronNode* node) {
+			node->m_decorator_data_ = std::string();
 		};
-		s_DecoratorCopyMethod["ATTACK"] = [](PatronNode* node, PatronNode* nodeCopied){
-			node->m_decoratorData = std::any_cast<std::string>(nodeCopied->m_decoratorData);
+		s_decorator_copy_method_["ATTACK"] = [](PatronNode* node, PatronNode* nodeCopied){
+			node->m_decorator_data_ = std::any_cast<std::string>(nodeCopied->m_decorator_data_);
 		};
-		s_DecoratorUpdateMethod["ATTACK"] = [](PatronNode* node) {
-			std::string attack_name = std::any_cast<std::string>(node->m_decoratorData);
+		s_decorator_update_method_["ATTACK"] = [](PatronNode* node) {
+			std::string attack_name = std::any_cast<std::string>(node->m_decorator_data_);
 			ImGui::InputText("Attack Name", attack_name, 150);
-			node->m_decoratorData = attack_name;
+			node->m_decorator_data_ = attack_name;
 		};
-		s_DecoratorSaveMethod["ATTACK"] = [](PatronNode* node, std::ofstream& file) {
-			std::string	attack_name = std::any_cast<std::string>(node->m_decoratorData);
+		s_decorator_save_method_["ATTACK"] = [](PatronNode* node, std::ofstream& file) {
+			std::string	attack_name = std::any_cast<std::string>(node->m_decorator_data_);
 			file << attack_name;
 		};
-		s_DecoratorLoadMethod["ATTACK"] = [](PatronNode* node, std::ifstream& file) {
+		s_decorator_load_method_["ATTACK"] = [](PatronNode* node, std::ifstream& file) {
 			std::string attack_name;
 			file >> attack_name;
-			node->m_decoratorData = attack_name;
+			node->m_decorator_data_ = attack_name;
 		};
 	}
 
 	//SHOT
 	{
-		s_DecoratorInitMethod["SHOT"] = [](PatronNode* node) {
-			node->m_decoratorData = std::string();
+		s_decorator_init_method_["SHOT"] = [](PatronNode* node) {
+			node->m_decorator_data_ = std::string();
 		};
-		s_DecoratorCopyMethod["SHOT"] = [](PatronNode* node, PatronNode* nodeCopied){
-			node->m_decoratorData = std::any_cast<std::string>(nodeCopied->m_decoratorData);
+		s_decorator_copy_method_["SHOT"] = [](PatronNode* node, PatronNode* nodeCopied){
+			node->m_decorator_data_ = std::any_cast<std::string>(nodeCopied->m_decorator_data_);
 		};
-		s_DecoratorUpdateMethod["SHOT"] = [](PatronNode* node) {
-			std::string attack_name = std::any_cast<std::string>(node->m_decoratorData);
+		s_decorator_update_method_["SHOT"] = [](PatronNode* node) {
+			std::string attack_name = std::any_cast<std::string>(node->m_decorator_data_);
 			ImGui::InputText("Attack Name", attack_name, 150);
-			node->m_decoratorData = attack_name;
+			node->m_decorator_data_ = attack_name;
 		};
-		s_DecoratorSaveMethod["SHOT"] = [](PatronNode* node, std::ofstream& file) {
-			std::string	attack_name = std::any_cast<std::string>(node->m_decoratorData);
+		s_decorator_save_method_["SHOT"] = [](PatronNode* node, std::ofstream& file) {
+			std::string	attack_name = std::any_cast<std::string>(node->m_decorator_data_);
 			file << attack_name;
 		};
-		s_DecoratorLoadMethod["SHOT"] = [](PatronNode* node, std::ifstream& file) {
+		s_decorator_load_method_["SHOT"] = [](PatronNode* node, std::ifstream& file) {
 			std::string attack_name;
 			file >> attack_name;
-			node->m_decoratorData = attack_name;
+			node->m_decorator_data_ = attack_name;
 		};
 	}
 }
 
+bool PatronNode::DidNodeExist(const std::string _name)
+{
+	if(_name == "NONE")
+		return false;
+	if(s_node_container_[_name])
+		return true;
+	return false;
+}
+
 std::string PatronNode::getNodeName(int type)
 {
-	 for (auto& i : s_NodeContainer)
+	 for (auto& i : s_node_container_)
 	 { 
 		 if (i.second == type)
 			 return i.first; 
@@ -632,7 +645,7 @@ std::string PatronNode::getNodeName(int type)
 
 std::string PatronNode::getConditionName(int type)
 {
-	for (auto& i : s_ConditionContainer)
+	for (auto& i : s_condition_container_)
 	{
 		if (i.second == type)
 			return i.first;
@@ -644,68 +657,68 @@ PatronNode PatronNode::Clone()
 	return  PatronNode(*this,true);
 }
 
-PatronNode::PatronNode(int type) : m_type(type), m_id(s_id++), m_parent(nullptr)
+PatronNode::PatronNode(int type) : m_type_(type), m_id_(s_id_++), m_parent_(nullptr)
 {
-	m_conditionType = -1;
-	if (s_DecoratorInitMethod[getNodeName(m_type)])
-		s_DecoratorInitMethod[getNodeName(m_type)](this);
+	m_condition_type_ = -1;
+	if (s_decorator_init_method_[getNodeName(m_type_)])
+		s_decorator_init_method_[getNodeName(m_type_)](this);
 	
 }
 
 PatronNode::PatronNode(const PatronNode& node, bool invoke_copy)
 {
-	m_type = node.m_type;
-	m_conditionType = node.m_conditionType;
-	m_decoratorData = node.m_decoratorData;
-	m_id = s_id++;
-	m_isOpen = node.m_isOpen;
-	m_newNodeIsAdded = node.m_newNodeIsAdded;
-	m_parent = nullptr;
-	m_child.clear();
-	for (auto& i : node.m_child)
+	m_type_ = node.m_type_;
+	m_condition_type_ = node.m_condition_type_;
+	m_decorator_data_ = node.m_decorator_data_;
+	m_id_ = s_id_++;
+	m_is_open_ = node.m_is_open_;
+	m_new_node_is_added_ = node.m_new_node_is_added_;
+	m_parent_ = nullptr;
+	m_child_.clear();
+	for (auto& i : node.m_child_)
 	{
 		Add(*i,invoke_copy);
 	}
 
 	if(!invoke_copy)
 	{
-		if (s_DecoratorInitMethod[getNodeName(m_type)])		
-			s_DecoratorInitMethod[getNodeName(m_type)](this);
+		if (s_decorator_init_method_[getNodeName(m_type_)])		
+			s_decorator_init_method_[getNodeName(m_type_)](this);
 	}
 	else
 	{
-		if (s_DecoratorCopyMethod[getNodeName(m_type)])
-			s_DecoratorCopyMethod[getNodeName(m_type)](this, const_cast<PatronNode*>(&node));
+		if (s_decorator_copy_method_[getNodeName(m_type_)])
+			s_decorator_copy_method_[getNodeName(m_type_)](this, const_cast<PatronNode*>(&node));
 	}
 }
 
 PatronNode::PatronNode(PatronNode&& node)
 {
-	m_type = node.m_type;
-	m_conditionType = node.m_conditionType;
-	m_decoratorData = node.m_decoratorData;
-	m_id = s_id++;
-	m_isOpen = node.m_isOpen;
-	m_newNodeIsAdded = node.m_newNodeIsAdded;
-	m_parent = nullptr;
-	m_child.clear();
-	for (auto& i : node.m_child)
+	m_type_ = node.m_type_;
+	m_condition_type_ = node.m_condition_type_;
+	m_decorator_data_ = node.m_decorator_data_;
+	m_id_ = s_id_++;
+	m_is_open_ = node.m_is_open_;
+	m_new_node_is_added_ = node.m_new_node_is_added_;
+	m_parent_ = nullptr;
+	m_child_.clear();
+	for (auto& i : node.m_child_)
 	{
 		Add(*i);
 	}
 
-	if (s_DecoratorCopyMethod[getNodeName(m_type)])
-		s_DecoratorCopyMethod[getNodeName(m_type)](this, &node);
+	if (s_decorator_copy_method_[getNodeName(m_type_)])
+		s_decorator_copy_method_[getNodeName(m_type_)](this, &node);
 }
 
 PatronNode* PatronNode::Add(const PatronNode& node, bool invoke_copy)
 {
 
-	if (node.m_type >= 0 and this->m_type < s_actionNodeStart)
+	if (node.m_type_ >= 0 and this->m_type_ < s_action_node_start_)
 	{
-		m_child.push_back(new PatronNode(node,invoke_copy));
-		m_child.back()->m_parent = this;
-		return m_child.back();
+		m_child_.push_back(new PatronNode(node,invoke_copy));
+		m_child_.back()->m_parent_ = this;
+		return m_child_.back();
 	}
 	else
 	{
@@ -716,11 +729,11 @@ PatronNode* PatronNode::Add(const PatronNode& node, bool invoke_copy)
 
 PatronNode* PatronNode::Add(PatronNode* node)
 {
-	if (node->m_type >= 0 and this->m_type < s_actionNodeStart)
+	if (node->m_type_ >= 0 and this->m_type_ < s_action_node_start_)
 	{
-		m_child.push_back(node);
-		m_child.back()->m_parent = this;
-		return m_child.back();
+		m_child_.push_back(node);
+		m_child_.back()->m_parent_ = this;
+		return m_child_.back();
 	}
 	else
 	{
@@ -732,25 +745,25 @@ PatronNode* PatronNode::Add(PatronNode* node)
 
 void PatronNode::removeChild(PatronNode* node)
 {
-	m_child.remove_if([&](PatronNode*& node_) {return node_ == node; });	
+	m_child_.remove_if([&](PatronNode*& node_) {return node_ == node; });	
 }
 
 void PatronNode::removeChild(int node_id)
 {
-	m_child.remove_if([&](PatronNode*& node_) {return node_->m_id == node_id; });
+	m_child_.remove_if([&](PatronNode*& node_) {return node_->m_id_ == node_id; });
 }
 
 
 
 PatronNode* PatronNode::CheckIfNodeIsAChild(int id)
 {
-	for (auto& i : m_child)
+	for (auto& i : m_child_)
 	{
-		if (i->m_id == id)
+		if (i->m_id_ == id)
 			return i;
 	}
 
-	for (auto& i : m_child)
+	for (auto& i : m_child_)
 	{
 		auto tmp = i->CheckIfNodeIsAChild(id);
 		if (tmp)
@@ -762,14 +775,14 @@ PatronNode* PatronNode::CheckIfNodeIsAChild(int id)
 
 void PatronNode::Save(std::ofstream& save)
 {
-	save << m_type << " " << static_cast<int>(m_child.size());
-	if(s_DecoratorSaveMethod[getNodeName(m_type)])
+	save << m_type_ << " " << static_cast<int>(m_child_.size());
+	if(s_decorator_save_method_[getNodeName(m_type_)])
 	{
 		save << " ";
-		s_DecoratorSaveMethod[getNodeName(m_type)](this, save);
+		s_decorator_save_method_[getNodeName(m_type_)](this, save);
 	}
 	save << std::endl;
-	for (auto& i : m_child)
+	for (auto& i : m_child_)
 	{
 		i->Save(save);
 	}
@@ -778,15 +791,15 @@ void PatronNode::Save(std::ofstream& save)
 void PatronNode::Load(std::ifstream& load)
 {
 	int size;
-	load >> m_type >> size;
-	if (s_DecoratorLoadMethod[getNodeName(m_type)])
-		s_DecoratorLoadMethod[getNodeName(m_type)](this, load);
+	load >> m_type_ >> size;
+	if (s_decorator_load_method_[getNodeName(m_type_)])
+		s_decorator_load_method_[getNodeName(m_type_)](this, load);
 	for (int i = 0; i < size; i++)
 	{
 		PatronNode tmp(0);
 		tmp.Load(load);
-		m_child.push_back(new PatronNode(tmp, true));
-		m_child.back()->m_parent = this;
+		m_child_.push_back(new PatronNode(tmp, true));
+		m_child_.back()->m_parent_ = this;
 	}
 }
 
@@ -808,16 +821,16 @@ ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObje
 	}
 
 
-	if (ImGui::TreeNodeEx((PatronNode::getNodeName(m_type) + (executionOrder ? " " + std::to_string(executionOrder) : "") + "## " + std::to_string(m_id)).c_str(),
+	if (ImGui::TreeNodeEx((PatronNode::getNodeName(m_type_) + (executionOrder ? " " + std::to_string(executionOrder) : "") + "## " + std::to_string(m_id_)).c_str(),
 		ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_AllowItemOverlap))
 	{
-		m_isOpen = true;
-	} else m_isOpen = false;
+		m_is_open_ = true;
+	} else m_is_open_ = false;
 
-	if(m_newNodeIsAdded)//Automatically open the tree if a new node is added
+	if(m_new_node_is_added_)//Automatically open the tree if a new node is added
 	{
-		ImGui::TreeNodeSetOpen(ImGui::GetID((PatronNode::getNodeName(m_type) + (executionOrder ? " " + std::to_string(executionOrder) : "") + "## " + std::to_string(m_id)).c_str()), true);
-		m_newNodeIsAdded = false;
+		ImGui::TreeNodeSetOpen(ImGui::GetID((PatronNode::getNodeName(m_type_) + (executionOrder ? " " + std::to_string(executionOrder) : "") + "## " + std::to_string(m_id_)).c_str()), true);
+		m_new_node_is_added_ = false;
 	}
 
 	const ImRect nodeRect = ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
@@ -833,7 +846,7 @@ ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObje
 		{
 			auto tmp = this;
 			ImGui::SetDragDropPayload("TREE_NODE", &tmp, sizeof(this));
-			ImGui::Text(PatronNode::getNodeName(m_type).c_str());
+			ImGui::Text(PatronNode::getNodeName(m_type_).c_str());
 			ImGui::EndDragDropSource();
 		}
 
@@ -841,11 +854,11 @@ ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObje
 		{
 			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 2.f);
 			ImGui::SameLine();
-			if(ImGui::ArrowButtonEx(std::string("Down##" + std::to_string(m_id)).c_str(),ImGuiDir_Down,sf::Vector2f(15.f, 13.f)))
+			if(ImGui::ArrowButtonEx(std::string("Down##" + std::to_string(m_id_)).c_str(),ImGuiDir_Down,sf::Vector2f(15.f, 13.f)))
 			{
 				auto patron_node = std::find_if(getParent()->getChildrens().begin(), getParent()->getChildrens().end(), [&](PatronNode*& node_)
 					{
-						return (node_->m_id == this->m_id);
+						return (node_->m_id_ == this->m_id_);
 					});
 
 				auto tmp_changePN = *patron_node;
@@ -856,11 +869,11 @@ ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObje
 		if(this != *getParent()->getChildrens().begin())
 		{
 			ImGui::SameLine();
-			if(ImGui::ArrowButtonEx(std::string("Up##" + std::to_string(m_id)).c_str(),ImGuiDir_Up,sf::Vector2f(15.f, 13.f)))
+			if(ImGui::ArrowButtonEx(std::string("Up##" + std::to_string(m_id_)).c_str(),ImGuiDir_Up,sf::Vector2f(15.f, 13.f)))
 			{
 				auto patron_node = std::find_if(getParent()->getChildrens().begin(), getParent()->getChildrens().end(), [&](PatronNode*& node_)
 					{
-						return (node_->m_id == this->m_id);
+						return (node_->m_id_ == this->m_id_);
 					});
 
 				auto tmp_changePN = *patron_node;
@@ -869,16 +882,16 @@ ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObje
 			}
 		}
 	}
-	if (m_type < s_decoratorNodeStart or (m_type >= PatronNode::getDecoratorNodeStart() and m_type < PatronNode::getActionNodeStart() and getChildrens().empty())) //if the node if not a leaf node or the decorator node is empty, we can drop the node dragged into it
+	if (m_type_ < s_decorator_node_start_ or (m_type_ >= PatronNode::getDecoratorNodeStart() and m_type_ < PatronNode::getActionNodeStart() and getChildrens().empty())) //if the node if not a leaf node or the decorator node is empty, we can drop the node dragged into it
 		if (BeginDragDropTarget())
 		{
 			if (auto tmp_playLoad = ImGui::AcceptDragDropPayload("TREE_NODE"))
 				if (auto node = reinterpret_cast<PatronNode**>(tmp_playLoad->Data))
 				{
-					auto parent = (*node)->m_parent;
-					if (this->CheckIfNodeIsAChild(m_id))
+					auto parent = (*node)->m_parent_;
+					if (this->CheckIfNodeIsAChild(m_id_))
 					{
-						if(m_isOpen)
+						if(m_is_open_)
 						{
 							ImGui::TreePop();
 						}
@@ -889,7 +902,7 @@ ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObje
 
 					if(this != parent)
 					{
-						parent->removeChild((*node)->m_id);
+						parent->removeChild((*node)->m_id_);
 						this->Add((*node))->setNewNodeIsAdded(true);
 						this->setNewNodeIsAdded(true);
 						*selectedNode = this;
@@ -898,7 +911,7 @@ ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObje
 			ImGui::EndDragDropTarget();
 		}
 	
-	if (m_isOpen)
+	if (m_is_open_)
 	{
 		
 		
@@ -912,7 +925,7 @@ ImRect PatronNode::Display(PatronNode** selectedNode, std::weak_ptr<lc::GameObje
 		ImVec2 verticalLineEnd = verticalLineStart;
 		
 		int index = 1;
-		for (auto child : m_child)
+		for (auto child : m_child_)
 		{
 			const float HorizontalTreeLineSize = 10.0f; //chosen arbitrarily
 			const ImRect childRect = child->Display(selectedNode, game_object,index);

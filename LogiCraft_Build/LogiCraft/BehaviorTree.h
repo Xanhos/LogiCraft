@@ -51,26 +51,28 @@ typedef std::unordered_map<std::string, std::function<void(PatronNode*, PatronNo
 
 class PatronNode
 {
-	int m_type;
-	int m_conditionType;
-	std::list <PatronNode*> m_child;
-	PatronNode* m_parent;
-	int m_id;
-	bool m_isOpen = false;
-	bool m_newNodeIsAdded = false;
-	std::any m_decoratorData;
+	int m_type_;
+	int m_condition_type_;
+	std::list <PatronNode*> m_child_;
+	PatronNode* m_parent_;
+	int m_id_;
+	bool m_is_open_ = false;
+	bool m_new_node_is_added_ = false;
+	std::any m_decorator_data_;
 	std::weak_ptr<lc::GameObject> m_game_object_;
 
-	static DecoratorSaveMethod s_DecoratorSaveMethod;
-	static DecoratorLoadMethod s_DecoratorLoadMethod;
-	static DecoratorMethod s_DecoratorInitMethod;
-	static DecoratorMethod s_DecoratorUpdateMethod;
-	static DecoratorCopyMethod s_DecoratorCopyMethod;
-	static std::unordered_map<std::string, int> s_ConditionContainer;
-	static std::unordered_map<std::string, int> s_NodeContainer;
-	inline static int s_id = 0;
-	inline static int s_actionNodeStart = 0;
-	inline static int s_decoratorNodeStart = 0;	
+	static DecoratorSaveMethod s_decorator_save_method_;
+	static DecoratorLoadMethod s_decorator_load_method_;
+	static DecoratorMethod s_decorator_init_method_;
+	static DecoratorMethod s_decorator_update_method_;
+	static DecoratorCopyMethod s_decorator_copy_method_;
+	static std::unordered_map<std::string, int> s_condition_container_;
+	static std::unordered_map<std::string, int> s_node_container_;
+	inline static int s_id_ = 0;
+	inline static int s_action_node_start_ = 0;
+	inline static int s_decorator_node_start_ = 0;	
+	inline static int s_action_node_end_ = 0;
+	inline static int s_decorator_node_end_ = 0;	
 public:
 	/**
 	 * @brief Static method, MUST BE CALLED AT PROGRAM INIT
@@ -79,6 +81,13 @@ public:
 	 */
 	static void SetupAllNode();
 
+	/**
+	 * @brief Static method, return true if the node exist
+	 *
+	 * @param _name Name of the node
+	 */
+	static bool DidNodeExist(const std::string _name);
+	
 	/**
 	 * @brief Static method, return the name of the node
 	 * 
@@ -101,22 +110,24 @@ public:
 	 * \param name Name of the node asociated with the type
 	 * \return the node type
 	 */
-	static int getNodeType(std::string name) { return s_NodeContainer[name]; }
+	static int getNodeType(std::string name) { return s_node_container_[name]; }
 
 	/**
 	*@brief Static method, return the container of all the nodes
 	* 
 	*/
-	static const std::unordered_map< std::string, int>& getNodeContainer() { return s_NodeContainer; } ;
+	static const std::unordered_map< std::string, int>& getNodeContainer() { return s_node_container_; } ;
 
 	/**
 	 * @brief Static method, return the container of all the decorator update method
 	 */
-	static const DecoratorMethod& getNodeUpdateMethod() { return s_DecoratorUpdateMethod; };
+	static const DecoratorMethod& getNodeUpdateMethod() { return s_decorator_update_method_; };
 
 
-	static int getActionNodeStart() { return s_actionNodeStart; }
-	static int getDecoratorNodeStart() { return s_decoratorNodeStart; }
+	static int getActionNodeStart() { return s_action_node_start_; }
+	static int getDecoratorNodeStart() { return s_decorator_node_start_; }
+	static int getActionNodeEnd() { return s_action_node_end_; }
+	static int getDecoratorNodeEnd() { return s_decorator_node_end_; }
 
 	/**
 	 * @brief Clone a node and all its children
@@ -148,15 +159,15 @@ public:
 	 */
 	PatronNode* Add(PatronNode* node);
 
-	int getType() { return m_type; }
+	int getType() { return m_type_; }
 
-	std::list<PatronNode*>& getChildrens() { return m_child; }
+	std::list<PatronNode*>& getChildrens() { return m_child_; }
 
-	PatronNode* getChild(int index) { return *std::next(m_child.begin(), index); }
+	PatronNode* getChild(int index) { return *std::next(m_child_.begin(), index); }
 
-	PatronNode* getParent() { return m_parent; }
+	PatronNode* getParent() { return m_parent_; }
 
-	void SetParent(PatronNode* parent) { m_parent = parent; }
+	void SetParent(PatronNode* parent) { m_parent_ = parent; }
 
 	void removeChild(PatronNode* node);
 
@@ -167,7 +178,7 @@ public:
 	 * 
 	 * \param isAdded true if you want to open the tree
 	 */
-	void setNewNodeIsAdded(bool isAdded) { m_newNodeIsAdded = isAdded; }
+	void setNewNodeIsAdded(bool isAdded) { m_new_node_is_added_ = isAdded; }
 
 	/**
 	 * @brief Return if the node is a child of the current node

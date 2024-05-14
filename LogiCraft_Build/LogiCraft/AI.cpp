@@ -151,8 +151,10 @@ void lc::AI::UpdateSelectedNode()
             {
                 bool isSelected = false;
 
-                for (int i = 0; i < PatronNode::getNodeContainer().size(); i++)
+                for (int i = 0; i < PatronNode::getActionNodeEnd(); i++)
                 {
+                    if(!PatronNode::DidNodeExist(PatronNode::getNodeName(i)))
+                        continue;
                     if(i < PatronNode::getDecoratorNodeStart() || i >= PatronNode::getActionNodeStart())
                         if (ImGui::Selectable(PatronNode::getNodeName(i).c_str(), &isSelected, ImGuiSelectableFlags_SelectOnClick))
                         {
@@ -180,7 +182,7 @@ void lc::AI::UpdateSelectedNode()
 
 
             ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 15.f);
-            m_newDecorateType = MakeCombo(PatronNode::getDecoratorNodeStart(), PatronNode::getActionNodeStart(), m_newDecorateType, "Decorator Type"); // Make a combo with all the decorator node type
+            m_newDecorateType = MakeCombo(PatronNode::getDecoratorNodeStart(), PatronNode::getDecoratorNodeEnd(), m_newDecorateType, "Decorator Type"); // Make a combo with all the decorator node type
 
             if (ImGui::Button("Add Decorator"))
             {
