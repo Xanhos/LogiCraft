@@ -265,7 +265,6 @@ namespace lc
 		std::ifstream file(path);
 		if(file.is_open() and fs::path(path).extension() == ".ptcl")
 		{
-			int tmp_key_anim_count;
 			std::string tmp_resources_type, tmp_resources_name;
 			
 			file >> m_typeName >> m_spawn_color_ >> m_texture_size_
