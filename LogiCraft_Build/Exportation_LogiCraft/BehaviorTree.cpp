@@ -763,7 +763,7 @@ bool bt::ActionNode::Play_Animation::tick()
 	if(!m_animation_.expired())
 	{
 		auto anim = m_animation_.lock();
-		anim->select_animation_key(m_key_anim_name_,m_key_anim_name_ == anim->get_current_animation_key().lock()->get_name() ? false : true);
+		anim->select_animation_key(m_key_anim_name_, m_key_anim_name_ != anim->get_actual_animation_key().lock()->get_name());
 		anim->set_stop_at_last_frame(m_stop_at_last_frame_);
 		anim->current_animation_is_reversed(m_reverse_);
 		return true;		
@@ -926,7 +926,7 @@ void bt::ActionNode::Attack::load(std::ifstream& file, std::shared_ptr<lc::GameO
 
     file >> attack_name;
 
-    auto scene = owner->GetRoot();
+    auto scene = lc::GameObject::GetRoot(owner);
 
     if (attack_name == "damageBox")
     {
