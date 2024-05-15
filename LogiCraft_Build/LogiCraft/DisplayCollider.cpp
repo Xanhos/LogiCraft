@@ -5,6 +5,7 @@ lc::DisplayCollider::DisplayCollider()
 {
     m_typeName = "DisplayCollider";
     m_type = TYPE::DISPLAY_COLLIDER;
+    m_name = "DisplayCollider";
 
 }
 
@@ -14,6 +15,7 @@ lc::DisplayCollider::DisplayCollider(const sf::FloatRect& collider, const std::s
 {
     m_typeName = "DisplayCollider";
     m_type = TYPE::DISPLAY_COLLIDER;
+    m_name = "DisplayCollider";
 }
 
 void lc::DisplayCollider::Save(std::ofstream& save, sf::RenderTexture& texture, int _depth)

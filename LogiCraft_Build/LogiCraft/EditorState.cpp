@@ -36,6 +36,7 @@ SOFTWARE.
 #include "Button.h"
 #include "RigidBody.h"
 #include "AI.h"
+#include "Convex.h"
 #include "PlayerSpawn.h"
 
 EditorState::EditorState(WindowManager& window, StateList* listState) : State(window, listState)
@@ -45,10 +46,21 @@ EditorState::EditorState(WindowManager& window, StateList* listState) : State(wi
 void EditorState::init()
 {
 	PatronNode::SetupAllNode();
+	ToolsBar::SetupParallaxSpeed();
 	m_viewports = Viewports();
 	m_viewports.addViewport(std::make_shared<Viewport>(sf::Vector2f(250.f, 20.f), sf::Vector2f(1420.f, 560.f), (sf::Vector2u)m_windowManager.getSize(), " "));
 	m_scene = lc::GameObject::CreateGameObject("WORLD");
 	m_scene->addComponent<lc::PlayerSpawn>();
+
+	std::vector<sf::Vector2f> convex_point;
+	convex_point.push_back({0,0});
+	convex_point.push_back({50,0});
+	convex_point.push_back({50,100});
+	convex_point.push_back({0,100});
+	auto player = m_scene->addObject(PLAYER_NAME);
+	player->addComponent<lc::Convex>(convex_point)->getConvex().setFillColor(sf::Color::Red);
+	player->getTransform().getOrigin() = {-25.f,-50.f};
+
 	
 	m_isReady = true;
 }
@@ -64,8 +76,8 @@ void EditorState::updateEvent(sf::Event& _event)
 void EditorState::update()
 {
 	m_viewports.Update(m_mainMenu.getHierarchie().getSelectedGameObject(), m_scene, m_windowManager);
-	m_scene->Update(m_windowManager);
 	m_mainMenu.Update(m_scene, m_viewports, m_windowManager);
+	m_scene->Update(m_windowManager);
 }
 
 void EditorState::render()

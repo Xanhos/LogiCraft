@@ -106,12 +106,15 @@ void Hierarchie::GameObjectsDisplay(std::shared_ptr<lc::GameObject> _gameObject,
     if (TreeNodeEx(std::string(_gameObject->getName() + "##<ID:" + std::to_string(_gameObject->getID()) + ">").c_str(),
                    flags))
     {
-        this->DragAndDropBehavior(_gameObject, _scene);
-
-        this->SelectionBehavior(_gameObject);
-
-        this->MoveDownUpBehavior(_gameObject, _gameObjectList);
-
+        if(_gameObject->getName() != PLAYER_NAME)
+        {
+            this->DragAndDropBehavior(_gameObject, _scene);
+        }
+            this->SelectionBehavior(_gameObject);
+        if(_gameObject->getName() != PLAYER_NAME)
+        {
+            this->MoveDownUpBehavior(_gameObject, _gameObjectList);
+        }
         for (auto& gameObject : _gameObject->getObjects())
         {
             GameObjectsDisplay(gameObject, _scene, &_gameObject->getObjects());
@@ -123,11 +126,15 @@ void Hierarchie::GameObjectsDisplay(std::shared_ptr<lc::GameObject> _gameObject,
     }
     else
     {
-        this->DragAndDropBehavior(_gameObject, _scene);
-
-        this->SelectionBehavior(_gameObject);
-
-        this->MoveDownUpBehavior(_gameObject, _gameObjectList);
+        if(_gameObject->getName() != PLAYER_NAME)
+        {
+            this->DragAndDropBehavior(_gameObject, _scene);
+        }
+            this->SelectionBehavior(_gameObject);
+        if(_gameObject->getName() != PLAYER_NAME)
+        {
+            this->MoveDownUpBehavior(_gameObject, _gameObjectList);
+        }
     }
     PopStyleColor();
 
@@ -158,43 +165,46 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
             Text(std::string("Name : " + tmp_object->getName()).c_str());
             if (tmp_object != _scene)
             {
-                if (Button(std::string("Delete Object##<ID:" + std::to_string(tmp_object->getID())).c_str()))
+                if(tmp_object->getName() != PLAYER_NAME)
                 {
-                    auto tmp_parent = tmp_object->getParent();
-                    tmp_parent->removeObject(tmp_object->getName(), tmp_object->getID());
-                }
-
-                Checkbox(std::string("is Visible##<ID:" + std::to_string(tmp_object->getID())).c_str(),
-                         &tmp_object->isVisible());
-                Checkbox(std::string("is Lock##<ID:" + std::to_string(tmp_object->getID())).c_str(),
-                         &tmp_object->isLock());
-
-                if (BeginCombo(std::string("Change Depth").c_str(),
-                               ToolsBar::GetLayers().find(tmp_object->getDepth())->second.c_str(),
-                               ImGuiComboFlags_WidthFitPreview))
-                {
-                    bool isSelected(false);
-                    for (auto& layer : ToolsBar::GetLayers())
+                    if (Button(std::string("Delete Object##<ID:" + std::to_string(tmp_object->getID())).c_str()))
                     {
-                        if (Selectable(layer.second.c_str(), &isSelected))
-                        {
-                            tmp_object->setDepth(layer.first);
-                        }
+                        auto tmp_parent = tmp_object->getParent();
+                        tmp_parent->removeObject(tmp_object->getName(), tmp_object->getID());
                     }
-                    EndCombo();
+
+                    Checkbox(std::string("is Visible##<ID:" + std::to_string(tmp_object->getID())).c_str(),
+                             &tmp_object->isVisible());
+                    Checkbox(std::string("is Lock##<ID:" + std::to_string(tmp_object->getID())).c_str(),
+                             &tmp_object->isLock());
+
+                    if (BeginCombo(std::string("Change Depth").c_str(),
+                                   ToolsBar::GetLayers().find(tmp_object->getDepth())->second.c_str(),
+                                   ImGuiComboFlags_WidthFitPreview))
+                    {
+                        bool isSelected(false);
+                        for (auto& layer : ToolsBar::GetLayers())
+                        {
+                            if (Selectable(layer.second.c_str(), &isSelected))
+                            {
+                                tmp_object->setDepth(layer.first);
+                            }
+                        }
+                        EndCombo();
+                    }
+
+                    InputText("Change Name", tmp_object->getName(), 150, ImGuiInputTextFlags_EnterReturnsTrue);
+
+                    SetCursorPosY(GetCursorPosY() + 10.f);
+
+                    if (Button("Add Component"))
+                    {
+                        m_want_to_add_a_component_.first = true;
+                        m_want_to_add_a_component_.second = tmp_object;
+                    }
+
+                    SetCursorPosY(GetCursorPosY() + 10.f);
                 }
-
-                InputText("Change Name", tmp_object->getName(), 150, ImGuiInputTextFlags_EnterReturnsTrue);
-
-                SetCursorPosY(GetCursorPosY() + 10.f);
-
-                if (Button("Add Component"))
-                {
-                    m_want_to_add_a_component_.first = true;
-                    m_want_to_add_a_component_.second = tmp_object;
-                }
-
-                SetCursorPosY(GetCursorPosY() + 10.f);
 
                 if (TreeNodeEx(std::string("Transform##" + std::to_string(tmp_object->getID())).c_str(),
                                ImGuiTreeNodeFlags_Selected | ImGuiTreeNodeFlags_OpenOnDoubleClick |
@@ -204,6 +214,7 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
                         "X " + std::to_string(tmp_object->getTransform().getSize().x) + ", Y " + std::to_string(
                             tmp_object->getTransform().getSize().y) + " : Size").c_str());
                     PushItemWidth(200.f);
+                    
                     DragFloat2("Position", tmp_object->getTransform().getPosition());
 
                     DragFloat2("Origin", tmp_object->getTransform().getOrigin());
@@ -230,16 +241,19 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
                     TreePop();
                 }
 
-                for (auto component = tmp_object->getComponents().begin(); component != tmp_object->getComponents().
-                     end(); ++component)
+                if(tmp_object->getName() != PLAYER_NAME)
                 {
-                    (*component)->Hierarchie_Draw(tmp_object->getID(), component, tmp_object->getComponents());
-                }
+                    for (auto component = tmp_object->getComponents().begin(); component != tmp_object->getComponents().
+                        end(); ++component)
+                    {
+                        (*component)->Hierarchie_Draw(tmp_object->getID(), component, tmp_object->getComponents());
+                    }
 
-                if (KEY(Delete))
-                {
-                    auto tmp_parent = tmp_object->getParent();
-                    tmp_parent->removeObject(tmp_object->getName(), tmp_object->getID());
+                    if (KEY(Delete))
+                    {
+                        auto tmp_parent = tmp_object->getParent();
+                        tmp_parent->removeObject(tmp_object->getName(), tmp_object->getID());
+                    }
                 }
             }
         }
@@ -331,12 +345,15 @@ void Hierarchie::CreateNewObjectBehavior()
 void Hierarchie::CopyPaste(std::shared_ptr<lc::GameObject> _scene, Viewports& _viewport)
 {
     m_copyPasteTimer += Tools::getDeltaTime();
+    if(m_selectedGameObjects.size()>1)
+        m_selectedGameObjects.remove_if([](std::weak_ptr<lc::GameObject> game_obj){return game_obj.lock()->getName() == PLAYER_NAME;});
+    
     if (KEY(LControl) && KEY(C) && m_copyPasteTimer > 0.2f && !m_selectedGameObjects.empty())
     {
         m_copyPasteObjects.clear();
         for (auto& sltObject : m_selectedGameObjects)
         {
-            if (!this->IsAChldOfASltObj(sltObject.lock(), _scene))
+            if (!this->IsAChldOfASltObj(sltObject.lock(), _scene) && sltObject.lock()->getName() != PLAYER_NAME)
             {
                 auto tmp_object = sltObject.lock()->Clone();
                 tmp_object->getTransform().getPosition() = sltObject.lock()->getTransform().getPosition() +

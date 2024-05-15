@@ -43,7 +43,9 @@ SOFTWARE.
 #include "Particule.h"
 #include "Animation.h"
 #include "HeatShader.h"
+#include "PlayerSpawn.h"
 #include "Shader.h"
+#include "ToolsBar.h"
 #include "WaterShader.h"
 
 lc::GameObject::GameObject()
@@ -273,6 +275,20 @@ void lc::GameObject::UpdateEvent(sf::Event& _event)
 
 void lc::GameObject::Update(WindowManager& _window)
 {
+	if(m_first_pass_init_[1] and !m_first_pass_init_[0])
+	{
+		m_first_pass_init_[1] = false;
+		m_before_simulate_parallax_pos_ = getTransform().getPosition();
+	}
+	
+	if(getParent() && getName() != PLAYER_NAME && !m_first_pass_init_[0])
+	{
+		m_before_simulate_parallax_pos_ = getTransform().getPosition();
+		getTransform().getPosition() += GetOffset(GetRoot(getParent()),m_depth);
+	}
+
+	m_first_pass_init_[0] = false;
+	
 	for (auto object = m_objects.begin(); object != m_objects.end();)
 	{
 		if(object->get()->m_name != "Background_Holder")
@@ -296,7 +312,9 @@ void lc::GameObject::Update(WindowManager& _window)
 			component++;
 	}
 
-	CheckMaxSize();	
+	CheckMaxSize();
+	if(getParent() && getName() != PLAYER_NAME && !m_first_pass_init_[1])
+		getTransform().getPosition() = m_before_simulate_parallax_pos_;
 }
 
 void lc::GameObject::Draw(WindowManager& _window)
@@ -319,10 +337,17 @@ void lc::GameObject::Draw(sf::RenderTexture& _renderer)
 	for (auto& component : m_components)
 		if (component->isVisible())
 			component->Draw(_renderer);
+
 }
 
 void lc::GameObject::Draw(sf::RenderTexture& _renderer, unsigned char _depth)
 {
+	if(getParent() && getName() != PLAYER_NAME && !m_first_pass_init_[1] && m_depth == _depth)
+	{
+		m_before_simulate_parallax_pos_ = getTransform().getPosition();
+		getTransform().getPosition() += GetOffset(GetRoot(getParent()),m_depth);
+	}
+	
 	for (auto& object : m_objects)
 		if (object->isVisible())
 			object->Draw(_renderer, _depth);
@@ -331,6 +356,8 @@ void lc::GameObject::Draw(sf::RenderTexture& _renderer, unsigned char _depth)
 		if (component->isVisible())
 			if (m_depth == _depth)
 				component->Draw(_renderer);
+	if(getParent() && getName() != PLAYER_NAME && m_depth ==_depth && !m_first_pass_init_[1])
+		getTransform().getPosition() = m_before_simulate_parallax_pos_;
 }
 
 bool lc::GameObject::is_in_window_view(WindowManager& window)
@@ -357,6 +384,14 @@ std::shared_ptr<lc::GameObject> lc::GameObject::GetRoot(std::shared_ptr<GameObje
 	while (object->getParent())
 		object = object->getParent();
 	return object;
+}
+
+sf::Vector2f lc::GameObject::GetOffset(std::shared_ptr<GameObject> root, int depth)
+{
+	auto spawn_position = root->getComponent<PlayerSpawn>("Player Spawn")->GetSpawnPosition();
+	auto player_position = root->getObject(PLAYER_NAME)->getTransform().getPosition();
+	return (player_position - spawn_position) * ToolsBar::GetParallaxSpeedFactor(depth);
+
 }
 
 

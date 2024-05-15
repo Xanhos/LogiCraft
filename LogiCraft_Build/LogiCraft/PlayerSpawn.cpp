@@ -6,6 +6,7 @@ lc::PlayerSpawn::PlayerSpawn()
 {
     m_type = TYPE::DISPLAY_COLLIDER;
     m_typeName = "Player Spawn";
+    m_name = "Player Spawn";
 }
 
 void lc::PlayerSpawn::Export(std::ofstream& exportation)
@@ -49,6 +50,9 @@ void lc::PlayerSpawn::Draw(WindowManager& _window)
 
 void lc::PlayerSpawn::Draw(sf::RenderTexture& _window)
 {
+    m_renderer.setPosition(m_relativePosition);
+    m_renderer.setSize({50,100});
+    _window.draw(m_renderer);
 }
 
 std::shared_ptr<lc::GameComponent> lc::PlayerSpawn::Clone()

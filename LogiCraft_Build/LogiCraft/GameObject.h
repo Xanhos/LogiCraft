@@ -40,6 +40,8 @@ SOFTWARE.
 #include "GameComponent.h"
 #include "Transform.h"
 
+const std::string PLAYER_NAME = "PLAYER";
+
 namespace lc
 {
 	class GameObject : public std::enable_shared_from_this<GameObject>
@@ -77,6 +79,7 @@ namespace lc
 
 		static std::shared_ptr<GameObject> GetRoot(std::shared_ptr<GameObject> object);
 
+		static sf::Vector2f GetOffset(std::shared_ptr<GameObject> root, int depth);
 #pragma endregion
 
 #pragma region TEMPLATE
@@ -322,11 +325,14 @@ namespace lc
 		
 		bool m_Saved = false;
 		bool m_needToBeExported;
+		bool m_first_pass_init_[2] = {true, true};
 		
 		std::list<std::shared_ptr<GameComponent>> m_components;
 		std::list<std::shared_ptr<GameObject>> m_objects;
 
 		std::weak_ptr<GameObject> m_wptrParent;
+
+		sf::Vector2f m_before_simulate_parallax_pos_ = {};
 		
 		lc::Transform m_transform;
 	};
