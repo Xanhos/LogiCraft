@@ -44,19 +44,25 @@ SOFTWARE.
 #include "Animation.h"
 #include "HeatShader.h"
 #include "Shader.h"
-
+#include "WaterShader.h"
 
 lc::GameObject::GameObject()
-	: m_ID(m_generalID++), m_depth(0), m_needToBeDeleted(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
-{}
+	: m_ID(m_generalID++), m_depth(0), m_isLock(false), m_isVisible(true), m_isUpdated(true), m_needToBeRemove(false),
+	  m_needToBeExported(false)
+{
+}
 
 lc::GameObject::GameObject(std::string _name)
-	: m_ID(m_generalID++), m_depth(0), m_needToBeDeleted(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
-{}
+	: m_name(_name), m_ID(m_generalID++), m_depth(0), m_isLock(false), m_isVisible(true), m_isUpdated(true), m_needToBeRemove(false),
+	  m_needToBeExported(false)
+{
+}
 
 lc::GameObject::GameObject(std::string _name, unsigned char _depth)
-	: m_name(_name), m_ID(m_generalID++), m_depth(_depth), m_needToBeDeleted(false), m_isLock(false), m_isVisible(true), m_needToBeExported(false)
-{}
+	: m_name(_name), m_ID(m_generalID++), m_depth(_depth), m_isLock(false), m_isVisible(true), m_isUpdated(true),
+	  m_needToBeRemove(false), m_needToBeExported(false)
+{
+}
 
 lc::GameObject::~GameObject()
 {
@@ -202,6 +208,8 @@ void lc::GameObject::Load(std::ifstream& load)
 
 			if (tmp_shader_name == "Heat Shader")
 				addComponent(std::make_shared<lc::shader::heat_shader>())->Load(load);
+			if (tmp_shader_name == "Water Shader")
+				addComponent(std::make_shared<lc::shader::water_shader>())->Load(load);
 		}
 		check('}');
 	}
@@ -218,15 +226,6 @@ void lc::GameObject::Load(std::ifstream& load)
 		this->addObject(CreateGameObject("OBJECT"))->Load(load);
 		check('}');
 	}
-
-
-}
-
-std::shared_ptr<lc::GameObject> lc::GameObject::GetRoot(std::shared_ptr<GameObject> object)
-{
-	while (object->getParent())
-		object = object->getParent();
-	return object;
 }
 
 void lc::GameObject::NeedToBeExported(std::list<std::string> ComponentToCheck)
@@ -263,36 +262,6 @@ void lc::GameObject::ResetExport()
 	}
 }
 
-
-
-
-std::shared_ptr<lc::GameObject> lc::GameObject::CreateGameObject(std::string _name, unsigned char _depth)
-{
-	return std::make_shared<GameObject>(_name, _depth);
-}
-
-void lc::GameObject::CheckMaxSize()
-{
-	lc::Ressource* SizeX{ 0 },* SizeY{ 0 };
-	for (auto& component : getComponents())
-	{
-
-		if (auto ressources = dynamic_cast<lc::Ressource*>(&*component))
-		{
-			if (!SizeX or SizeX->getMaximumSize().x < ressources->getMaximumSize().x)
-				SizeX = ressources;
-
-			if (!SizeY or SizeY->getMaximumSize().y < ressources->getMaximumSize().y)
-				SizeY = ressources;
-		}
-	}
-
-	if(SizeX)
-		m_transform.getSize().x = SizeX->getMaximumSize().x;
-	if(SizeY)
-		m_transform.getSize().y = SizeY->getMaximumSize().y;
-}
-
 void lc::GameObject::UpdateEvent(sf::Event& _event)
 {
 	for (auto& object : m_objects)
@@ -307,9 +276,10 @@ void lc::GameObject::Update(WindowManager& _window)
 	for (auto object = m_objects.begin(); object != m_objects.end();)
 	{
 		if(object->get()->m_name != "Background_Holder")
-			(*object)->Update(_window);
+			if ((*object)->isUpdated())
+				(*object)->Update(_window);
 		
-		if ((*object)->needToBeDeleted())
+		if ((*object)->hasToBeRemoved())
 			object = m_objects.erase(object);
 		else
 			object++;
@@ -317,7 +287,8 @@ void lc::GameObject::Update(WindowManager& _window)
 
 	for (auto component = m_components.begin(); component != m_components.end();)
 	{
-		(*component)->Update(_window);
+		if ((*component)->isUpdated())
+			(*component)->Update(_window);
 		
 		if ((*component)->needToBeDeleted())
 			component = m_components.erase(component);
@@ -374,4 +345,198 @@ bool lc::GameObject::is_in_window_view(const sf::RenderTexture& window)
 	auto& tmp_window_view = window.getView();
 	return Tools::Collisions::rect_rect({getTransform().getPosition(), getTransform().getSize()},
 		{tmp_window_view.getCenter() - (tmp_window_view.getSize() / 2.f), tmp_window_view.getSize()});
+}
+
+std::shared_ptr<lc::GameObject> lc::GameObject::CreateGameObject(std::string _name, unsigned char _depth)
+{
+	return std::make_shared<GameObject>(_name, _depth);
+}
+
+std::shared_ptr<lc::GameObject> lc::GameObject::GetRoot(std::shared_ptr<GameObject> object)
+{
+	while (object->getParent())
+		object = object->getParent();
+	return object;
+}
+
+bool lc::GameObject::hasComponent(std::string _name)
+{
+	for (auto& component : m_components)
+		if (component->getName() == _name)
+			return true;
+
+	return false;
+}
+
+bool lc::GameObject::hasComponent(std::string _name, unsigned int _ID)
+{
+	for (auto& component : m_components)
+		if (component->getName() == _name && component->getID() == _ID)
+			return true;
+
+	return false;
+}
+
+void lc::GameObject::removeComponent(std::string _name)
+{
+	for (auto component = m_components.begin(); component != m_components.end();)
+	{
+		if ((*component)->getName() == _name)
+		{
+			component = m_components.erase(component);
+			break;
+		}
+		else
+			++component;
+	}
+}
+
+void lc::GameObject::removeComponent(std::string _name, unsigned int _ID)
+{
+	for (auto component = m_components.begin(); component != m_components.end();)
+	{
+		if ((*component)->getName() == _name && (*component)->getID() == _ID)
+		{
+			component = m_components.erase(component);
+			break;
+		}
+		else
+			++component;
+	}
+}
+
+std::shared_ptr<lc::GameObject> lc::GameObject::addObject(std::shared_ptr<GameObject> _object)
+{
+	_object->setParent(this->shared_from_this());
+	m_objects.push_back(_object);
+	m_objects.sort([](std::shared_ptr<GameObject> _a, std::shared_ptr<GameObject> _b) { return _a->getDepth() > _b->getDepth(); });
+	return _object;
+}
+
+std::shared_ptr<lc::GameObject> lc::GameObject::addObject(std::string _name, unsigned char _depth)
+{
+	auto tmp_object = std::make_shared<GameObject>(_name, _depth);
+	tmp_object->setParent(this->shared_from_this());
+	m_objects.push_back(tmp_object);
+	m_objects.sort([](std::shared_ptr<GameObject> _a, std::shared_ptr<GameObject> _b) { return _a->getDepth() > _b->getDepth(); });
+	return tmp_object;
+}
+
+std::shared_ptr<lc::GameObject> lc::GameObject::getObject(std::string _name)
+{
+	for (auto& object : m_objects)
+		if (object->getName() == _name)
+			return object;
+
+	throw std::runtime_error("Object not found.");
+}
+
+std::shared_ptr<lc::GameObject> lc::GameObject::getObject(std::string _name, unsigned int _ID)
+{
+	for (auto& object : m_objects)
+		if (object->getName() == _name && object->getID() == _ID)
+			return object;
+
+	throw std::runtime_error("Object not found.");
+}
+
+bool lc::GameObject::hasObject(std::string _name)
+{
+	for (auto& object : m_objects)
+		if (Tools::ToLower(object->getName()) == Tools::ToLower(_name))
+			if (object->getName() == _name)
+				return true;
+
+	return false;
+}
+
+bool lc::GameObject::hasObject(std::string _name, unsigned int _ID)
+{
+	for (auto& object : m_objects)
+		if (Tools::ToLower(object->getName()) == Tools::ToLower(_name))
+			if (object->getName() == _name && object->getID() == _ID)
+				return true;
+
+	return false;
+}
+
+void lc::GameObject::removeObject(std::string _name)
+{
+	for (auto object = m_objects.begin(); object != m_objects.end();)
+	{
+		if ((*object)->getName() == _name)
+		{
+			object = m_objects.erase(object);
+			break;
+		}
+		else
+			object++;
+	}
+}
+
+void lc::GameObject::removeObject(std::string _name, unsigned int _ID)
+{
+	for (auto object = m_objects.begin(); object != m_objects.end();)
+	{
+		if ((*object)->getName() == _name && (*object)->getID() == _ID)
+		{
+			object = m_objects.erase(object);
+			break;
+		}
+		else
+			object++;
+	}
+}
+
+bool lc::GameObject::objectIsParent(std::string _name, unsigned int _ID)
+{
+	for (auto& gameObject : m_objects)
+	{
+		if (gameObject->getName() == _name && gameObject->getID() == _ID)
+			return true;
+		else if (gameObject->objectIsParent(_name, _ID))
+			return true;
+	}
+
+	return false;
+}
+
+std::shared_ptr<lc::GameObject> lc::GameObject::Clone()
+{
+	auto Clone = lc::GameObject::CreateGameObject(m_name, m_depth);
+	Clone->getTransform() = getTransform();
+	Clone->getTransform().getPosition() += sf::Vector2f(10.f, 10.f);
+	for (auto& component : m_components)
+	{
+		Clone->addComponent(component->Clone());
+	}
+
+	for (auto& object : m_objects)
+	{
+		Clone->addObject(object->Clone());
+	}
+
+	return Clone;
+}
+
+void lc::GameObject::CheckMaxSize()
+{
+	lc::Ressource* SizeX{ 0 },* SizeY{ 0 };
+	for (auto& component : getComponents())
+	{
+
+		if (auto ressources = dynamic_cast<lc::Ressource*>(&*component))
+		{
+			if (!SizeX or SizeX->getMaximumSize().x < ressources->getMaximumSize().x)
+				SizeX = ressources;
+
+			if (!SizeY or SizeY->getMaximumSize().y < ressources->getMaximumSize().y)
+				SizeY = ressources;
+		}
+	}
+
+	if(SizeX)
+		m_transform.getSize().x = SizeX->getMaximumSize().x;
+	if(SizeY)
+		m_transform.getSize().y = SizeY->getMaximumSize().y;
 }

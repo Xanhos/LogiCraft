@@ -184,8 +184,6 @@ void lc::Texture::Draw(WindowManager& _window)
 		m_renderer.setSize(m_thumbnailSize);
 
 	_window.draw(m_renderer);
-
-	onDraw(_window, sf::Color::Magenta);
 }
 
 void lc::Texture::Draw(sf::RenderTexture& _window)

@@ -121,27 +121,29 @@ namespace lc
 		* @brief Its use when you call AddComponent from the class GameObject.
 		* @see GameObject()
 		*/
-		inline void setParent(const std::shared_ptr<lc::GameObject> _parent) { m_wptrParent = _parent; }
+		void setParent(const std::shared_ptr<lc::GameObject> _parent) { m_wptrParent = _parent; }
 
 		/*
 		* @brief This function just return the shared_ptr of the parent.
 		*/
-		inline std::shared_ptr<lc::GameObject> getParent() { return m_wptrParent.lock(); }
+		std::shared_ptr<lc::GameObject> getParent() { return m_wptrParent.lock(); }
 
-		void setName(std::string _name) { m_name = _name; }
-		std::string getName() const { return m_name; }
+		std::string& getName() { return m_name; }
+		std::string& getTypeName() { return m_typeName; }
 
-		void setTypeName(std::string _typeName) { m_typeName = _typeName; }
-		std::string getTypeName() const { return m_typeName; }
-
-		unsigned short getID() const { return m_ID; }
-		void setID(unsigned short _ID) { m_ID = _ID; }
+		void setID(const unsigned int& ID) { m_ID = ID; }
+		unsigned int getID() const { return m_ID; }
 		
-		bool& needToBeDeleted() { return m_needToBeDeleted; }
+		void hasToBeDeleted(const bool& needToBeDeleted) { m_needToBeDeleted = needToBeDeleted; }
+		bool needToBeDeleted() const { return m_needToBeDeleted; }
 
-		static unsigned short& getGeneralID() { return m_generalID; }
+		void isVisible(const bool& isVisible) { m_isVisible = isVisible; }
+		bool isVisible() const { return m_isVisible; }
 
-		bool& isVisible() { return m_isVisible; }
+		void isUpdated(const bool& isUpdated) { m_isUpdated = isUpdated; }
+		bool isUpdated() const { return m_isUpdated; }
+
+		static unsigned int& getGeneralID() { return m_generalID; }
 
 		virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int _depth) = 0;
 		virtual void SaveRenderer(sf::RenderTexture& texture, int _depth) = 0;
@@ -160,11 +162,12 @@ namespace lc
 
 		bool m_needToBeDeleted;
 		bool m_isVisible;
+		bool m_isUpdated;
 
 		std::function<void()> m_hierarchieInformation;
 
-		unsigned short m_ID;
-		inline static unsigned short m_generalID = 0u;
+		unsigned int m_ID;
+		inline static unsigned int m_generalID = 0u;
 	private:
 		std::weak_ptr<lc::GameObject> m_wptrParent;
 	};

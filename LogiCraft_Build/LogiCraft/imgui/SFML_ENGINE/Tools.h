@@ -71,7 +71,7 @@ namespace Tools
     T Rand(T min, T max)
     {
         std::random_device rd;
-        std::mt19937 mt(rd());
+        std::mt19937 mt(std::time(nullptr));
         std::uniform_real_distribution<double> distribution(min, max);
         return static_cast<T>(distribution(rd));
     }
