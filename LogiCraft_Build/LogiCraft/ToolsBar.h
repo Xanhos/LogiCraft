@@ -56,6 +56,11 @@ public:
 
 	static Layers GetLayers();
 	static Layer GetActualLayer();
+
+	
+	static void SetupParallaxSpeed();
+	static float GetParallaxSpeed(const int& index);
+	static bool& SimulateParallax() {return  s_simulate_parallax_;}
 private:
 	void InputCheck(std::shared_ptr <lc::GameObject> object, WindowManager& _window, Viewports& _viewport);
 	void AddViewport(Viewports& _viewport);
@@ -75,10 +80,14 @@ private:
 	bool m_isLoading = false;
 	bool m_showingHelp = false;
 
+	inline static std::map<int,float> s_parallax_speed_factor_map_ = {};
+	inline static bool s_simulate_parallax_ = false;
+	
 	std::string m_path {'\0'};
 
 	static Layer s_actualLayer;
 
 	static Layers s_layers;
+	
 };
 

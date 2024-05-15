@@ -34,6 +34,8 @@ SOFTWARE.
 
 #include "GameComponent.h"
 
+#include "GameObject.h"
+
 lc::GameComponent::GameComponent()
 	: m_needToBeDeleted(false), m_isVisible(true), m_isUpdated(true), m_ID(0u)
 {
@@ -93,14 +95,17 @@ void lc::GameComponent::Hierarchie_Draw(unsigned int _parentID, std::list<std::s
 			}
 		}
 
-		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
-		if (ImGui::ImageButton(std::string("Delete component" + std::to_string(_parentID) + std::to_string(m_ID)).c_str(), GET_MANAGER->getTexture("poubelle"), sf::Vector2f(15.f, 15.f)))
-			m_needToBeDeleted = true;
+		if(getParent()->getParent())
+		{
+			ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10.f);
+			if (ImGui::ImageButton(std::string("Delete component" + std::to_string(_parentID) + std::to_string(m_ID)).c_str(), GET_MANAGER->getTexture("poubelle"), sf::Vector2f(15.f, 15.f)))
+				m_needToBeDeleted = true;
 
-		ImGui::SameLine();
-		ImGui::Text("Delete component");
+			ImGui::SameLine();
+			ImGui::Text("Delete component");
 
-		ImGui::Checkbox(std::string("is Visible##" + std::to_string(m_ID)).c_str(), &m_isVisible);
+			ImGui::Checkbox(std::string("is Visible##" + std::to_string(m_ID)).c_str(), &m_isVisible);
+		}
 
 		if (m_hierarchieInformation)
 			m_hierarchieInformation();

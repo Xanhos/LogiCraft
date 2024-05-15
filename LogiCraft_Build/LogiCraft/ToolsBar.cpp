@@ -158,6 +158,19 @@ Layer ToolsBar::GetActualLayer()
 	return s_actualLayer;
 }
 
+void ToolsBar::SetupParallaxSpeed()
+{
+	/*{11, "BackGround 7"},{10,"BackGround 6"},{ 9, "BackGround 5"},{8, "BackGround 4"},{7, "BackGround 3"},{ 6, "BackGround 2"},{5, "BackGround 1"},
+	 *{4, "Player Plan"},{3, "Front Plan 4"}, {2, "Front Plan 3"}, {1, "Front Plan 2"}, {0, "Front Plan 1"}*/
+
+	s_parallax_speed_factor_map_[4] = 0.f;	
+}
+
+float ToolsBar::GetParallaxSpeed(const int& index)
+{
+	return s_parallax_speed_factor_map_[index];
+}
+
 void ToolsBar::InputCheck(std::shared_ptr <lc::GameObject> object, WindowManager& _window, Viewports& _viewport)
 {
 	if (KEY(LControl) && KEY(N)) { New(object, _viewport); }

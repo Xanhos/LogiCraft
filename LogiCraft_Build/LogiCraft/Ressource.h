@@ -45,7 +45,7 @@ namespace lc
 	class Ressource : public lc::GameComponent
 	{
 	public:
-		enum class TYPE { NONE = -1, TEXTURE, IA, BUTTON, FONT, MUSIC, SOUND, ANIMATION, RIGIDBODY, EVENT, PARTICULES, CONVEX, SHADER };
+		enum class TYPE { NONE = -1, TEXTURE, IA, BUTTON, FONT, MUSIC, SOUND, ANIMATION, RIGIDBODY, EVENT, PARTICULES, CONVEX, SHADER, DISPLAY_COLLIDER,SPAWN_POSITION };
 	protected:
 		bool m_displayThumbnail;
 		sf::Vector2f m_thumbnailSize;

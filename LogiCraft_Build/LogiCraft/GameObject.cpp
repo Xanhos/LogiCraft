@@ -359,6 +359,7 @@ std::shared_ptr<lc::GameObject> lc::GameObject::GetRoot(std::shared_ptr<GameObje
 	return object;
 }
 
+
 bool lc::GameObject::hasComponent(std::string _name)
 {
 	for (auto& component : m_components)

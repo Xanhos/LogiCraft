@@ -76,6 +76,7 @@ namespace lc
 		static std::shared_ptr<GameObject> CreateGameObject(std::string _name, unsigned char _depth = 0);
 
 		static std::shared_ptr<GameObject> GetRoot(std::shared_ptr<GameObject> object);
+
 #pragma endregion
 
 #pragma region TEMPLATE
@@ -309,6 +310,7 @@ namespace lc
 	private:
 		inline static unsigned int m_generalID = 0u;
 
+		
 		std::string m_name;
 		unsigned int m_ID;
 		unsigned char m_depth;
@@ -325,7 +327,7 @@ namespace lc
 		std::list<std::shared_ptr<GameObject>> m_objects;
 
 		std::weak_ptr<GameObject> m_wptrParent;
-
+		
 		lc::Transform m_transform;
 	};
 }

@@ -36,6 +36,7 @@ SOFTWARE.
 #include "Button.h"
 #include "RigidBody.h"
 #include "AI.h"
+#include "PlayerSpawn.h"
 
 EditorState::EditorState(WindowManager& window, StateList* listState) : State(window, listState)
 {
@@ -47,8 +48,7 @@ void EditorState::init()
 	m_viewports = Viewports();
 	m_viewports.addViewport(std::make_shared<Viewport>(sf::Vector2f(250.f, 20.f), sf::Vector2f(1420.f, 560.f), (sf::Vector2u)m_windowManager.getSize(), " "));
 	m_scene = lc::GameObject::CreateGameObject("WORLD");
-	//auto AI = m_scene->addObject(lc::GameObject::CreateGameObject("OBJECT", 0));
-	//AI->addComponent(std::make_shared<lc::AI>());
+	m_scene->addComponent<lc::PlayerSpawn>();
 	
 	m_isReady = true;
 }
