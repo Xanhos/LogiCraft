@@ -11,7 +11,7 @@ lc::PlayerSpawn::PlayerSpawn()
 
 void lc::PlayerSpawn::Export(std::ofstream& exportation)
 {
-    Ressource::Export(exportation);
+    exportation << static_cast<int>(m_type) << " " << m_relativePosition;
 }
 
 void lc::PlayerSpawn::setHierarchieFunc()

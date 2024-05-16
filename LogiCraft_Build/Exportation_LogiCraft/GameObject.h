@@ -41,7 +41,6 @@ SOFTWARE.
 #include "Transform.h"
 #include "Tools_LC.h"
 
-class Ressources;
 
 namespace lc
 {

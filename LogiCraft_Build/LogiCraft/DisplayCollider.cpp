@@ -24,7 +24,9 @@ void lc::DisplayCollider::Save(std::ofstream& save, sf::RenderTexture& texture, 
             << " " << Tools::replaceSpace(m_typeName, true)
             << " " << m_collider_.getSize()
             << " " << m_relativePosition.x
-            << " " << m_relativePosition.y << std::endl;
+            << " " << m_relativePosition.y
+            << " " << m_trigger_name_
+            << " " << m_triggered_name_ << std::endl;
 }
 
 void lc::DisplayCollider::SaveRenderer(sf::RenderTexture& texture, int _depth)
@@ -37,7 +39,9 @@ void lc::DisplayCollider::Load(std::ifstream& load)
     sf::Vector2f size;
     load >> m_typeName
     >> size
-    >> m_relativePosition;
+    >> m_relativePosition
+    >> m_trigger_name_
+    >> m_triggered_name_;
     Tools::replaceSpace(m_typeName,false);
 }
 
@@ -84,7 +88,11 @@ std::shared_ptr<lc::GameComponent> lc::DisplayCollider::Clone()
 
 void lc::DisplayCollider::Export(std::ofstream& exportation)
 {
-    Ressource::Export(exportation);
+    exportation << static_cast<int>(m_type)
+                << " " << m_relativePosition.x
+                << " " << m_relativePosition.y
+                << " " << m_trigger_name_
+                << " " << m_triggered_name_ << std::endl;
 }
 
 void lc::DisplayCollider::setHierarchieFunc()
