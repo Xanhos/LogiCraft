@@ -139,11 +139,13 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="BehaviorTree.cpp" />
     <ClCompile Include="Button.cpp" />
+    <ClCompile Include="DisplayCollider.cpp" />
     <ClCompile Include="Event.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="GameComponent.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Particule.cpp" />
+    <ClCompile Include="PlayerSpawn.cpp" />
     <ClCompile Include="Ressource.cpp" />
     <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="Source.cpp" />
@@ -156,11 +158,13 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="BehaviorTree.h" />
     <ClInclude Include="Button.h" />
+    <ClInclude Include="DisplayCollider.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="GameComponent.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Particule.h" />
+    <ClInclude Include="PlayerSpawn.h" />
     <ClInclude Include="Ressource.h" />
     <ClInclude Include="RigidBody.h" />
     <ClInclude Include="Texture.h" />

@@ -42,8 +42,10 @@ SOFTWARE.
 #include "AI.h"
 #include "Animation.h"
 #include "Button.h"
+#include "DisplayCollider.h"
 #include "Event.h"
 #include "Particule.h"
+#include "PlayerSpawn.h"
 
 lc::GameObject::GameObject()
 	: m_ID(m_generalID++), m_depth(0), m_isVisible(true), m_isUpdated(true), m_needToBeRemove(false)
@@ -131,6 +133,21 @@ void lc::GameObject::Load(std::ifstream& load)
 		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::ANIMATION)
 		{
 			addComponent(std::make_shared<lc::Animation>())->Load(load);
+		}
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::CONVEX)
+		{
+			
+		}
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::DISPLAY_COLLIDER)
+		{
+			addComponent(std::make_shared<lc::DisplayCollider>())->Load(load);
+		}
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::SHADER)
+		{
+		}		
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::SPAWN_POSITION)
+		{
+			addComponent(std::make_shared<lc::PlayerSpawn>())->Load(load);
 		}
 		check('}');
 	}
