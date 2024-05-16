@@ -490,6 +490,17 @@ namespace bt
 			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 		};
 
+		class IsHiding : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_owner_;
+		public:
+			IsHiding()  {}
+			IsHiding(std::weak_ptr<lc::GameObject> owner);
+			bool tick() override;
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
+			std::shared_ptr<Node> clone() override;
+		};
+
 		class Attack : public Node
 		{
 			NodePtr m_attack_node_;

@@ -188,15 +188,6 @@ void bt::ActionNode::Wander::setup(NodePtr node)
 				if (!is_on_a_platform or has_hit_a_wall)
 				{
 					node_cast->m_bool_direction_ = !node_cast->m_bool_direction_;
-					/*rigid_body->getParent()->getTransform().getScale().x = -rigid_body->getParent()->getTransform().getScale().x;
-					if (!node_cast->m_bool_direction_)
-					{
-						rigid_body->getParent()->getTransform().getOrigin() = sf::Vector2f();
-					}
-					else
-					{
-						rigid_body->getParent()->getTransform().getOrigin() = sf::Vector2f(rigid_body->getParent()->getTransform().getSize().x, 0);
-					}*/
 				}
 			}
 			else rigid_body->getVelocity().x = 0.f;
@@ -912,7 +903,8 @@ void bt::ActionNode::In_Range_Of_Player::load(std::ifstream& file, std::shared_p
 
 void bt::Node::init_custom_condition()
 {
-	m_custom_condition_map_["Test"] = New(ActionNode::NodeFunc([]{return true;}));
+	m_custom_condition_map_["isHiding"] = New(ActionNode::IsHiding());
+
 }
 
 bool bt::ActionNode::Attack::tick()
@@ -1057,4 +1049,27 @@ bt::NodePtr bt::Condition_Factory(const condition_type& type, std::ifstream& fil
 	default:
 		return Node::New(ActionNode::NodeFunc([]{return true;}));
 	}
+}
+
+bt::ActionNode::IsHiding::IsHiding(std::weak_ptr<lc::GameObject> owner) : m_owner_(owner)
+{
+}
+
+bool bt::ActionNode::IsHiding::tick()
+{
+	if (!m_owner_.expired())
+		if (m_owner_.lock()->getComponent<lc::Animation>("Animation")->get_current_animation_key().lock()->get_name() == "hiding" && m_owner_.lock()->getComponent<lc::Animation>("Animation")->get_current_animation_key().lock()->get_actual_frame() != 0)
+			return true;
+	
+	return false;
+}
+
+void bt::ActionNode::IsHiding::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	m_owner_ = owner;
+}
+
+std::shared_ptr<bt::Node> bt::ActionNode::IsHiding::clone()
+{
+	return  std::make_shared<IsHiding>(*this);
 }
