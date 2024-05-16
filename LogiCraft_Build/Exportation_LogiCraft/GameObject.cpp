@@ -160,6 +160,7 @@ void lc::GameObject::UpdateEvent(sf::Event& _event)
 
 void lc::GameObject::Update(WindowManager& _window)
 {
+	
 	for (auto object = m_objects.begin(); object != m_objects.end();)
 	{
 		if ((*object)->isUpdated())

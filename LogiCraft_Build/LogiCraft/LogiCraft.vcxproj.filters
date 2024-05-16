@@ -171,6 +171,9 @@
     <ClCompile Include="WaterShader.cpp">
       <Filter>Fichiers sources\RESSOURCES\SHADERS</Filter>
     </ClCompile>
+    <ClCompile Include="DisplayCollider.cpp">
+      <Filter>Fichiers sources\RESSOURCES</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IMGUI\imconfig.h">
@@ -289,6 +292,9 @@
     </ClInclude>
     <ClInclude Include="HeatShader.h">
       <Filter>Fichiers d%27en-tête\RESSOURCES\SHADERS</Filter>
+    </ClInclude>
+    <ClInclude Include="DisplayCollider.h">
+      <Filter>Fichiers d%27en-tête\RESSOURCES</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
