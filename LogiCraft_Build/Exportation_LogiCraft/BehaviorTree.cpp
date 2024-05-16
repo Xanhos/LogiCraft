@@ -67,7 +67,7 @@ void bt::ActionNode::MoveTo::setup(std::shared_ptr<Node> node)
 					}
 					node_cast->m_bool_go_to_ = false;
 				}
-				else rigid_body->getVelocity().x = 0.f;
+				//else rigid_body->getVelocity().x = 0.f;
 			});
 	}
 }
@@ -190,7 +190,7 @@ void bt::ActionNode::Wander::setup(NodePtr node)
 					node_cast->m_bool_direction_ = !node_cast->m_bool_direction_;
 				}
 			}
-			else rigid_body->getVelocity().x = 0.f;
+			//else rigid_body->getVelocity().x = 0.f;
 
 		});
 	}
@@ -960,6 +960,11 @@ void bt::ActionNode::Attack::load(std::ifstream& file, std::shared_ptr<lc::GameO
         m_attack_node_ = bt::Node::New(bt::ActionNode::TestController(owner));
         std::cout << "lanceSpawn loaded" << std::endl;
     }
+	else if (attack_name == "StayAway")
+	{
+		m_attack_node_ = bt::Node::New(bt::ActionNode::StayAway(owner, scene->getObject("player")));
+		std::cout << "lanceSpawn loaded" << std::endl;
+	}
     else
     {
     	m_attack_node_ = bt::Node::New(bt::ActionNode::NodeFunc([]{return true;}));
@@ -1072,4 +1077,46 @@ void bt::ActionNode::IsHiding::load(std::ifstream& file, std::shared_ptr<lc::Gam
 std::shared_ptr<bt::Node> bt::ActionNode::IsHiding::clone()
 {
 	return  std::make_shared<IsHiding>(*this);
+}
+
+bt::ActionNode::StayAway::StayAway(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_) : m_agent_(agent_), m_target_(target_), m_bool_away_(false)
+{
+}
+
+void bt::ActionNode::StayAway::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody"))
+	{
+		auto rb = agent->getComponent<lc::RigidBody>("RigidBody");
+
+		rb->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+				auto node_cast = std::dynamic_pointer_cast<StayAway>(node);
+				if (node_cast->m_bool_away_)
+				{
+					if (!node_cast->m_target_.expired())
+					{
+						if (Tools::Vector::getDistance(node_cast->m_agent_.lock()->getTransform().getPosition(), node_cast->m_target_.lock()->getTransform().getPosition()) < 1000)
+						{
+							rigid_body->getVelocity().x = -Tools::Vector::normalize((node_cast->m_target_.lock()->getTransform().getPosition() + node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() / 2.f)
+								- (node_cast->m_agent_.lock()->getTransform().getPosition() + rigid_body->getCollider().getSize() / 2.f)).x * 100.f;
+						}
+
+
+					}
+					node_cast->m_bool_away_ = false;
+				}
+				//else rigid_body->getVelocity() = sf::Vector2f();
+			});
+	}
+}
+
+bool bt::ActionNode::StayAway::tick()
+{
+	if (!m_agent_.expired())
+	{
+		m_bool_away_ = true;
+	}
+	return m_bool_away_;
 }

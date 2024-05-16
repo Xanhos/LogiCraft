@@ -323,6 +323,18 @@ namespace bt
 			bool tick() override;
 		};
 
+		class StayAway : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			std::weak_ptr<lc::GameObject> m_target_;
+			bool m_bool_away_;
+		public:
+			StayAway() : m_agent_(), m_target_(), m_bool_away_(false) {}
+			StayAway(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
+
 		class DamageBox : public Node
 		{
 			std::weak_ptr<lc::GameObject> m_agent_;

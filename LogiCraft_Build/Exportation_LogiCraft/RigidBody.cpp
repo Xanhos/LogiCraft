@@ -139,6 +139,7 @@ void lc::RigidBody::Update(WindowManager& _window)
 		//std::cout << getParent()->getTransform().getOrigin().x << std::endl;
 	}
 
+	m_velocity.x =0;
 }
 
 void lc::RigidBody::Draw(WindowManager& _window)
