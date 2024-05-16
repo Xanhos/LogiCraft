@@ -524,7 +524,7 @@ void Viewports::ResizeSelectionBoxBehavior(sf::Vector2f _mousePositionWithView, 
 					if (!selectedObject.expired())
 						if (!selectedObject.lock()->isLock())
 						{
-							if (ToolsBar::GetActualLayer().second == "Player Plan" && selectedObject.lock()->getDepth() == 4)
+							if (ToolsBar::GetActualLayer().second == "Player Plan" && selectedObject.lock()->getDepth() == 4 && selectedObject.lock()->getName() != PLAYER_NAME)
 							{
 								selectedObject.lock()->getTransform().getPosition() = 
 									sf::Vector2f((int)(_mousePositionWithView.x + selectedObject.lock()->getTransform().getDistance().x) / 120 * 120,
@@ -588,7 +588,7 @@ bool Viewports::CheckSelection(ObjWeakPtrList& _object, std::shared_ptr<lc::Game
 	if (std::find_if(_scene->getObjects().begin(), _scene->getObjects().end(), [this, &_window, &_object, &_viewport, _mousePosition, &_scene](std::shared_ptr<lc::GameObject> _sceneObject)
 		{
 			if (Tools::Collisions::point_rect(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow()), _viewport->getView()),
-				{ _sceneObject->getTransform().getPosition() + lc::GameObject::GetOffset(lc::GameObject::GetRoot(_sceneObject),_sceneObject->getDepth()), _sceneObject->getTransform().getSize()})
+				{ _sceneObject->getTransform().getPosition() - _sceneObject->getTransform().getOrigin() + lc::GameObject::GetOffset(lc::GameObject::GetRoot(_sceneObject),_sceneObject->getDepth()), _sceneObject->getTransform().getSize()})
 				&& _sceneObject->getDepth() == ToolsBar::GetActualLayer().first)
 			{
 				if (!KEY(LControl))

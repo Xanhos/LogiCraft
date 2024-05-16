@@ -57,9 +57,8 @@ void EditorState::init()
 	convex_point.push_back({50,0});
 	convex_point.push_back({50,100});
 	convex_point.push_back({0,100});
-	auto player = m_scene->addObject(PLAYER_NAME);
+	auto player = m_scene->addObject(PLAYER_NAME,4);
 	player->addComponent<lc::Convex>(convex_point)->getConvex().setFillColor(sf::Color::Red);
-	player->getTransform().getOrigin() = {-25.f,-50.f};
 
 	
 	m_isReady = true;

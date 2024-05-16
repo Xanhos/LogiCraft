@@ -390,7 +390,7 @@ sf::Vector2f lc::GameObject::GetOffset(std::shared_ptr<GameObject> root, int dep
 {
 	auto spawn_position = root->getComponent<PlayerSpawn>("Player Spawn")->GetSpawnPosition();
 	auto player_position = root->getObject(PLAYER_NAME)->getTransform().getPosition();
-	return (player_position - spawn_position) * ToolsBar::GetParallaxSpeedFactor(depth);
+	return {(player_position - spawn_position).x * ToolsBar::GetParallaxSpeedFactor(depth),(player_position - spawn_position).y * ToolsBar::GetParallaxSpeedFactor(depth) * 0.10f};
 
 }
 
