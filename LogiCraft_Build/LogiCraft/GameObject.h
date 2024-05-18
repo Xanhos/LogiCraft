@@ -303,8 +303,6 @@ namespace lc
 
 		bool& isLock() { return m_isLock; }
 
-		bool& isVisible() { return m_isVisible; }
-
 		static unsigned int& getGeneralID() { return m_generalID; }
 		void CheckMaxSize();
 
