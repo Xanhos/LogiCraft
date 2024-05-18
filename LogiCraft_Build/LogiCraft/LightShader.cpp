@@ -380,6 +380,8 @@ void lc::Shader::LightShader::setHierarchieFunc()
 {
 	m_hierarchieInformation = [this]()
 	{
+		ImGui::ColorEdit3("General Ambient", LightShader::s_ambient_light_, ImGuiColorEditFlags_InputRGB);
+		
 		ImGui::ColorEdit3("Color", m_color_, ImGuiColorEditFlags_InputRGB);
 
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5.f);
