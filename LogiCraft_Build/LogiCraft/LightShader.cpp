@@ -380,7 +380,9 @@ void lc::Shader::LightShader::setHierarchieFunc()
 {
 	m_hierarchieInformation = [this]()
 	{
-		ImGui::ColorEdit3("General Ambient", LightShader::s_ambient_light_, ImGuiColorEditFlags_InputRGB);
+		ImGui::SliderFloat("General Light Alpha", &LightShader::s_ambient_light_.x, 0.f, 1.f);
+		LightShader::s_ambient_light_ =
+			{ LightShader::s_ambient_light_.x, LightShader::s_ambient_light_.x, LightShader::s_ambient_light_.x };
 		
 		ImGui::ColorEdit3("Color", m_color_, ImGuiColorEditFlags_InputRGB);
 
