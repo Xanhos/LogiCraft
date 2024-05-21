@@ -443,6 +443,7 @@ namespace lc
 
 		tmp_ressource ? tmp_ressource->getShape().setFillColor(m_spawn_color_) : m_base_shape_.setFillColor(m_spawn_color_);
 		tmp_ressource ? tmp_ressource->getShape().setOrigin(particle->get_transform().getOrigin()) : m_base_shape_.setOrigin(particle->get_transform().getOrigin());
+		tmp_ressource ? tmp_ressource->getShape().setScale(particle->get_transform().getScale()) : m_base_shape_.setScale(particle->get_transform().getScale());
 		
 		tmp_ressource ? 
 			tmp_ressource->getShape().setPosition(particle->get_transform().getPosition()) : 
