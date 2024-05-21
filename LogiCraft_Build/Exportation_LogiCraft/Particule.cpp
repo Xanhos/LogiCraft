@@ -216,6 +216,7 @@ namespace lc
 
 	void Particles::Draw(sf::RenderTexture& window)
 	{
+		this->particles_draw(window);
 	}
 
 	std::shared_ptr<lc::GameComponent> Particles::Clone()
@@ -252,6 +253,7 @@ namespace lc
 			 >> m_base_shape_point_count_
 			 >> m_spawn_count_
 			 >> m_has_gravity_
+			>> m_relativePosition
 			 >> tmp_textureName;
 
 		if (tmp_textureName != "No_Ressource")
@@ -414,6 +416,19 @@ namespace lc
 		}
 	}
 
+	void Particles::particles_draw(sf::RenderTexture& window)
+	{
+		for (auto particle = m_particles_.begin(); particle != m_particles_.end();)
+		{
+			this->particle_draw(*particle, window);
+
+			if ((*particle)->get_despawn_time() > (*particle)->get_despawn_cooldown())
+				particle = m_particles_.erase(particle);
+			else
+				++particle;
+		}
+	}
+
 	void Particles::particle_draw(const std::shared_ptr<Particle>& particle, WindowManager& window)
 	{
 		const auto tmp_ressource = m_particles_ressource_.lock();
@@ -441,6 +456,44 @@ namespace lc
 			{
 				window.getWindow().getView().getCenter() - window.getWindow().getView().getSize() / 2.f,
 				window.getWindow().getView().getSize()
+			},
+			{
+				particle->get_transform().getPosition() - particle->get_transform().getOrigin(),
+				tmp_ressource ? m_texture_size_ : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_)
+			}))
+		{
+			tmp_ressource ? window.draw(tmp_ressource->getShape()) : window.draw(m_base_shape_);
+		}
+	}
+
+	void Particles::particle_draw(const std::shared_ptr<Particle>& particle, sf::RenderTexture& window)
+	{
+		const auto tmp_ressource = m_particles_ressource_.lock();
+
+		if (particle->has_gravity())
+			particle->get_velocity().y += particle->get_gravity_force() * Tools::getDeltaTime();
+
+		particle->get_transform().getPosition() += particle->get_velocity() * Tools::getDeltaTime();
+		particle->get_transform().getRotation() += particle->get_rotation_speed() * Tools::getDeltaTime();
+
+		particle->get_despawn_time() += Tools::getDeltaTime();
+
+		tmp_ressource ? tmp_ressource->getShape().setFillColor(m_spawn_color_) : m_base_shape_.setFillColor(m_spawn_color_);
+		tmp_ressource ? tmp_ressource->getShape().setOrigin(particle->get_transform().getOrigin()) : m_base_shape_.setOrigin(particle->get_transform().getOrigin());
+		tmp_ressource ? tmp_ressource->getShape().setScale(particle->get_transform().getScale()) : m_base_shape_.setScale(particle->get_transform().getScale());
+		
+		tmp_ressource ? 
+			tmp_ressource->getShape().setPosition(particle->get_transform().getPosition()) : 
+			m_base_shape_.setPosition(particle->get_transform().getPosition());
+
+		tmp_ressource ? 
+			tmp_ressource->getShape().setRotation(particle->get_transform().getRotation()) : 
+			m_base_shape_.setRotation(particle->get_transform().getRotation());
+
+		if (Tools::Collisions::rect_rect(
+			{
+				window.getView().getCenter() - window.getView().getSize() / 2.f,
+				window.getView().getSize()
 			},
 			{
 				particle->get_transform().getPosition() - particle->get_transform().getOrigin(),

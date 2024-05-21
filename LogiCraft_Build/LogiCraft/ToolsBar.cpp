@@ -166,20 +166,20 @@ void ToolsBar::SetupParallaxSpeed()
 	/*{11, "BackGround 7"},{10,"BackGround 6"},{ 9, "BackGround 5"},{8, "BackGround 4"},{7, "BackGround 3"},{ 6, "BackGround 2"},{5, "BackGround 1"},
 	 *{4, "Player Plan"},{3, "Front Plan 4"}, {2, "Front Plan 3"}, {1, "Front Plan 2"}, {0, "Front Plan 1"}*/
 	std::ifstream file("../Ressources/parallax.txt");
-	file >> s_parallax_speed_factor_map_[13];
-	file >>s_parallax_speed_factor_map_[12];
-	file >>s_parallax_speed_factor_map_[11];
-	file >>s_parallax_speed_factor_map_[10];
-	file >>s_parallax_speed_factor_map_[9];
-	file >>s_parallax_speed_factor_map_[8];
-	file >>s_parallax_speed_factor_map_[7];
-	file >>s_parallax_speed_factor_map_[6];
+	file >> s_parallax_speed_factor_map_[0];
+	file >>s_parallax_speed_factor_map_[1];
+	file >>s_parallax_speed_factor_map_[2];
+	file >>s_parallax_speed_factor_map_[3];
+	file >>s_parallax_speed_factor_map_[4];
 	file >>s_parallax_speed_factor_map_[5];
-	file >>s_parallax_speed_factor_map_[4] ;
-	file >>s_parallax_speed_factor_map_[3] ;
-	file >>s_parallax_speed_factor_map_[2] ;
-	file >>s_parallax_speed_factor_map_[1] ;
-	file >>s_parallax_speed_factor_map_[0]	;
+	file >>s_parallax_speed_factor_map_[6];
+	file >>s_parallax_speed_factor_map_[7];
+	file >>s_parallax_speed_factor_map_[8];
+	file >>s_parallax_speed_factor_map_[9];
+	file >>s_parallax_speed_factor_map_[10];
+	file >>s_parallax_speed_factor_map_[11];
+	file >>s_parallax_speed_factor_map_[12];
+	file >>s_parallax_speed_factor_map_[13];
 	file.close();
 }
 

@@ -228,6 +228,7 @@ namespace lc
 
 	void Particles::Draw(WindowManager& window)
 	{
+		this->particles_draw(window);
 	}
 
 	void Particles::Draw(sf::RenderTexture& window)
@@ -332,8 +333,7 @@ namespace lc
 				{
 					if (ImGui::Selectable(std::string("No Resources ##" + std::to_string(m_ID)).c_str(), tmp_is_selected))
 					{
-						if (tmp_ressource)
-							tmp_ressource->isVisible(false);
+						tmp_ressource->isVisible(true);
 
 						//Reset of the origin to the one for the base shape.
 						m_particles_origin_ = { m_base_shape_radius_, m_base_shape_radius_ };
@@ -833,6 +833,19 @@ namespace lc
 		m_renderer_.Draw(m_spawn_point_particles_extend_);
 	}
 
+	void Particles::particles_draw(WindowManager& window)
+	{
+		for (auto particle = m_particles_.begin(); particle != m_particles_.end();)
+		{
+			this->particle_draw(*particle, window);
+
+			if ((*particle)->get_despawn_time() > (*particle)->get_despawn_cooldown())
+				particle = m_particles_.erase(particle);
+			else
+				++particle;
+		}
+	}
+
 	void Particles::particles_draw(sf::RenderTexture& window)
 	{
 		for (auto particle = m_particles_.begin(); particle != m_particles_.end();)
@@ -843,6 +856,78 @@ namespace lc
 				particle = m_particles_.erase(particle);
 			else
 				++particle;
+		}
+	}
+
+	void Particles::particle_draw(const std::shared_ptr<Particle>& particle, WindowManager& window)
+	{
+		const auto tmp_ressource = m_particles_ressource_.lock();
+
+		if (particle->has_gravity())
+			particle->get_velocity().y += particle->get_gravity_force() * Tools::getDeltaTime();
+
+		particle->get_transform().getPosition() += particle->get_velocity() * Tools::getDeltaTime();
+		particle->get_transform().getRotation() += particle->get_rotation_speed() * Tools::getDeltaTime();
+		particle->get_renderer_transform().getPosition() += particle->get_velocity() * Tools::getDeltaTime();
+		particle->get_renderer_transform().getRotation() += particle->get_rotation_speed() * Tools::getDeltaTime();
+
+		particle->get_despawn_time() += Tools::getDeltaTime();
+
+		if (this->particles_his_rendered())
+		{
+			tmp_ressource ? tmp_ressource->getShape().setFillColor(m_spawn_color_) : m_base_shape_.setFillColor(m_spawn_color_);
+			tmp_ressource ? tmp_ressource->getShape().setOrigin(particle->get_transform().getOrigin()) : m_base_shape_.setOrigin(particle->get_transform().getOrigin());
+			tmp_ressource ?
+					tmp_ressource->getShape().setScale(getParent()->getTransform().getScale()) :
+					m_base_shape_.setScale(getParent()->getTransform().getScale());
+		}
+
+		if (m_is_particles_rendered_on_the_viewport_)
+		{
+			tmp_ressource ? 
+				tmp_ressource->getShape().setPosition(particle->get_transform().getPosition()) : 
+				m_base_shape_.setPosition(particle->get_transform().getPosition());
+
+			tmp_ressource ? 
+				tmp_ressource->getShape().setRotation(particle->get_transform().getRotation()) : 
+				m_base_shape_.setRotation(particle->get_transform().getRotation());
+
+			if (Tools::Collisions::rect_rect(
+				{
+					window.getWindow().getView().getCenter() - window.getWindow().getView().getSize() / 2.f,
+					window.getWindow().getView().getSize()
+				},
+				{
+					tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getPosition() : particle->get_transform().getPosition() - (particle->get_transform().getOrigin() * particle->get_transform().getScale()),
+					(tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getSize() : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_))
+				}))
+			{
+				tmp_ressource ? window.draw(tmp_ressource->getShape()) : window.draw(m_base_shape_);
+			}
+		}
+
+		if (m_is_window_test_is_open_)
+		{
+			tmp_ressource ? 
+				tmp_ressource->getShape().setPosition(particle->get_renderer_transform().getPosition()) : 
+				m_base_shape_.setPosition(particle->get_renderer_transform().getPosition());
+			
+			tmp_ressource ? 
+				tmp_ressource->getShape().setRotation(particle->get_renderer_transform().getRotation()) : 
+				m_base_shape_.setRotation(particle->get_renderer_transform().getRotation());
+
+			if (Tools::Collisions::rect_rect(
+				{
+					m_renderer_.get_view().getCenter() - m_renderer_.get_view().getSize() / 2.f,
+					m_renderer_.get_view().getSize()
+				},
+				{
+					particle->get_renderer_transform().getPosition() - particle->get_transform().getOrigin(),
+					tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getSize() : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_)
+				}))
+			{
+				tmp_ressource ? m_renderer_.Draw(tmp_ressource->getShape()) : m_renderer_.Draw(m_base_shape_);
+			}
 		}
 	}
 
@@ -864,6 +949,9 @@ namespace lc
 		{
 			tmp_ressource ? tmp_ressource->getShape().setFillColor(m_spawn_color_) : m_base_shape_.setFillColor(m_spawn_color_);
 			tmp_ressource ? tmp_ressource->getShape().setOrigin(particle->get_transform().getOrigin()) : m_base_shape_.setOrigin(particle->get_transform().getOrigin());
+			tmp_ressource ?
+					tmp_ressource->getShape().setScale(getParent()->getTransform().getScale()) :
+					m_base_shape_.setScale(getParent()->getTransform().getScale());
 		}
 
 		if (m_is_particles_rendered_on_the_viewport_)
