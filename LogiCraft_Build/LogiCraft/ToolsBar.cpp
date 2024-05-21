@@ -292,7 +292,7 @@ void ToolsBar::Export(std::shared_ptr<lc::GameObject> _game_object, Viewports& _
 	save << oss.str();
 	exportation << oss.str();
 	sf::RenderTexture render_texture;
-	_game_object->NeedToBeExported({"AI", "RigidBody", "Particles", "Animation", "Event", "Button"});
+	_game_object->NeedToBeExported({"AI", "RigidBody", "Particles", "Animation", "Event", "Button", "Player Spawn", "DisplayCollider"});
 	_game_object->Save(save, exportation, render_texture, s_actualLayer.first);
 
 	

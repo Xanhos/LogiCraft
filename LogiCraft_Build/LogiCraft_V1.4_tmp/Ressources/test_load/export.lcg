@@ -1,0 +1,18 @@
+1 0 0 
+WORLD 0 0 1 1 0 0 0 0 0 0
+Components
+{
+}
+Objects
+{
+ok 1246.14 919.684 1 1 200 200 0 0 0 0
+Components
+{
+0 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+}
+Objects
+{
+}
+
+}

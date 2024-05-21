@@ -1000,6 +1000,29 @@ void bt::ActionNode::Shot::setup(std::shared_ptr<Node> node)
 	m_attack_node_->setup(node);
 }
 
+bool bt::ActionNode::ChangeState::tick()
+{
+	GetRoot().lock()->getState() = m_new_state_;
+	return true;
+}
+
+void bt::ActionNode::ChangeState::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	file >> m_new_state_;
+}
+
+bool bt::Decorator::IfStateIs::tick()
+{
+	if(m_state_needed_ == GetRoot().lock()->getState())
+		return SECURE_TASK(m_task);
+	return false;
+}
+
+void bt::Decorator::IfStateIs::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	file >> m_state_needed_;
+}
+
 bt::NodePtr bt::Factory(const node_type& type)
 {
 	switch (type) {
@@ -1019,6 +1042,8 @@ bt::NodePtr bt::Factory(const node_type& type)
 		return Node::New(Decorator::Cooldown());
 	case node_type::FORCE_SUCCESS:
 		return Node::New(Decorator::ForceSuccess());
+	case node_type::IF_STATE_IS:
+		return Node::New(Decorator::IfStateIs());
 	case node_type::WANDER:
 		return Node::New(ActionNode::Wander());
 	case node_type::MOVE_TO:
@@ -1036,7 +1061,9 @@ bt::NodePtr bt::Factory(const node_type& type)
 	case node_type::SHOT:
 		return Node::New(ActionNode::Shot());
 	case node_type::JUMP:
-		return Node::New(ActionNode::Jump());		
+		return Node::New(ActionNode::Jump());	
+	case node_type::CHANGE_STATE:
+		return Node::New(ActionNode::ChangeState());		
 	default:
 		return Node::New(Composite::Sequence());
 	}
