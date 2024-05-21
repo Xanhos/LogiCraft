@@ -3,13 +3,13 @@
 
 namespace lc
 {
-	namespace shader
+	namespace Shader
 	{
-		class shader : public lc::Ressource
+		class Shader : public lc::Ressource
 		{
 		public:
-			shader();
-			virtual ~shader() override;
+			Shader();
+			virtual ~Shader() override;
 
 			virtual void UpdateEvent(sf::Event& event) = 0;
 			virtual void Update(WindowManager& window) = 0;

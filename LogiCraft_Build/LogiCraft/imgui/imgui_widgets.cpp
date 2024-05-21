@@ -5290,6 +5290,14 @@ bool ImGui::ColorEdit3(const char* label, float col[3], ImGuiColorEditFlags flag
     return ColorEdit4(label, col, flags | ImGuiColorEditFlags_NoAlpha);
 }
 
+bool ImGui::ColorEdit3(const char* label, sf::Vector3f& color, ImGuiColorEditFlags flags)
+{
+    float col[3]{color.x, color.y, color.y};
+    const bool has_changed(ColorEdit4(label, col, flags | ImGuiColorEditFlags_NoAlpha));
+    color = {col[0], col[1], col[2]};
+    return has_changed;
+}
+
 static void ColorEditRestoreH(const float* col, float* H)
 {
     ImGuiContext& g = *GImGui;

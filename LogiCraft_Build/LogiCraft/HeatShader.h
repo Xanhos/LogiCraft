@@ -5,13 +5,13 @@
 
 namespace lc
 {
-    namespace shader
+    namespace Shader
     {
-        class heat_shader : public shader
+        class HeatShader : public Shader
         {
         public:
-            heat_shader();
-            virtual ~heat_shader() override;
+            HeatShader();
+            virtual ~HeatShader() override;
 
             virtual void UpdateEvent(sf::Event& event) override;
             virtual void Update(WindowManager& window) override;
@@ -20,7 +20,7 @@ namespace lc
 
             virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int depth) override;
             virtual void SaveRenderer(sf::RenderTexture& texture, int depth) override {}
-            virtual void Export(std::ofstream& exportation) override {}
+            virtual void Export(std::ofstream& exportation) override;
             virtual void Load(std::ifstream& load) override;
 
             virtual std::shared_ptr<lc::GameComponent> Clone() override;

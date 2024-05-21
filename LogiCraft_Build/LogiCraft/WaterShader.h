@@ -4,13 +4,13 @@
 
 namespace lc
 {
-    namespace shader
+    namespace Shader
     {
-        class water_shader : public shader
+        class WaterShader : public Shader
        {
         public:
-            water_shader();
-            ~water_shader();
+            WaterShader();
+            virtual ~WaterShader() override;
 
             virtual void UpdateEvent(sf::Event& event) override;
             virtual void Update(WindowManager& window) override;
@@ -19,7 +19,7 @@ namespace lc
 
             virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int depth) override;
             virtual void SaveRenderer(sf::RenderTexture& texture, int depth) override {}
-            virtual void Export(std::ofstream& exportation) override {}
+            virtual void Export(std::ofstream& exportation) override;
             virtual void Load(std::ifstream& load) override;
 
             virtual std::shared_ptr<lc::GameComponent> Clone() override;

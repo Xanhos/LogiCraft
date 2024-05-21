@@ -40,6 +40,7 @@ SOFTWARE.
 #include "Animation.h"
 #include "DisplayCollider.h"
 #include "HeatShader.h"
+#include "LightShader.h"
 #include "WaterShader.h"
 
 Hierarchie::Hierarchie()
@@ -173,10 +174,11 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
                         tmp_parent->removeObject(tmp_object->getName(), tmp_object->getID());
                     }
 
-                    Checkbox(std::string("is Visible##<ID:" + std::to_string(tmp_object->getID())).c_str(),
-                             &tmp_object->isVisible());
-                    Checkbox(std::string("is Lock##<ID:" + std::to_string(tmp_object->getID())).c_str(),
-                             &tmp_object->isLock());
+					bool tmp_isVisible(tmp_object->isVisible());
+					ImGui::Checkbox(std::string("is Visible##<ID:" + std::to_string(tmp_object->getID())).c_str(), &tmp_isVisible);
+					tmp_object->isVisible(tmp_isVisible);
+					ImGui::Checkbox(std::string("is Lock##<ID:" + std::to_string(tmp_object->getID())).c_str(), &tmp_object->isLock());
+				
 
                     if (BeginCombo(std::string("Change Depth").c_str(),
                                    ToolsBar::GetLayers().find(tmp_object->getDepth())->second.c_str(),
@@ -262,28 +264,30 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
 
 void Hierarchie::add_component_to_object_window_display()
 {
-    static std::string tmp_component_name;
-    Begin("Add a component", &m_want_to_add_a_component_.first);
-    {
-        PushItemWidth(GetContentRegionAvail().x);
-        InputText("##Search Component Name", tmp_component_name, 150);
-        PopItemWidth();
-        if (BeginChild("Component Selection", GetContentRegionAvail(), ImGuiChildFlags_Border))
-        {
-            bool tmp_selected(false);
-            for (const auto& component : m_components_map_)
-            {
-                if (component.first.find(tmp_component_name) != std::string::npos)
-                    if (Selectable(component.first.c_str(), tmp_selected))
-                        component.second();
-
-                SetCursorPosY(GetCursorPosY() + 5.f);
-            }
-
-            EndChild();
-        }
-    }
-    End();
+	static std::string tmp_component_name;
+	ImGui::Begin("Add a component", &m_want_to_add_a_component_.first);
+	{
+		ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x);
+		ImGui::InputText("##Search Component Name", tmp_component_name, 150);
+		ImGui::PopItemWidth();
+		if (ImGui::BeginChild("Component Selection", ImGui::GetContentRegionAvail(), ImGuiChildFlags_Border))
+		{
+			bool tmp_selected(false);
+			for (const auto& component : m_components_map_)
+			{
+				if (component.first.find(tmp_component_name) != std::string::npos)
+				{
+					if (ImGui::Selectable(component.first.c_str(), tmp_selected))
+						component.second();
+					
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5.f);
+				}
+			}
+				
+			ImGui::EndChild();
+		}
+	}
+	ImGui::End();
 
     //If the object that the user open the add component window with and this object get unselected then the window close itself.
     if (std::find_if(m_selectedGameObjects.begin(), m_selectedGameObjects.end(), [&](const auto& game_object)
@@ -305,27 +309,27 @@ void Hierarchie::CreateNewObjectBehavior()
         {
             static std::string tmp_NewGameObjectName("");
             static std::pair<unsigned char, std::string> tmp_DepthName = *ToolsBar::GetLayers().begin();
-            bool isSeleted = false;
+            bool isSelected = false;
 
             PushItemWidth(200.f);
             InputText("New GameObject Name", tmp_NewGameObjectName, 40);
             SameLine();
+			
+			if (ImGui::BeginCombo("New GameObject Depth", tmp_DepthName.second.c_str()))
+			{
+				ImGuiStyle& style = ImGui::GetStyle();
+				float w = ImGui::CalcItemWidth();
+				float spacing = style.ItemInnerSpacing.x;
+				float button_sz = ImGui::GetFrameHeight();
+				ImGui::PushItemWidth(w - spacing * 2.0f - button_sz * 2.0f);
+				for (auto& depth : ToolsBar::GetLayers())
+					if (ImGui::Selectable(depth.second.c_str(), &isSelected))
+						tmp_DepthName = depth;
+				ImGui::PopItemWidth();
+				ImGui::EndCombo();
+			}
 
-            if (BeginCombo("New GameObject Depth", tmp_DepthName.second.c_str()))
-            {
-                ImGuiStyle& style = GetStyle();
-                float w = CalcItemWidth();
-                float spacing = style.ItemInnerSpacing.x;
-                float button_sz = GetFrameHeight();
-                PushItemWidth(w - spacing * 2.0f - button_sz * 2.0f);
-                for (auto& depth : ToolsBar::GetLayers())
-                    if (Selectable(depth.second.c_str(), &isSeleted))
-                        tmp_DepthName = depth;
-                PopItemWidth();
-                EndCombo();
-            }
-
-            PopItemWidth();
+            ImGui::PopItemWidth();
 
             PushItemWidth(200.f);
             if (Button("Create GameObject"))
@@ -697,16 +701,8 @@ void Hierarchie::setup_components_function()
                                   if (tmp_object->hasComponent("RigidBody") and !tmp_object->hasComponent("AI"))
                                       tmp_object->addComponent<lc::AI>();
                               });
-
-    m_components_map_.emplace("Display Collider",
-                              [&]()
-                              {
-                                  const auto tmp_object = m_want_to_add_a_component_.second.lock();
-
-                                  tmp_object->addComponent<lc::DisplayCollider>();
-                              });
-
-    m_components_map_.emplace("Button",
+							  
+							  m_components_map_.emplace("Button",
                               [&]()
                               {
                                   const auto tmp_object = m_want_to_add_a_component_.second.lock();
@@ -720,15 +716,23 @@ void Hierarchie::setup_components_function()
                                       tmp_object->addComponent<lc::Button>();
                               });
 
-    m_components_map_.emplace("Heat Shader",
+    m_components_map_.emplace("Display Collider",
                               [&]()
                               {
-                                  m_want_to_add_a_component_.second.lock()->addComponent<lc::shader::heat_shader>();
+                                  const auto tmp_object = m_want_to_add_a_component_.second.lock();
+                                  tmp_object->addComponent<lc::DisplayCollider>();
                               });
 
-    m_components_map_.emplace("Water Shader",
-                              [&]()
-                              {
-                                  m_want_to_add_a_component_.second.lock()->addComponent<lc::shader::water_shader>();
-                              });
+	m_components_map_.emplace("Heat Shader",
+	[&]() { m_want_to_add_a_component_.second.lock()->addComponent<lc::Shader::HeatShader>(); });
+
+	m_components_map_.emplace("Water Shader",
+	[&]() { m_want_to_add_a_component_.second.lock()->addComponent<lc::Shader::WaterShader>(); });
+
+	m_components_map_.emplace("Light Shader",
+	[&]()
+	{
+		if (m_want_to_add_a_component_.second.lock()->getDepth() == 4)
+			m_want_to_add_a_component_.second.lock()->addComponent<lc::Shader::LightShader>();
+	});
 }
