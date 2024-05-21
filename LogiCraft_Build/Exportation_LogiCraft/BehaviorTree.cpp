@@ -904,7 +904,7 @@ void bt::ActionNode::In_Range_Of_Player::load(std::ifstream& file, std::shared_p
 void bt::Node::init_custom_condition()
 {
 	m_custom_condition_map_["isHiding"] = New(ActionNode::IsHiding());
-
+	m_custom_condition_map_["FarEnough"] = New(ActionNode::FarEnough());
 }
 
 bool bt::ActionNode::Attack::tick()
@@ -958,12 +958,17 @@ void bt::ActionNode::Attack::load(std::ifstream& file, std::shared_ptr<lc::GameO
     else if (attack_name == "controller")
     {
         m_attack_node_ = bt::Node::New(bt::ActionNode::TestController(owner));
-        std::cout << "lanceSpawn loaded" << std::endl;
+        std::cout << "controller loaded" << std::endl;
     }
 	else if (attack_name == "StayAway")
 	{
 		m_attack_node_ = bt::Node::New(bt::ActionNode::StayAway(owner, scene->getObject("player")));
-		std::cout << "lanceSpawn loaded" << std::endl;
+		std::cout << "StayAway loaded" << std::endl;
+	}
+	else if (attack_name == "ResetDirection")
+	{
+		m_attack_node_ = bt::Node::New(bt::ActionNode::ResetDirection(owner, scene->getObject("player")));
+		std::cout << "ResetDirection loaded" << std::endl;
 	}
     else
     {
@@ -988,13 +993,26 @@ void bt::ActionNode::Shot::load(std::ifstream& file, std::shared_ptr<lc::GameObj
 {
 	std::string m_attack_name;
 	file >> m_attack_name;
+
+	auto scene = owner->GetRoot();
+
+	if (m_attack_name == "shoot")
+	{
+		m_attack_node_ = bt::Node::New(bt::ActionNode::Shoot(owner, scene->getObject("player")));
+		std::cout << "shoot loaded" << std::endl;
+	}
+	else
+	{
+		m_attack_node_ = bt::Node::New(bt::ActionNode::NodeFunc([] {return true; }));
+		std::cout << "no attack of this name exist" << std::endl;
+	}
 	
 	m_attack_node_->load(file, owner);
 }
 
 void bt::ActionNode::Shot::setup(std::shared_ptr<Node> node)
 {
-	m_attack_node_->setup(node);
+	m_attack_node_->setup(m_attack_node_);
 }
 
 bt::NodePtr bt::Factory(const node_type& type)
@@ -1102,12 +1120,9 @@ void bt::ActionNode::StayAway::setup(NodePtr node)
 							rigid_body->getVelocity().x = -Tools::Vector::normalize((node_cast->m_target_.lock()->getTransform().getPosition() + node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() / 2.f)
 								- (node_cast->m_agent_.lock()->getTransform().getPosition() + rigid_body->getCollider().getSize() / 2.f)).x * 100.f;
 						}
-
-
 					}
 					node_cast->m_bool_away_ = false;
 				}
-				//else rigid_body->getVelocity() = sf::Vector2f();
 			});
 	}
 }
@@ -1119,4 +1134,131 @@ bool bt::ActionNode::StayAway::tick()
 		m_bool_away_ = true;
 	}
 	return m_bool_away_;
+}
+
+bt::ActionNode::ResetDirection::ResetDirection(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_) : m_agent_(agent_), m_target_(target_), m_bool_direction_(false)
+{
+}
+
+void bt::ActionNode::ResetDirection::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody"))
+	{
+		auto rb = agent->getComponent<lc::RigidBody>("RigidBody");
+
+		rb->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+				auto node_cast = std::dynamic_pointer_cast<ResetDirection>(node);
+				if (node_cast->m_bool_direction_)
+				{
+					if (!node_cast->m_target_.expired())
+					{
+						if (node_cast->m_target_.lock()->getTransform().getPosition().x > node_cast->m_agent_.lock()->getTransform().getPosition().x)
+						{
+							node_cast->m_agent_.lock()->getTransform().getScale().x = -1.f;
+							node_cast->m_agent_.lock()->getTransform().getOrigin().x = node_cast->m_agent_.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize().x;
+						}
+						else
+						{
+							node_cast->m_agent_.lock()->getTransform().getScale().x = 1.f;
+							node_cast->m_agent_.lock()->getTransform().getOrigin() = sf::Vector2f();
+						}
+							
+					}
+					node_cast->m_bool_direction_ = false;
+				}
+			});
+	}
+}
+
+bool bt::ActionNode::ResetDirection::tick()
+{
+	if (!m_agent_.expired())
+	{
+		m_bool_direction_ = true;
+	}
+	return m_bool_direction_;
+}
+
+bt::ActionNode::FarEnough::FarEnough(std::weak_ptr<lc::GameObject> owner)
+{
+}
+
+bool bt::ActionNode::FarEnough::tick()
+{
+	if (!m_owner_.expired() && !m_player_.expired())
+		if (Tools::Vector::getDistance(m_owner_.lock()->getTransform().getPosition(), m_player_.lock()->getTransform().getPosition()) > 1000 )
+			return true;
+
+	return false;
+}
+
+void bt::ActionNode::FarEnough::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	m_owner_ = owner;
+	m_player_ = owner->GetRoot()->getObject("player");
+}
+
+std::shared_ptr<bt::Node> bt::ActionNode::FarEnough::clone()
+{
+	return std::make_shared<FarEnough>(*this);
+}
+
+bt::ActionNode::Shoot::Shoot(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_) : m_agent_(agent_), m_target_(target_), m_bool_shoot_(false)
+{
+}
+
+void bt::ActionNode::Shoot::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
+	{
+		auto rba = agent->getComponent<lc::RigidBody>("RigidBody");
+		auto rbt = agent->getComponent<lc::RigidBody>("RigidBody");
+		//auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::Shoot>(node);
+		
+		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+
+
+				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::Shoot>(node);
+
+				if (node_cast->m_bool_shoot_)
+				{
+					if (!node_cast->m_target_.expired())
+					{
+						auto rbt = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody");
+						if (node_cast->m_bool_shoot_)
+						{
+							
+							std::shared_ptr<lc::GameObject> tmpBalle = std::make_shared<lc::GameObject>();
+							tmpBalle->getTransform().getPosition() = node_cast->m_agent_.lock()->getTransform().getPosition();
+							tmpBalle->addComponent<lc::Texture>(lc::Texture("test", "../ASSETS/200x200D.png", sf::IntRect(0,0,200,200)));
+							std::shared_ptr<lc::RigidBody> tmpRB = std::make_shared<lc::RigidBody>(lc::RigidBody(sf::FloatRect(0, 0, 200, 200), sf::Vector2f(), sf::Vector2f(), true));
+							tmpRB->getIsFlying() = true;
+							tmpBalle->addComponent<lc::RigidBody>();
+							
+
+							node_cast->m_agent_.lock()->GetRoot()->addObject(tmpBalle);
+
+							node_cast->m_bool_shoot_ = false;
+						}
+					}
+				}
+
+				
+
+
+			});
+	}
+}
+
+bool bt::ActionNode::Shoot::tick()
+{
+	if (!m_agent_.expired())
+	{
+		m_bool_shoot_ = true;
+	}
+	return m_bool_shoot_;
 }

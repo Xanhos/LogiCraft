@@ -60,7 +60,7 @@ namespace lc
 
 		sf::Vector2f& getVelocity() { return m_velocity; }
 		const sf::FloatRect getCollider() const { return m_collider; }
-		bool getIsFlying() const {return m_is_flying;}
+		bool& getIsFlying() {return m_is_flying;}
 	private:
 		bool CheckAllObject(std::shared_ptr<lc::GameObject> _object);
 

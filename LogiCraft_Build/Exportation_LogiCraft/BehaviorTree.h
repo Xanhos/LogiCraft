@@ -335,6 +335,18 @@ namespace bt
 			bool tick() override;
 		};
 
+		class ResetDirection : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			std::weak_ptr<lc::GameObject> m_target_;
+			bool m_bool_direction_;
+		public:
+			ResetDirection() : m_agent_(), m_target_(), m_bool_direction_(false) {}
+			ResetDirection(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
+
 		class DamageBox : public Node
 		{
 			std::weak_ptr<lc::GameObject> m_agent_;
@@ -395,6 +407,17 @@ namespace bt
 			bool tick() override;
 		};
 
+		class Shoot : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			std::weak_ptr<lc::GameObject> m_target_;
+			bool m_bool_shoot_;
+		public:
+			Shoot() : m_agent_(), m_target_(), m_bool_shoot_(false) {}
+			Shoot(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
 
 		class lanceSpawn : public Node
 		{
@@ -508,6 +531,17 @@ namespace bt
 		public:
 			IsHiding()  {}
 			IsHiding(std::weak_ptr<lc::GameObject> owner);
+			bool tick() override;
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
+			std::shared_ptr<Node> clone() override;
+		};
+
+		class FarEnough : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_owner_, m_player_;
+		public:
+			FarEnough() {}
+			FarEnough(std::weak_ptr<lc::GameObject> owner );
 			bool tick() override;
 			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 			std::shared_ptr<Node> clone() override;

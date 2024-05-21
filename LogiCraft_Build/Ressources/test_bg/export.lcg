@@ -5,7 +5,7 @@ Components
 }
 Objects
 {
-player -1532.91 1053.82 1 1 228 281 0 0 0 0
+player -1003.51 1073.5 1 1 228 281 0 0 0 0
 Components
 {
 0 0 0 1824 281 sprite_chara_marche_228x281.png 0 0
@@ -13,7 +13,7 @@ Components
 6 Animation sprite_chara_marche_228x281 Walking 1
 Walking 0 0 228 281 8 0 0.141 8
 
-7 -1532.91 1053.82 228 281 0 0 1 0
+7 -1003.51 1073.5 228 281 0 0 1 0
 
 1 
 0 1
@@ -154,7 +154,7 @@ swimming 0 0 358 156 0 8 0.147 8
 Objects
 {
 }
-bishop 4629.3 2151.94 1 1 1617 1029 0 0 0 0
+bishop 4242.13 1701.2 1 1 1617 1029 0 0 0 0
 Components
 {
 0 0 0 6669 2240 BISHOP-IDLE_PNG_7_1617x1029.png 0 0
@@ -162,7 +162,7 @@ Components
 6 Animation BISHOP-IDLE_PNG_7_1617x1029 Idle 1
 Idle 0 0 1617 1029 0 7 0.15 4
 
-7 4629.3 2151.94 1617 1029 0 0 1 0
+7 4242.13 1701.2 1617 1029 0 0 1 0
 
 1 
 0 1
@@ -211,7 +211,7 @@ hiding 0 828 232 168 0 6 0.082 6
 Objects
 {
 }
-drone -583.189 513.519 1 1 225 361 0 0 0 0
+drone -492.597 536.008 1 1 225 361 0 0 0 0
 Components
 {
 0 0 0 3108 2096 sprite_sheet.png 0 0
@@ -219,15 +219,20 @@ Components
 6 Animation sprite_sheet Idle 1
 Idle 0 1735 225 361 10 0 0.155 10
 
-7 -583.189 513.519 225 361 0 0 1 1
+7 -492.597 536.008 225 361 0 0 1 1
 
 1 
 0 1
 1 2
 2001 1 0 1500
 2006 1
-0 1
+0 3
 5006 0 StayAway
+2001 1 2 FarEnough
+5006 0 ResetDirection
+2003 1 5
+
+5007 0 shoot
 5000 0
 
 }
