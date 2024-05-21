@@ -1,6 +1,6 @@
 #include "Shader.h"
 
-lc::shader::shader::shader()
+lc::Shader::Shader::Shader()
     : m_time_(0.f)
 {
     m_shader_ = std::make_shared<sf::Shader>();
@@ -11,12 +11,12 @@ lc::shader::shader::shader()
     m_shader_states_.texture = nullptr;
 }
 
-lc::shader::shader::~shader()
+lc::Shader::Shader::~Shader()
 {
     m_shader_.reset();
 }
 
-bool lc::shader::shader::is_totally_in(const std::shared_ptr<lc::GameObject>& game_object)
+bool lc::Shader::Shader::is_totally_in(const std::shared_ptr<lc::GameObject>& game_object)
 {
     if (game_object->getTransform().getPosition().x >= getParent()->getTransform().getPosition().x &&
     game_object->getTransform().getPosition().y >= getParent()->getTransform().getPosition().y &&

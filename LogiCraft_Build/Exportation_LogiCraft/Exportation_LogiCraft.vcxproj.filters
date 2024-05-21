@@ -13,18 +13,24 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\Shader">
+      <UniqueIdentifier>{c5cf81bc-5ed6-40e3-aa77-8e8af56bb7e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Shader">
+      <UniqueIdentifier>{e1c5c2fd-c861-401b-b927-e6c9f7ebb202}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\Resources">
+      <UniqueIdentifier>{ce729856-20bc-4659-80c3-c38db27358fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Resources">
+      <UniqueIdentifier>{61335b70-b130-4684-bbc8-bf9f83932707}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GameObject.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="Ressource.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="Source.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="Tools_LC.cpp">
@@ -36,29 +42,47 @@
     <ClCompile Include="GameComponent.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="RigidBody.cpp">
-      <Filter>Fichiers sources</Filter>
+    <ClCompile Include="WaterShader.cpp">
+      <Filter>Fichiers sources\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="Font.cpp">
-      <Filter>Fichiers sources</Filter>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Fichiers sources\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="BehaviorTree.cpp">
-      <Filter>Fichiers sources</Filter>
+    <ClCompile Include="HeatShader.cpp">
+      <Filter>Fichiers sources\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="LightShader.cpp">
+      <Filter>Fichiers sources\Shader</Filter>
     </ClCompile>
     <ClCompile Include="AI.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Button.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Particule.cpp">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\Resources</Filter>
     </ClCompile>
     <ClCompile Include="Animation.cpp">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="BehaviorTree.cpp">
+      <Filter>Fichiers sources\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Button.cpp">
+      <Filter>Fichiers sources\Resources</Filter>
     </ClCompile>
     <ClCompile Include="Event.cpp">
-      <Filter>Fichiers sources</Filter>
+      <Filter>Fichiers sources\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Font.cpp">
+      <Filter>Fichiers sources\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Particule.cpp">
+      <Filter>Fichiers sources\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Ressource.cpp">
+      <Filter>Fichiers sources\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="RigidBody.cpp">
+      <Filter>Fichiers sources\Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Fichiers sources\Resources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,41 +92,53 @@
     <ClInclude Include="GameObject.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="Ressource.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="Tools_LC.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="Transform.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="RigidBody.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+    <ClInclude Include="WaterShader.h">
+      <Filter>Fichiers d%27en-tête\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Fichiers d%27en-tête\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="HeatShader.h">
+      <Filter>Fichiers d%27en-tête\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="LightShader.h">
+      <Filter>Fichiers d%27en-tête\Shader</Filter>
     </ClInclude>
     <ClInclude Include="Font.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="BehaviorTree.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\Resources</Filter>
     </ClInclude>
     <ClInclude Include="AI.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="Button.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="Particule.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\Resources</Filter>
     </ClInclude>
     <ClInclude Include="Animation.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="BehaviorTree.h">
+      <Filter>Fichiers d%27en-tête\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Button.h">
+      <Filter>Fichiers d%27en-tête\Resources</Filter>
     </ClInclude>
     <ClInclude Include="Event.h">
-      <Filter>Fichiers d%27en-tête</Filter>
+      <Filter>Fichiers d%27en-tête\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Particule.h">
+      <Filter>Fichiers d%27en-tête\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Ressource.h">
+      <Filter>Fichiers d%27en-tête\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="RigidBody.h">
+      <Filter>Fichiers d%27en-tête\Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Fichiers d%27en-tête\Resources</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

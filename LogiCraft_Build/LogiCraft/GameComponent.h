@@ -49,7 +49,7 @@ namespace lc
 	*/
 	class GameObject;
 
-	class GameComponent
+	class GameComponent : public std::enable_shared_from_this<GameComponent>
 	{
 	public:
 

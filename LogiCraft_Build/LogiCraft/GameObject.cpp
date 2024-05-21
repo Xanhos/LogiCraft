@@ -47,8 +47,8 @@ SOFTWARE.
 #include "Animation.h"
 #include "DisplayCollider.h"
 #include "HeatShader.h"
+#include "LightShader.h"
 #include "PlayerSpawn.h"
-#include "Shader.h"
 #include "ToolsBar.h"
 #include "WaterShader.h"
 
@@ -212,10 +212,12 @@ void lc::GameObject::Load(std::ifstream& load)
 			std::string tmp_shader_name;
 			load >> tmp_shader_name;
 
-			if (tmp_shader_name == "Heat Shader")
-				addComponent(std::make_shared<lc::shader::heat_shader>())->Load(load);
-			if (tmp_shader_name == "Water Shader")
-				addComponent(std::make_shared<lc::shader::water_shader>())->Load(load);
+			if (tmp_shader_name == "Heat_Shader")
+				addComponent(std::make_shared<lc::Shader::HeatShader>())->Load(load);
+			else if (tmp_shader_name == "Water_Shader")
+				addComponent(std::make_shared<lc::Shader::WaterShader>())->Load(load);
+			else if (tmp_shader_name == "Light_Shader")
+				addComponent(std::make_shared<lc::Shader::LightShader>())->Load(load);
 		}
 		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::SPAWN_POSITION)
 		{
