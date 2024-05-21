@@ -33,6 +33,9 @@ SOFTWARE.
 ---------------------------------------------------------------------------------*/
 
 #include "GameObject.h"
+
+#include <memory>
+
 #include "Ressource.h"
 #include "AI.h"
 #include "Button.h"
@@ -42,6 +45,7 @@ SOFTWARE.
 #include "Event.h"
 #include "Particule.h"
 #include "Animation.h"
+#include "DisplayCollider.h"
 #include "HeatShader.h"
 #include "LightShader.h"
 #include "PlayerSpawn.h"
@@ -122,7 +126,7 @@ void lc::GameObject::SaveRenderer(sf::RenderTexture& texture, int _depth, bool& 
 {
 	if(!getNeedToBeExported())
 	{
-		if(Tools::Collisions::rect_rect(_view_rect,{getTransform().getPosition(),getTransform().getSize()}))
+		if(Tools::Collisions::rect_rect(_view_rect,{getTransform().getPosition(),getTransform().getSize()}) and _depth == getDepth())
 			for (auto& components : m_components)
 			{
 				components->SaveRenderer(texture, _depth);
@@ -218,6 +222,14 @@ void lc::GameObject::Load(std::ifstream& load)
 			else if (tmp_shader_name == "Light_Shader")
 				addComponent(std::make_shared<lc::Shader::LightShader>())->Load(load);
 		}
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::SPAWN_POSITION)
+		{
+			addComponent(std::make_shared<PlayerSpawn>())->Load(load);
+		}
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::DISPLAY_COLLIDER)
+		{
+			addComponent(std::make_shared<DisplayCollider>())->Load(load);
+		}
 		check('}');
 	}
 
@@ -254,6 +266,9 @@ void lc::GameObject::NeedToBeExported(std::list<std::string> ComponentToCheck)
 			}
 		}
 
+	if(getName() == PLAYER_NAME)
+		m_needToBeExported = true;
+	
 	for (auto& object : m_objects)
 	{
 		object->NeedToBeExported(ComponentToCheck);

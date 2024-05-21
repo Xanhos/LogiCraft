@@ -4,7 +4,7 @@
 
 lc::PlayerSpawn::PlayerSpawn()
 {
-    m_type = TYPE::DISPLAY_COLLIDER;
+    m_type = TYPE::SPAWN_POSITION;
     m_typeName = "Player Spawn";
     m_name = "Player Spawn";
 }

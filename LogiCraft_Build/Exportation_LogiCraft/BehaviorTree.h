@@ -56,6 +56,7 @@ namespace bt
 		DIRECTION,
 		DO_ON_ANIM_FRAME,
 		FORCE_SUCCESS,
+		IF_STATE_IS,
 		WANDER = 5000,
 		MOVE_TO,
 		PLAY_ANIMATION,
@@ -64,7 +65,8 @@ namespace bt
 		WAIT,
 		ATTACK,
 		SHOT,
-		JUMP
+		JUMP,
+		CHANGE_STATE
 	};
 	
 	enum class condition_type{
@@ -78,6 +80,7 @@ namespace bt
 		inline static unsigned int m_idCounter = 0;
 		inline static std::unordered_map<std::string, std::shared_ptr<Node>> m_custom_condition_map_ = {};
 	protected:
+		std::string m_state;
 		unsigned int m_id;
 		Node() : m_id(m_idCounter++) {}
 		virtual ~Node() = default;
@@ -92,12 +95,15 @@ namespace bt
 		unsigned int getID() const { return m_id; }
 		
 		std::weak_ptr<Node>& getParent() {return m_parent;}
+		std::string& getState() {return m_state;}
 		
 		template<typename T>
 		static std::shared_ptr<T> New(const T& node) { return std::make_shared<T>(node); }
 
 		static void init_custom_condition();
 		static std::unordered_map<std::string,std::shared_ptr<Node>>& get_unordered_map_custom_condition() {return m_custom_condition_map_;}
+
+		 std::weak_ptr<Node> GetRoot(){auto root = m_parent; while(!root.lock()->m_parent.expired()) root = root.lock()->m_parent;return root;}
 	};
 
 	typedef std::shared_ptr<Node> NodePtr;
@@ -177,7 +183,7 @@ namespace bt
 			Decorator() {m_task = NodePtr();}
 			Decorator(NodePtr task) { m_task = task; }
 
-			NodePtr setTask(NodePtr task) { m_task = task; m_parent = this->shared_from_this() ;return m_task; }
+			NodePtr setTask(NodePtr task) { m_task = task; task->getParent() = this->shared_from_this() ;return m_task; }
 			NodePtr& getTask() {return m_task;}
 		};
 
@@ -290,6 +296,16 @@ namespace bt
 			Do_On_Anim_Frame(const std::weak_ptr<lc::GameObject>& owner,const std::string& anim_name,const std::string& key_anim_name,const unsigned int& action_frame);
 			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 			bool tick() override;
+		};
+
+		class IfStateIs : public  Decorator
+		{
+			std::string m_state_needed_;
+		public:
+			IfStateIs() = default;
+			IfStateIs(const int& direction,const std::weak_ptr<lc::GameObject>& owner){}
+			bool tick() override;
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 		};
 	}
 
@@ -508,6 +524,15 @@ namespace bt
 			bool tick() override;
 			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 			void setup(std::shared_ptr<Node> node) override;
+		};
+
+		class ChangeState : public Node
+		{
+			std::string m_new_state_;
+		public:
+			ChangeState() = default;
+			bool tick() override;
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 		};
 	}
 

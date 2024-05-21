@@ -1,0 +1,19 @@
+1 0 0 
+WORLD 0 0 1 1 0 0 0 0 0 0
+Components
+{
+}
+Objects
+{
+200x200D 479.473 338.456 1 1 200 200 0 0 0 0
+Components
+{
+0 Texture 0 0 200 200 ../ASSETS\200x200D.png 0 0
+
+9 Particles 0 255 255 255 255 0 0 10 10 0 0.1 1 10 0 45 0 50 10 5 300 3 1 0 No_Ressource
+}
+Objects
+{
+}
+
+}
