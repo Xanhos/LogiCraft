@@ -36,29 +36,11 @@ SOFTWARE.
 #include "GameObject.h"
 #include "SFML_ENGINE/RessourcesManager.h"
 
-
 lc::Ressource::Ressource()
 {
 	m_type = Ressource::TYPE::NONE;
-	m_isUsedByAComponent = false;
 }
 
 lc::Ressource::~Ressource()
 {
-}
-
-
-sf::Vector2f lc::Ressource::getRelativePosition()
-{
-	return m_relativePosition;
-}
-
-void lc::Ressource::setRelativePosition(sf::Vector2f pos)
-{
-	m_relativePosition = pos;
-}
-
-void lc::Ressource::setPosition(sf::Vector2f pos)
-{
-	m_renderer.setPosition(pos);
 }

@@ -42,7 +42,7 @@ namespace lc
 	{
 	public:
 		AnimationKey();
-		AnimationKey(std::string name, int total_frame, sf::Vector2i max_frame, float frame_time, sf::IntRect frame_rect);
+		AnimationKey(const std::string& name, const int& total_frame, const sf::Vector2i& max_frame, const float& frame_time, const sf::IntRect& frame_rect);
 		~AnimationKey();
 
 		std::string& get_name();
@@ -59,6 +59,10 @@ namespace lc
 		float& get_frame_time();
 
 		void create_frames_rect();
+
+		void update_animation_key(const std::shared_ptr<lc::Texture>& texture, 
+			const bool& animation_is_paused, const bool& animation_is_reversed,
+			const bool& stop_at_last_frame);
 	private:
 		std::string m_name_;
 
@@ -73,13 +77,13 @@ namespace lc
 
 		float m_frame_timer_;
 		float m_frame_time_;
-
 	};
 
 	class Animation : public lc::Ressource
 	{
 	public:
 		Animation();
+		Animation(const std::shared_ptr<lc::Texture>& used_texture, const std::string& name);
 		virtual ~Animation() override;
 
 		virtual void UpdateEvent(sf::Event& event) override;
@@ -93,18 +97,34 @@ namespace lc
 
 		virtual sf::RectangleShape& getShape() override;
 
-		void select_animation_key(const std::string& name, const bool& reset_last_anim_key = false);
+		void select_animation_key(
+			const std::string& name, const int& start_frame = 0u, const float start_frame_timer = 0.f,
+			const bool reset_last_anim_key = false
+		);
+		
+		void select_animation_key(const std::string& name, const bool reset_last_anim_key = false);
 
 		void current_animation_is_paused(const bool& paused = true);
 
 		void current_animation_is_reversed(const bool& reversed = true);
 
+		void load_animation_file(const std::string& path = "");
+
 		void set_stop_at_last_frame(const bool& stop_at_last_frame);
 
-		std::weak_ptr<AnimationKey> get_current_animation_key();
+		void add_animation_key(const std::string& name, const int& total_frame, const sf::Vector2i& max_frame, const float& frame_time, const sf::IntRect& frame_rect);
+		
+		void delete_animation_key(const std::string& name);
+
+		const auto& get_all_key_animation() { return m_animation_keys_; }
+		const auto& get_actual_animation_key() { return m_actual_animation_key_; }
+		auto& get_texture() { return m_texture_; }
 	private:
 		void texture_to_search();
 
+		void update_renderer_window();
+
+		void draw_animation(WindowManager& window);
 	private:
 		int m_base_total_frame_;
 		float m_base_frame_time_;
@@ -116,7 +136,6 @@ namespace lc
 		bool m_animation_is_reversed_;
 		bool m_stop_at_last_frame_;
 		
-
 		std::weak_ptr<lc::Texture> m_texture_;
 
 		std::weak_ptr<AnimationKey> m_actual_animation_key_;

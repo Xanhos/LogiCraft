@@ -524,7 +524,7 @@ void Viewports::ResizeSelectionBoxBehavior(sf::Vector2f _mousePositionWithView, 
 					if (!selectedObject.expired())
 						if (!selectedObject.lock()->isLock())
 						{
-							if (ToolsBar::GetActualLayer().second == "Player Plan" && selectedObject.lock()->getDepth() == 4)
+							if (ToolsBar::GetActualLayer().second == "Player Plan" && selectedObject.lock()->getDepth() == 4 && selectedObject.lock()->getName() != PLAYER_NAME)
 							{
 								selectedObject.lock()->getTransform().getPosition() = 
 									sf::Vector2f((int)(_mousePositionWithView.x + selectedObject.lock()->getTransform().getDistance().x) / 120 * 120,
@@ -585,9 +585,11 @@ void Viewports::ObjectIsSelectedOrMovedBehavior(sf::Vector2f _mousePosition, sf:
 
 bool Viewports::CheckSelection(ObjWeakPtrList& _object, std::shared_ptr<lc::GameObject> _scene, sf::Vector2f _mousePosition, std::shared_ptr<Viewport>& _viewport, WindowManager& _window)
 {
-	if (std::find_if(_scene->getObjects().begin(), _scene->getObjects().end(), [this, &_window, &_object, &_viewport, _mousePosition](std::shared_ptr<lc::GameObject> _sceneObject)
+	if (std::find_if(_scene->getObjects().begin(), _scene->getObjects().end(), [this, &_window, &_object, &_viewport, _mousePosition, &_scene](std::shared_ptr<lc::GameObject> _sceneObject)
 		{
-			if (Tools::Collisions::point_rect(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow()), _viewport->getView()), { _sceneObject->getTransform().getPosition(), _sceneObject->getTransform().getSize() }) && _sceneObject->getDepth() == ToolsBar::GetActualLayer().first)
+			if (Tools::Collisions::point_rect(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow()), _viewport->getView()),
+				{ _sceneObject->getTransform().getPosition() - _sceneObject->getTransform().getOrigin() + lc::GameObject::GetOffset(lc::GameObject::GetRoot(_sceneObject),_sceneObject->getDepth()), _sceneObject->getTransform().getSize()})
+				&& _sceneObject->getDepth() == ToolsBar::GetActualLayer().first)
 			{
 				if (!KEY(LControl))
 					_object.clear();
@@ -632,10 +634,10 @@ void Viewports::ResizeRectSelection(ObjWeakPtrList& _object, std::shared_ptr<lc:
 			if (_scene != selectedObject.lock())
 			{
 				if (m_maxSelectedObjectPosition.x > selectedObject.lock()->getTransform().getPosition().x - selectedObject.lock()->getTransform().getOrigin().x)
-					m_maxSelectedObjectPosition.x = selectedObject.lock()->getTransform().getPosition().x - selectedObject.lock()->getTransform().getOrigin().x;
+					m_maxSelectedObjectPosition.x = selectedObject.lock()->getTransform().getPosition().x - selectedObject.lock()->getTransform().getOrigin().x + lc::GameObject::GetOffset(lc::GameObject::GetRoot(selectedObject.lock()),selectedObject.lock()->getDepth()).x;
 
 				if (m_maxSelectedObjectPosition.y > selectedObject.lock()->getTransform().getPosition().y - selectedObject.lock()->getTransform().getOrigin().y)
-					m_maxSelectedObjectPosition.y = selectedObject.lock()->getTransform().getPosition().y - selectedObject.lock()->getTransform().getOrigin().y;
+					m_maxSelectedObjectPosition.y = selectedObject.lock()->getTransform().getPosition().y - selectedObject.lock()->getTransform().getOrigin().y + lc::GameObject::GetOffset(lc::GameObject::GetRoot(selectedObject.lock()),selectedObject.lock()->getDepth()).y;
 			}
 		}
 	}
@@ -647,10 +649,10 @@ void Viewports::ResizeRectSelection(ObjWeakPtrList& _object, std::shared_ptr<lc:
 			if (_scene != selectedObject.lock())
 			{
 				if (m_maxSelectedObjectPosition.x + m_maxSelectedObjectSize.x < (selectedObject.lock()->getTransform().getPosition().x - selectedObject.lock()->getTransform().getOrigin().x) + selectedObject.lock()->getTransform().getSize().x)
-					m_maxSelectedObjectSize.x = ((selectedObject.lock()->getTransform().getPosition().x - selectedObject.lock()->getTransform().getOrigin().x) + selectedObject.lock()->getTransform().getSize().x) - m_maxSelectedObjectPosition.x;
+					m_maxSelectedObjectSize.x = ((selectedObject.lock()->getTransform().getPosition().x - selectedObject.lock()->getTransform().getOrigin().x) + selectedObject.lock()->getTransform().getSize().x) +lc::GameObject::GetOffset(lc::GameObject::GetRoot(selectedObject.lock()),selectedObject.lock()->getDepth()).x - m_maxSelectedObjectPosition.x;
 
 				if (m_maxSelectedObjectPosition.y + m_maxSelectedObjectSize.y < (selectedObject.lock()->getTransform().getPosition().y - selectedObject.lock()->getTransform().getOrigin().y) + selectedObject.lock()->getTransform().getSize().y)
-					m_maxSelectedObjectSize.y = ((selectedObject.lock()->getTransform().getPosition().y - selectedObject.lock()->getTransform().getOrigin().y) + selectedObject.lock()->getTransform().getSize().y) - m_maxSelectedObjectPosition.y;
+					m_maxSelectedObjectSize.y = ((selectedObject.lock()->getTransform().getPosition().y - selectedObject.lock()->getTransform().getOrigin().y) + selectedObject.lock()->getTransform().getSize().y) +lc::GameObject::GetOffset(lc::GameObject::GetRoot(selectedObject.lock()),selectedObject.lock()->getDepth()).y  - m_maxSelectedObjectPosition.y;
 			}
 		}
 	}

@@ -754,7 +754,7 @@ bool bt::ActionNode::Play_Animation::tick()
 	if(!m_animation_.expired())
 	{
 		auto anim = m_animation_.lock();
-		anim->select_animation_key(m_key_anim_name_,m_key_anim_name_ == anim->get_current_animation_key().lock()->get_name() ? false : true);
+		anim->select_animation_key(m_key_anim_name_, m_key_anim_name_ != anim->get_actual_animation_key().lock()->get_name());
 		anim->set_stop_at_last_frame(m_stop_at_last_frame_);
 		anim->current_animation_is_reversed(m_reverse_);
 		return true;		
@@ -858,7 +858,7 @@ bool bt::Decorator::Do_On_Anim_Frame::tick()
 	}
 
 	if(const auto anim = m_animation_.lock())	
-		if(const auto anim_key = anim->get_current_animation_key().lock())		
+		if(const auto anim_key = anim->get_actual_animation_key().lock())		
 			if(anim_key->get_name() == m_key_anim_name_)
 			{
 				if(anim_key->get_actual_frame() == m_action_frame_ and m_new_frame_)
@@ -880,7 +880,7 @@ bool bt::ActionNode::In_Range_Of_Player::tick()
 {
 	if(m_player_.expired() and !m_owner_.expired())
 	{
-		auto scene = m_owner_.lock()->GetRoot();
+		auto scene = lc::GameObject::GetRoot(m_owner_.lock());
 		if(scene->hasObject("PLAYER"))
 			m_player_ = scene->getObject("PLAYER");
 	}
@@ -918,7 +918,7 @@ void bt::ActionNode::Attack::load(std::ifstream& file, std::shared_ptr<lc::GameO
 
     file >> attack_name;
 
-    auto scene = owner->GetRoot();
+    auto scene = lc::GameObject::GetRoot(owner);
 
     if (attack_name == "damageBox")
     {
@@ -1015,6 +1015,29 @@ void bt::ActionNode::Shot::setup(std::shared_ptr<Node> node)
 	m_attack_node_->setup(m_attack_node_);
 }
 
+bool bt::ActionNode::ChangeState::tick()
+{
+	GetRoot().lock()->getState() = m_new_state_;
+	return true;
+}
+
+void bt::ActionNode::ChangeState::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	file >> m_new_state_;
+}
+
+bool bt::Decorator::IfStateIs::tick()
+{
+	if(m_state_needed_ == GetRoot().lock()->getState())
+		return SECURE_TASK(m_task);
+	return false;
+}
+
+void bt::Decorator::IfStateIs::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	file >> m_state_needed_;
+}
+
 bt::NodePtr bt::Factory(const node_type& type)
 {
 	switch (type) {
@@ -1034,6 +1057,8 @@ bt::NodePtr bt::Factory(const node_type& type)
 		return Node::New(Decorator::Cooldown());
 	case node_type::FORCE_SUCCESS:
 		return Node::New(Decorator::ForceSuccess());
+	case node_type::IF_STATE_IS:
+		return Node::New(Decorator::IfStateIs());
 	case node_type::WANDER:
 		return Node::New(ActionNode::Wander());
 	case node_type::MOVE_TO:
@@ -1051,7 +1076,9 @@ bt::NodePtr bt::Factory(const node_type& type)
 	case node_type::SHOT:
 		return Node::New(ActionNode::Shot());
 	case node_type::JUMP:
-		return Node::New(ActionNode::Jump());		
+		return Node::New(ActionNode::Jump());	
+	case node_type::CHANGE_STATE:
+		return Node::New(ActionNode::ChangeState());		
 	default:
 		return Node::New(Composite::Sequence());
 	}

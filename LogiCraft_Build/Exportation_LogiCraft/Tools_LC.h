@@ -34,9 +34,6 @@ void ThreadManager::AddNewThread(const Func& func)
 	}),is_thread_finish});
 }
 
-
-
-
 namespace lc
 {
 	class GameObject;
@@ -103,6 +100,8 @@ std::ostream& operator<<(std::ostream& os, const sf::Rect<T>& rect)
 	return os << rect.left << " " << rect.top << " " << rect.width << " " << rect.height;
 }
 
+std::ostream& operator<<(std::ostream& os, const sf::Color& color);
+
 template<typename T>
 std::istream& operator>>(std::istream& is, sf::Vector2<T>& vec)
 {
@@ -114,3 +113,5 @@ std::istream& operator>>(std::istream& is, sf::Rect<T>& rect)
 {
 	return is >> rect.left >> rect.top >> rect.width >> rect.height;
 }
+
+std::istream& operator>>(std::istream& is, sf::Color& color);

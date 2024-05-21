@@ -67,6 +67,8 @@ void PatronNode::SetupAllNode()
 	pushNode("DIRECTION");
 	pushNode("DO ON ANIM FRAME");
 	pushNode("FORCE SUCCESS");
+	pushNode("IF STATE IS");
+	//
 	pushNode("WANDER");
 	s_node_container_["WANDER"] = 5000;
 	previous_node = 5001;
@@ -77,13 +79,13 @@ void PatronNode::SetupAllNode()
 	pushNode("WAIT");
 	pushNode("ATTACK");
 	pushNode("SHOT");
-	pushNode("JUMP");
-	
+	pushNode("JUMP");	
+	pushNode("CHANGE STATE");
 
 	s_decorator_node_start_ = s_node_container_["INVERSER"];//Were the decorator node start
 	s_action_node_start_ = s_node_container_["WANDER"];//Were the action node start and were the decorator node stop (leaf node)
-	s_decorator_node_end_ = s_node_container_["FORCE SUCCESS"] + 1;
-	s_action_node_end_ = s_node_container_["JUMP"] + 1;
+	s_decorator_node_end_ = s_node_container_["IF STATE IS"] + 1;
+	s_action_node_end_ = s_node_container_["CHANGE STATE"] + 1;
 	
 
 	
@@ -123,6 +125,64 @@ void PatronNode::SetupAllNode()
 	//CUSTOM
 	{
 		//Init method set the std::any to the default value
+		s_decorator_init_method_["IF STATE IS"] = [](PatronNode* node) {
+			node->m_decorator_data_ = std::string();
+		};
+		s_decorator_copy_method_["IF STATE IS"] = [](PatronNode* node, PatronNode* copied_node)		{
+			node->m_decorator_data_ = std::any_cast<std::string>(copied_node->m_decorator_data_);
+		};
+		//Update method display the data and set the std::any to the new value
+		s_decorator_update_method_["IF STATE IS"] = [](PatronNode* node) {
+			auto customCondition = std::any_cast<std::string>(node->m_decorator_data_);
+			ImGui::InputText("State needed", customCondition,100);
+			Tools::ReplaceCharacter(customCondition,' ','_');
+			node->m_decorator_data_ = customCondition;
+		};
+		//Save method save the data in the file
+		s_decorator_save_method_["IF STATE IS"] = [](PatronNode* node, std::ofstream& file) {
+			std::string customCondition = std::any_cast<std::string>(node->m_decorator_data_);
+			file << customCondition;
+		};
+		//Load method load the data from the file
+		s_decorator_load_method_["IF STATE IS"] = [](PatronNode* node, std::ifstream& file) {
+			std::string customCondition;
+			file >> customCondition;
+			node->m_decorator_data_ = customCondition;
+		};
+	}
+
+	//CUSTOM
+	{
+		//Init method set the std::any to the default value
+		s_decorator_init_method_["CHANGE STATE"] = [](PatronNode* node) {
+			node->m_decorator_data_ = std::string();
+		};
+		s_decorator_copy_method_["CHANGE STATE"] = [](PatronNode* node, PatronNode* copied_node)		{
+			node->m_decorator_data_ = std::any_cast<std::string>(copied_node->m_decorator_data_);
+		};
+		//Update method display the data and set the std::any to the new value
+		s_decorator_update_method_["CHANGE STATE"] = [](PatronNode* node) {
+			auto customCondition = std::any_cast<std::string>(node->m_decorator_data_);
+			ImGui::InputText("New state", customCondition,100);
+			Tools::ReplaceCharacter(customCondition,' ','_');
+			node->m_decorator_data_ = customCondition;
+		};
+		//Save method save the data in the file
+		s_decorator_save_method_["CHANGE STATE"] = [](PatronNode* node, std::ofstream& file) {
+			std::string customCondition = std::any_cast<std::string>(node->m_decorator_data_);
+			file << customCondition;
+		};
+		//Load method load the data from the file
+		s_decorator_load_method_["CHANGE STATE"] = [](PatronNode* node, std::ifstream& file) {
+			std::string customCondition;
+			file >> customCondition;
+			node->m_decorator_data_ = customCondition;
+		};
+	}
+
+	//CUSTOM
+	{
+		//Init method set the std::any to the default value
 		s_decorator_init_method_["CUSTOM"] = [](PatronNode* node) {
 			node->m_decorator_data_ = std::string();
 		};
@@ -132,7 +192,7 @@ void PatronNode::SetupAllNode()
 		//Update method display the data and set the std::any to the new value
 		s_decorator_update_method_["CUSTOM"] = [](PatronNode* node) {
 			auto customCondition = std::any_cast<std::string>(node->m_decorator_data_);
-			ImGui::InputText("Loop Number", customCondition,100);
+			ImGui::InputText("Custom condition", customCondition,100);
 			Tools::ReplaceCharacter(customCondition,' ','_');
 			node->m_decorator_data_ = customCondition;
 		};

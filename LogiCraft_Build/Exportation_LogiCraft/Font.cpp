@@ -58,7 +58,6 @@ lc::Font::Font(const std::string& name,const std::string& path,const std::string
 	m_outLineColor = sf::Color::Black;
 
 	UpdateText();
-
 }
 
 
@@ -84,15 +83,11 @@ lc::Font::Font(const Font& font)
 	m_name = font.m_name;
 
 	UpdateText();
-
 }
 
 lc::Font::~Font()
 {
 }
-
-
-
 
 void lc::Font::setNewSentence(const std::string& sentence)
 {

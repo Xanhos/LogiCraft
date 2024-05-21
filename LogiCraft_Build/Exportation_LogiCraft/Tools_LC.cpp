@@ -87,3 +87,18 @@ bool Tools::Collisions::lineLine(sf::FloatRect line_one, sf::FloatRect line_two)
 	}
 	return false;
 }
+
+std::ostream& operator<<(std::ostream& os, const sf::Color& color)
+{
+	return os << static_cast<int>(color.r) << " " << static_cast<int>(color.g) << " "
+			  << static_cast<int>(color.b) << " " << static_cast<int>(color.a);
+}
+
+std::istream& operator>>(std::istream& is, sf::Color& color)
+{
+	int tmp_tab[4]{ 0, 0, 0, 0 };
+	is >> tmp_tab[0] >> tmp_tab[1] >> tmp_tab[2] >> tmp_tab[3];
+	color = sf::Color(static_cast<sf::Uint8>(tmp_tab[0]), static_cast<sf::Uint8>(tmp_tab[1]),
+		static_cast<sf::Uint8>(tmp_tab[2]), static_cast<sf::Uint8>(tmp_tab[3]));
+	return is;
+}

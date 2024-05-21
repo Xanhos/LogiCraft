@@ -17,9 +17,7 @@ namespace lc
 		this->create_frames_rect();
 	}
 
-	AnimationKey::~AnimationKey()
-	{
-	}
+	AnimationKey::~AnimationKey() = default;
 
 	std::string& AnimationKey::get_name()
 	{
@@ -86,9 +84,11 @@ namespace lc
 	}
 
 	void AnimationKey::update_animation_key(const std::shared_ptr<lc::Texture>& texture, 
-		const bool& animation_is_paused, const bool& animation_is_reversed)
+	const bool& animation_is_paused, const bool& animation_is_reversed,
+		const bool& stop_at_last_frame)
 	{
-		if (!animation_is_paused)
+		if ((!animation_is_paused && !stop_at_last_frame) || (!animation_is_paused && stop_at_last_frame
+			&& m_actual_frame_ != m_total_frame_ - 1))
 		{
 			m_frame_timer_ += Tools::getDeltaTime();
 			if (m_frame_timer_ >= m_frame_time_)
@@ -113,32 +113,35 @@ namespace lc
 
 	Animation::Animation()
 		: m_base_total_frame_(0), m_base_frame_time_(0.f),
-		m_window_his_open_(false), m_animation_is_paused_(false), m_animation_is_reversed_(false) , m_want_to_load_anim_(false)
+		  m_window_his_open_(false), m_animation_is_paused_(false), m_animation_is_reversed_(false),
+		  m_stop_at_last_frame_(false), m_want_to_load_anim_(false)
 	{
 		m_name = "Animation";
 		m_typeName = "Animation";
 		m_type = TYPE::ANIMATION;
 
-		m_texture_to_search_ = std::make_pair(true, "");
+		m_texture_to_search_ = std::make_pair(false, "");
 	}
 
 	Animation::Animation(const std::shared_ptr<lc::Texture>& used_texture, const std::string& name)
 		: m_base_total_frame_(0), m_base_frame_time_(0.f),
-		m_window_his_open_(false), m_animation_is_paused_(false), m_animation_is_reversed_(false) , m_want_to_load_anim_(false)
+		  m_window_his_open_(false), m_animation_is_paused_(false), m_animation_is_reversed_(false),
+		  m_stop_at_last_frame_(false), m_want_to_load_anim_(false)
 	{
 		m_name = name;
 		m_typeName = "Animation";
 		m_type = TYPE::ANIMATION;
 
 		m_texture_ = used_texture;
+		used_texture->isVisible(false);
 
-		m_texture_to_search_ = std::make_pair(true, "");
+		m_texture_to_search_ = std::make_pair(false, "");
 	}
 
 	Animation::~Animation()
 	{
 		if (!m_texture_.expired())
-			m_texture_.lock()->isVisible() = true;
+			m_texture_.lock()->isVisible(true);
 	}
 
 	void Animation::UpdateEvent(sf::Event& event)
@@ -154,7 +157,7 @@ namespace lc
 
 		if (const auto tmp_texture = m_texture_.lock())
 			if (const auto tmp_animation_key = m_actual_animation_key_.lock())
-				tmp_animation_key->update_animation_key(tmp_texture, m_animation_is_paused_, m_animation_is_reversed_);
+				tmp_animation_key->update_animation_key(tmp_texture, m_animation_is_paused_, m_animation_is_reversed_, m_stop_at_last_frame_);
 	}
 
 	void Animation::Draw(WindowManager& window)
@@ -329,7 +332,7 @@ namespace lc
 						if (ImGui::Selectable(std::string("No Texture ##" + std::to_string(m_ID)).c_str(), tmp_is_selected))
 						{
 							const auto tmp_texture = m_texture_.lock();
-							tmp_texture->isVisible() = true;
+							tmp_texture->isVisible(true);
 							tmp_texture->getShape().setTextureRect(tmp_texture->getTextureRect());
 
 							m_texture_.reset();
@@ -345,10 +348,10 @@ namespace lc
 								if (ImGui::Selectable(std::string(tmp_texture_component->getName() + "##" + std::to_string(tmp_texture_component->getID())).c_str(), tmp_is_selected))
 								{
 									if (!m_texture_.expired())
-										m_texture_.lock()->isVisible() = true;
+										m_texture_.lock()->isVisible(true);
 
 									m_texture_ = tmp_texture_component;
-									tmp_texture_component->isVisible() = false;
+									tmp_texture_component->isVisible(false);
 								}
 							}
 						}
@@ -471,11 +474,6 @@ namespace lc
 		return (m_texture_.expired() ? m_renderer : m_texture_.lock()->getShape());
 	}
 
-	std::shared_ptr<lc::Texture> Animation::get_texture() const
-	{
-		return m_texture_.lock();
-	}
-
 	void Animation::select_animation_key(
 		const std::string& name, const int& start_frame, const float start_frame_timer, const bool reset_last_anim_key
 	)
@@ -526,6 +524,11 @@ namespace lc
 	void Animation::current_animation_is_reversed(const bool& reversed)
 	{
 		m_animation_is_reversed_ = reversed;
+	}
+
+	void Animation::set_stop_at_last_frame(const bool& stop_at_last_frame)
+	{
+		m_stop_at_last_frame_ = stop_at_last_frame;		
 	}
 
 	void Animation::load_animation_file(const std::string& path)
@@ -615,7 +618,7 @@ namespace lc
 					if (m_texture_to_search_.second == tmp_texture->getName())
 					{
 						m_texture_ = tmp_texture;
-						tmp_texture->isVisible() = false;
+						tmp_texture->isVisible(false);
 						break;
 					}
 				}

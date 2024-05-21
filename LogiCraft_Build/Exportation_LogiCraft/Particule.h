@@ -102,6 +102,8 @@ namespace lc
 
 		virtual std::shared_ptr<lc::GameComponent> Clone() override;
 		virtual void Load(std::ifstream& load) override;
+
+		void load_particles_file(std::string path = "");
 	private:
 		/*
 		* @brief When the particles system is load by a save it can have a texture,
@@ -133,23 +135,6 @@ namespace lc
 		* @brief Function to draw Particle.
 		*/
 		void particle_draw(const std::shared_ptr<Particle>& particle, WindowManager& window);
-		
-		/*
-		* @brief Function to update all the particles, so it took less performance.
-		*/
-		void thread_update();
-
-		/*
-		* @brief Function to restart the clock of the thread.
-		*/
-		static void restart_thread_clock();
-
-		/*
-		* @brief Function to return delta time of the thread.
-		* 
-		* @return Return the delta time.
-		*/
-		static float get_thread_delta_time();
 
 		/*
 		* @brief Take the _centerPosition and Rotate it from the angle.
@@ -158,14 +143,6 @@ namespace lc
 		*/
 		sf::Vector2f get_extend_spawn_point(sf::Vector2f center_position) const;
 	private:
-		static std::list<std::shared_ptr<Particle>> s_thread_particles_;
-		static bool s_thread_update_is_on_;
-		static int s_number_of_particle_system_;
-		static std::thread s_update_thread_;
-		static sf::Clock s_update_clock_;
-		static sf::Time s_update_time_;
-
-
 		ParticlesSystemType m_particles_type_;
 
 		std::list<std::shared_ptr<Particle>> m_particles_;
@@ -184,7 +161,7 @@ namespace lc
 		float m_spawn_point_extend_size_;
 		
 		float m_spawn_cooldown_;
-		float m_spawn_time_;
+		float m_spawn_timer_;
 		float m_despawn_cooldown_;
 		float m_rotation_speed_;
 		float m_spawn_rotation_;

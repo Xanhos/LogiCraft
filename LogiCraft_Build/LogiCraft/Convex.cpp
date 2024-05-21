@@ -83,6 +83,12 @@ void lc::Convex::UpdateEvent(sf::Event& _window)
 void lc::Convex::Update(WindowManager& _window)
 {
 	m_convex.setPosition(getParent()->getTransform().getPosition());
+	m_convex.setScale(getParent()->getTransform().getScale());
+	m_convex.setOrigin(getParent()->getTransform().getOrigin());
+	m_renderer.setSize(m_convex.getGlobalBounds().getSize());
+
+	if(getParent()->getName() == PLAYER_NAME)
+		m_convex.setFillColor(sf::Color::Red);
 }
 
 void lc::Convex::Draw(WindowManager& _window)

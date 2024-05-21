@@ -4,13 +4,13 @@
 
 namespace lc
 {
-    namespace shader
+    namespace Shader
     {
-        class water_shader : public shader
+        class WaterShader : public Shader
        {
         public:
-            water_shader();
-            ~water_shader();
+            WaterShader();
+            virtual ~WaterShader() override;
 
             virtual void UpdateEvent(sf::Event& event) override;
             virtual void Update(WindowManager& window) override;
@@ -19,7 +19,7 @@ namespace lc
 
             virtual void Save(std::ofstream& save, sf::RenderTexture& texture, int depth) override;
             virtual void SaveRenderer(sf::RenderTexture& texture, int depth) override {}
-            virtual void Export(std::ofstream& exportation) override {}
+            virtual void Export(std::ofstream& exportation) override;
             virtual void Load(std::ifstream& load) override;
 
             virtual std::shared_ptr<lc::GameComponent> Clone() override;
@@ -27,8 +27,8 @@ namespace lc
         private:
             virtual void setup_shader_script_string() override;
 
-            void draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, sf::RenderTexture& window);
-            void draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, WindowManager& window);
+            void draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, sf::RenderTexture& window, const unsigned char& depth);
+            void draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, WindowManager& window, const unsigned char& depth);
         private:
             float m_level_;
             int m_distortion_level_;

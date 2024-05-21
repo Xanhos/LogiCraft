@@ -40,6 +40,8 @@ SOFTWARE.
 #include "GameComponent.h"
 #include "Transform.h"
 
+const std::string PLAYER_NAME = "PLAYER";
+
 namespace lc
 {
 	class GameObject : public std::enable_shared_from_this<GameObject>
@@ -76,6 +78,8 @@ namespace lc
 		static std::shared_ptr<GameObject> CreateGameObject(std::string _name, unsigned char _depth = 0);
 
 		static std::shared_ptr<GameObject> GetRoot(std::shared_ptr<GameObject> object);
+
+		static sf::Vector2f GetOffset(std::shared_ptr<GameObject> root, int depth);
 #pragma endregion
 
 #pragma region TEMPLATE
@@ -137,37 +141,6 @@ namespace lc
 		}
 
 		/*
-		* @brief Add another GameObject to the GameObject.
-		*
-		* @param _component : The Object that you want to be added.
-		*
-		* @return Return the shared_ptr that as been created.
-		*/
-		std::shared_ptr<GameObject> addObject(std::shared_ptr<GameObject> _object)
-		{
-			_object->setParent(this->shared_from_this());
-			m_objects.push_back(_object);
-			m_objects.sort([](std::shared_ptr<GameObject> _a, std::shared_ptr<GameObject> _b) { return _a->getDepth() > _b->getDepth(); });
-			return _object;
-		}
-
-		/*
-		* @brief Add another GameObject to the GameObject.
-		*
-		* @param _name : The name of the Object that you want to be added.
-		*
-		* @return Return the shared_ptr that as been created.
-		*/
-		std::shared_ptr<GameObject> addObject(std::string _name, unsigned char _depth = 0)
-		{
-			auto tmp_object = std::make_shared<GameObject>(_name, _depth);
-			tmp_object->setParent(this->shared_from_this());
-			m_objects.push_back(tmp_object);
-			m_objects.sort([](std::shared_ptr<GameObject> _a, std::shared_ptr<GameObject> _b) { return _a->getDepth() > _b->getDepth(); });
-			return tmp_object;
-		}
-
-		/*
 		* @brief Just a function to return one of the wanted component.
 		*
 		* @return The shared_ptr of the wanted component.
@@ -186,34 +159,69 @@ namespace lc
 		}
 
 		/*
+		* @brief Just a function to return one of the wanted component.
+		*
+		* @return The shared_ptr of the wanted component.
+		*
+		* @throw If the component is not found.
+		*/
+		template<typename T>
+		std::shared_ptr<T> getComponent(std::string _name, unsigned int _ID)
+		{
+			for (auto& component : m_components)
+				if (auto tmp_component = std::dynamic_pointer_cast<T>(component))
+					if (tmp_component->getName() == _name &&
+						tmp_component->getID() == _ID)
+						return tmp_component;
+
+			throw std::runtime_error("Component not found.");
+		}
+
+		/*
 		* @brief Just a function to return if the object has the wanted component.
 		*
 		* @return return true if component exist.
 		*/
-		bool hasComponent(std::string _name)
-		{
-			auto toLower = [](std::string str)->std::string {std::transform(str.begin(), str.end(), str.begin(), tolower); return str; };
-			for (auto& component : m_components)
-				if (toLower(component->getName()) == toLower(_name) or toLower(component->getTypeName()) == toLower(_name))
-					return true;
-
-			return false;
-		}
+		bool hasComponent(std::string _name);
 
 		/*
-		* @brief Just a function to return if the object has the wanted Object.
+		* @brief Just a function to return if the object has the wanted component.
 		*
-		* @return return true if Object exist.
+		* @return return true if component exist.
 		*/
-		bool hasObject(std::string _name)
-		{
-			auto toLower = [](std::string str)->std::string {std::transform(str.begin(), str.end(), str.begin(), tolower); return str; };
-			for (auto& object : m_objects)
-				if (toLower(object->getName()) == toLower(_name))
-					return true;
+		bool hasComponent(std::string _name, unsigned int _ID);
 
-			return false;
-		}
+		/*
+		* @brief Just a function to remove wanted object.
+		*
+		* @throw If the object is not found.
+		*/
+		void removeComponent(std::string _name);
+		
+		/*
+		* @brief Just a function to remove wanted object.
+		*
+		* @throw If the object is not found.
+		*/
+		void removeComponent(std::string _name, unsigned int _ID);
+
+		/*
+		* @brief Add another GameObject to the GameObject.
+		*
+		* @param _component : The Object that you want to be added.
+		*
+		* @return Return the shared_ptr that as been created.
+		*/
+		std::shared_ptr<GameObject> addObject(std::shared_ptr<GameObject> _object);
+
+		/*
+		* @brief Add another GameObject to the GameObject.
+		*
+		* @param _name : The name of the Object that you want to be added.
+		*
+		* @return Return the shared_ptr that as been created.
+		*/
+		std::shared_ptr<GameObject> addObject(std::string _name, unsigned char _depth = 0);
 
 		/*
 		* @brief Just a function to return one of the wanted component.
@@ -222,14 +230,7 @@ namespace lc
 		*
 		* @throw If the object is not found.
 		*/
-		std::shared_ptr<GameObject> getObject(std::string _name)
-		{
-			for (auto& object : m_objects)
-				if (object->getName() == _name)
-					return object;
-
-			throw std::runtime_error("Object not found.");
-		}
+		std::shared_ptr<GameObject> getObject(std::string _name);
 
 		/*
 		* @brief Just a function to return one of the wanted component.
@@ -238,77 +239,39 @@ namespace lc
 		*
 		* @throw If the object is not found.
 		*/
-		std::shared_ptr<GameObject> getObject(std::string _name, unsigned int _ID)
-		{
-			for (auto& object : m_objects)
-				if (object->getName() == _name && object->getID() == _ID)
-					return object;
+		std::shared_ptr<GameObject> getObject(std::string _name, unsigned int _ID);
 
-			throw std::runtime_error("Object not found.");
-		}
+		/*
+		* @brief Just a function to return if the object has the wanted component.
+		*
+		* @return return true if component exist.
+		*/
+		bool hasObject(std::string _name);
+
+		/*
+		* @brief Just a function to return if the object has the wanted component.
+		*
+		* @return return true if component exist.
+		*/
+		bool hasObject(std::string _name, unsigned int _ID);
 
 		/*
 		* @brief Just a function to remove wanted object.
 		*
 		* @throw If the object is not found.
 		*/
-		void removeObject(std::string _name)
-		{
-			for (auto object = m_objects.begin(); object != m_objects.end();)
-			{
-				if ((*object)->getName() == _name)
-					object = m_objects.erase(object);
-				else
-					object++;
-			}
-		}
+		void removeObject(std::string _name);
 
 		/*
 		* @brief Just a function to remove wanted object.
 		*
 		* @throw If the object is not found.
 		*/
-		void removeObject(std::string _name, unsigned int _ID)
-		{
-			for (auto object = m_objects.begin(); object != m_objects.end();)
-			{
-				if ((*object)->getName() == _name && (*object)->getID() == _ID)
-					object = m_objects.erase(object);
-				else
-					object++;
-			}
-		}
+		void removeObject(std::string _name, unsigned int _ID);
 
-		bool objectIsParent(std::string _name, unsigned int _ID)
-		{
-			for (auto& gameObject : m_objects)
-			{
-				if (gameObject->getName() == _name && gameObject->getID() == _ID)
-					return true;
-				else if (gameObject->objectIsParent(_name, _ID))
-					return true;
-			}
+		bool objectIsParent(std::string _name, unsigned int _ID);
 
-			return false;
-		}
-
-		std::shared_ptr<lc::GameObject> Clone()
-		{
-			auto Clone = lc::GameObject::CreateGameObject(m_name, m_depth);
-			Clone->getTransform() = getTransform();
-			Clone->getTransform().getPosition() += sf::Vector2f(10.f, 10.f);
-			for (auto& component : m_components)
-			{
-				Clone->addComponent(component->Clone());
-			}
-
-			for (auto& object : m_objects)
-			{
-				Clone->addObject(object->Clone());
-			}
-
-			return Clone;
-		}
+		std::shared_ptr<lc::GameObject> Clone();
 #pragma endregion
 
 #pragma region GETTER/SETTER
@@ -326,14 +289,19 @@ namespace lc
 		auto& getObjects() { return m_objects; }
 		auto& getIsSaved() { return m_Saved; }
 
-		void setID(unsigned int _ID) { m_ID = _ID; }
+		void setID(const unsigned int& ID) { m_ID = ID; }
 		unsigned int getID() const { return m_ID; }
 		
-		bool& needToBeDeleted() { return m_needToBeDeleted; }
+		void needToBeRemoved(const bool& needToBeRemoved) { m_needToBeRemove = needToBeRemoved; }
+		bool hasToBeRemoved() const { return m_needToBeRemove; }
+
+		void isVisible(const bool& isVisible) { m_isVisible = isVisible; }
+		bool isVisible() const { return m_isVisible; }
+
+		void isUpdated(const bool& isUpdated) { m_isUpdated = isUpdated; }
+		bool isUpdated() const { return m_isUpdated; }
 
 		bool& isLock() { return m_isLock; }
-
-		bool& isVisible() { return m_isVisible; }
 
 		static unsigned int& getGeneralID() { return m_generalID; }
 		void CheckMaxSize();
@@ -341,24 +309,29 @@ namespace lc
 		bool& getNeedToBeExported() { return m_needToBeExported; }
 #pragma endregion
 	private:
-
 		inline static unsigned int m_generalID = 0u;
 
+		
 		std::string m_name;
 		unsigned int m_ID;
 		unsigned char m_depth;
-
-		bool m_needToBeDeleted;
+		
 		bool m_isLock;
 		bool m_isVisible;
+		bool m_isUpdated;
+		bool m_needToBeRemove;
+		
 		bool m_Saved = false;
 		bool m_needToBeExported;
+		bool m_first_pass_init_[2] = {true, true};
 		
 		std::list<std::shared_ptr<GameComponent>> m_components;
 		std::list<std::shared_ptr<GameObject>> m_objects;
 
 		std::weak_ptr<GameObject> m_wptrParent;
 
+		sf::Vector2f m_before_simulate_parallax_pos_ = {};
+		
 		lc::Transform m_transform;
 	};
 }

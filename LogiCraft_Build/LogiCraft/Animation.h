@@ -61,7 +61,8 @@ namespace lc
 		void create_frames_rect();
 
 		void update_animation_key(const std::shared_ptr<lc::Texture>& texture, 
-			const bool& animation_is_paused, const bool& animation_is_reversed);
+			const bool& animation_is_paused, const bool& animation_is_reversed,
+			const bool& stop_at_last_frame);
 	private:
 		std::string m_name_;
 
@@ -100,8 +101,6 @@ namespace lc
 
 		virtual sf::RectangleShape& getShape() override;
 
-		std::shared_ptr<lc::Texture> get_texture() const;
-
 		void select_animation_key(const std::string& name, const int& start_frame = 0u, const float start_frame_timer = 0.f, const bool reset_last_anim_key = false);
 		
 		void select_animation_key(const std::string& name, const bool reset_last_anim_key = false);
@@ -114,6 +113,8 @@ namespace lc
 
 		void save_animation_file(const bool open_file_browser = true, std::string path = "") const;
 
+		void set_stop_at_last_frame(const bool& stop_at_last_frame);
+		
 		void add_animation_key(const std::string& name, const int& total_frame, const sf::Vector2i& max_frame, const float& frame_time, const sf::IntRect& frame_rect);
 		
 		void delete_animation_key(const std::string& name);
@@ -137,6 +138,7 @@ namespace lc
 		bool m_window_his_open_;
 		bool m_animation_is_paused_;
 		bool m_animation_is_reversed_;
+		bool m_stop_at_last_frame_;
 		bool m_want_to_load_anim_;
 		
 		Tools::Renderer m_renderer_;
