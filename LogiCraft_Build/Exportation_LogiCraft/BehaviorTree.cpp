@@ -1262,9 +1262,13 @@ void bt::ActionNode::Shoot::setup(NodePtr node)
 							
 							std::shared_ptr<lc::GameObject> tmpBalle = std::make_shared<lc::GameObject>();
 							tmpBalle->getTransform().getPosition() = node_cast->m_agent_.lock()->getTransform().getPosition();
+							tmpBalle->getTransform().getOrigin() = sf::Vector2f(100, 100);
+							tmpBalle->getTransform().getRotation() = Tools::Vector::getAngle(node_cast->m_agent_.lock()->getTransform().getPosition(), node_cast->m_target_.lock()->getTransform().getPosition()) * RAD2DEG;
 							tmpBalle->addComponent<lc::Texture>(lc::Texture("test", "../ASSETS/200x200D.png", sf::IntRect(0,0,200,200)));
 							std::shared_ptr<lc::RigidBody> tmpRB = std::make_shared<lc::RigidBody>(lc::RigidBody(sf::FloatRect(0, 0, 200, 200), sf::Vector2f(), sf::Vector2f(), true));
 							tmpRB->getIsFlying() = true;
+
+
 							tmpBalle->addComponent<lc::RigidBody>();
 							
 							
