@@ -922,22 +922,22 @@ void bt::ActionNode::Attack::load(std::ifstream& file, std::shared_ptr<lc::GameO
 
     if (attack_name == "damageBox")
     {
-        m_attack_node_ = bt::Node::New(bt::ActionNode::DamageBox(owner, scene->getObject("player")));
+        m_attack_node_ = bt::Node::New(bt::ActionNode::DamageBox(owner, scene->getObject("PLAYER")));
         std::cout << "damageBox loaded" << std::endl;
     }
     else if (attack_name == "lanceHit")
     {
-        m_attack_node_ = bt::Node::New(bt::ActionNode::LanceHit(owner, scene->getObject("player")));
+        m_attack_node_ = bt::Node::New(bt::ActionNode::LanceHit(owner, scene->getObject("PLAYER")));
         std::cout << "lanceHit loaded" << std::endl;
     }
     else if (attack_name == "CrazyHit")
     {
-        m_attack_node_ = bt::Node::New(bt::ActionNode::CrazyHit(owner, scene->getObject("player")));
+        m_attack_node_ = bt::Node::New(bt::ActionNode::CrazyHit(owner, scene->getObject("PLAYER")));
         std::cout << "CrazyHit loaded" << std::endl;
     }
     else if (attack_name == "pickHit")
     {
-        m_attack_node_ = bt::Node::New(bt::ActionNode::PickHit(owner, scene->getObject("player")));
+        m_attack_node_ = bt::Node::New(bt::ActionNode::PickHit(owner, scene->getObject("PLAYER")));
         std::cout << "pickHit loaded" << std::endl;
     }
     else if (attack_name == "protect")
@@ -947,12 +947,12 @@ void bt::ActionNode::Attack::load(std::ifstream& file, std::shared_ptr<lc::GameO
     }
     else if (attack_name == "hit")
     {
-        m_attack_node_ = bt::Node::New(bt::ActionNode::Hit(owner, scene->getObject("player")));
+        m_attack_node_ = bt::Node::New(bt::ActionNode::Hit(owner, scene->getObject("PLAYER")));
         std::cout << "hit loaded" << std::endl;
     }
     else if (attack_name == "lanceSpawn")
     {
-        m_attack_node_ = bt::Node::New(bt::ActionNode::lanceSpawn(owner, scene->getObject("player")));
+        m_attack_node_ = bt::Node::New(bt::ActionNode::lanceSpawn(owner, scene->getObject("PLAYER")));
         std::cout << "lanceSpawn loaded" << std::endl;
     }
     else if (attack_name == "controller")
@@ -962,12 +962,12 @@ void bt::ActionNode::Attack::load(std::ifstream& file, std::shared_ptr<lc::GameO
     }
 	else if (attack_name == "StayAway")
 	{
-		m_attack_node_ = bt::Node::New(bt::ActionNode::StayAway(owner, scene->getObject("player")));
+		m_attack_node_ = bt::Node::New(bt::ActionNode::StayAway(owner, scene->getObject("PLAYER")));
 		std::cout << "StayAway loaded" << std::endl;
 	}
 	else if (attack_name == "ResetDirection")
 	{
-		m_attack_node_ = bt::Node::New(bt::ActionNode::ResetDirection(owner, scene->getObject("player")));
+		m_attack_node_ = bt::Node::New(bt::ActionNode::ResetDirection(owner, scene->getObject("PLAYER")));
 		std::cout << "ResetDirection loaded" << std::endl;
 	}
     else
@@ -994,11 +994,11 @@ void bt::ActionNode::Shot::load(std::ifstream& file, std::shared_ptr<lc::GameObj
 	std::string m_attack_name;
 	file >> m_attack_name;
 
-	auto scene = owner->GetRoot();
+	auto scene = lc::GameObject::GetRoot(owner);
 
 	if (m_attack_name == "shoot")
 	{
-		m_attack_node_ = bt::Node::New(bt::ActionNode::Shoot(owner, scene->getObject("player")));
+		m_attack_node_ = bt::Node::New(bt::ActionNode::Shoot(owner, scene->getObject("PLAYER")));
 		std::cout << "shoot loaded" << std::endl;
 	}
 	else
@@ -1108,7 +1108,7 @@ bt::ActionNode::IsHiding::IsHiding(std::weak_ptr<lc::GameObject> owner) : m_owne
 bool bt::ActionNode::IsHiding::tick()
 {
 	if (!m_owner_.expired())
-		if (m_owner_.lock()->getComponent<lc::Animation>("Animation")->get_current_animation_key().lock()->get_name() == "hiding" && m_owner_.lock()->getComponent<lc::Animation>("Animation")->get_current_animation_key().lock()->get_actual_frame() != 0)
+		if (m_owner_.lock()->getComponent<lc::Animation>("Animation")->get_actual_animation_key().lock()->get_name() == "hiding" && m_owner_.lock()->getComponent<lc::Animation>("Animation")->get_actual_animation_key().lock()->get_actual_frame() != 0)
 			return true;
 	
 	return false;
@@ -1224,7 +1224,8 @@ bool bt::ActionNode::FarEnough::tick()
 void bt::ActionNode::FarEnough::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
 {
 	m_owner_ = owner;
-	m_player_ = owner->GetRoot()->getObject("player");
+
+	m_player_ = lc::GameObject::GetRoot(owner)->getObject("PLAYER");
 }
 
 std::shared_ptr<bt::Node> bt::ActionNode::FarEnough::clone()
@@ -1266,8 +1267,8 @@ void bt::ActionNode::Shoot::setup(NodePtr node)
 							tmpRB->getIsFlying() = true;
 							tmpBalle->addComponent<lc::RigidBody>();
 							
-
-							node_cast->m_agent_.lock()->GetRoot()->addObject(tmpBalle);
+							
+							lc::GameObject::GetRoot(node_cast->m_agent_.lock())->addObject(tmpBalle);
 
 							node_cast->m_bool_shoot_ = false;
 						}

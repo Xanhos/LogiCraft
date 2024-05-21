@@ -86,7 +86,7 @@ namespace lc
 	const bool& stop_at_last_frame)
 	{
 		if ((!animation_is_paused && !stop_at_last_frame) || (!animation_is_paused && stop_at_last_frame
-			&& m_actual_frame_ != m_total_frame_ - 1))
+			&& m_actual_frame_ != m_total_frame_ - 1) || (!animation_is_paused && stop_at_last_frame && animation_is_reversed && m_actual_frame_ > 0))
 		{
 			m_frame_timer_ += Tools::getDeltaTime();
 			if (m_frame_timer_ >= m_frame_time_)
