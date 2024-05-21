@@ -1,0 +1,4338 @@
+7 1 0 0 0 2 0 3 0 3 -1 4 0 4 -1 
+WORLD 0 0 1 1 0 0 0 0 0 0
+Components
+{
+}
+Objects
+{
+1 4080 0 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\18.png 0 0
+
+}
+Objects
+{
+}
+
+2 3960 120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\20.png 0 0
+
+}
+Objects
+{
+}
+
+3 3840 120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\26.png 0 0
+
+}
+Objects
+{
+}
+
+4 3720 240 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\18.png 0 0
+
+}
+Objects
+{
+}
+
+5 3600 240 1 1 120 185 0 0 0 4
+Components
+{
+0 Texture 0 0 120 185 ../ASSETS\Tileset\25.png 0 0
+
+}
+Objects
+{
+}
+
+6 3480 240 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\26.png 0 0
+
+}
+Objects
+{
+}
+
+7 3360 360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\17.png 0 0
+
+}
+Objects
+{
+}
+
+8 3240 360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\26.png 0 0
+
+}
+Objects
+{
+}
+
+9 3120 360 1 1 120 185 0 0 0 4
+Components
+{
+0 Texture 0 0 120 185 ../ASSETS\Tileset\25.png 0 0
+
+}
+Objects
+{
+}
+
+10 3000 360 1 1 120 199 0 0 0 4
+Components
+{
+0 Texture 0 0 120 199 ../ASSETS\Tileset\29.png 0 0
+
+}
+Objects
+{
+}
+
+11 2880 360 1 1 120 185 0 0 0 4
+Components
+{
+0 Texture 0 0 120 185 ../ASSETS\Tileset\25.png 0 0
+
+}
+Objects
+{
+}
+
+12 2760 480 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\17.png 0 0
+
+}
+Objects
+{
+}
+
+13 2640 480 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\26.png 0 0
+
+}
+Objects
+{
+}
+
+14 2520 600 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\20.png 0 0
+
+}
+Objects
+{
+}
+
+15 2400 720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\17.png 0 0
+
+}
+Objects
+{
+}
+
+16 2280 720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\26.png 0 0
+
+}
+Objects
+{
+}
+
+17 2160 720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\23.png 0 0
+
+}
+Objects
+{
+}
+
+18 2040 600 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\24.png 0 0
+
+}
+Objects
+{
+}
+
+19 1920 360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\23.png 0 0
+
+}
+Objects
+{
+}
+
+20 1800 240 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\21.png 0 0
+
+}
+Objects
+{
+}
+
+21 1680 120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\26.png 0 0
+
+}
+Objects
+{
+}
+
+22 1560 120 1 1 120 185 0 0 0 4
+Components
+{
+0 Texture 0 0 120 185 ../ASSETS\Tileset\25.png 0 0
+
+}
+Objects
+{
+}
+
+23 1440 120 1 1 120 207 0 0 0 4
+Components
+{
+0 Texture 0 0 120 207 ../ASSETS\Tileset\27.png 0 0
+
+}
+Objects
+{
+}
+
+24 1320 120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\28.png 0 0
+
+}
+Objects
+{
+}
+
+25 1200 120 1 1 120 199 0 0 0 4
+Components
+{
+0 Texture 0 0 120 199 ../ASSETS\Tileset\29.png 0 0
+
+}
+Objects
+{
+}
+
+26 240 240 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\19.png 0 0
+
+}
+Objects
+{
+}
+
+27 1080 120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\28.png 0 0
+
+}
+Objects
+{
+}
+
+28 960 120 1 1 120 185 0 0 0 4
+Components
+{
+0 Texture 0 0 120 185 ../ASSETS\Tileset\25.png 0 0
+
+}
+Objects
+{
+}
+
+29 840 120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\26.png 0 0
+
+}
+Objects
+{
+}
+
+30 720 120 1 1 120 199 0 0 0 4
+Components
+{
+0 Texture 0 0 120 199 ../ASSETS\Tileset\29.png 0 0
+
+}
+Objects
+{
+}
+
+31 600 120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\28.png 0 0
+
+}
+Objects
+{
+}
+
+32 480 120 1 1 120 207 0 0 0 4
+Components
+{
+0 Texture 0 0 120 207 ../ASSETS\Tileset\27.png 0 0
+
+}
+Objects
+{
+}
+
+33 360 120 1 1 120 185 0 0 0 4
+Components
+{
+0 Texture 0 0 120 185 ../ASSETS\Tileset\25.png 0 0
+
+}
+Objects
+{
+}
+
+34 240 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+35 120 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+36 120 1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+37 120 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+38 120 1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+39 120 960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+40 120 840 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+41 120 720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+42 120 600 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+43 120 480 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+44 120 360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+45 360 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+46 480 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+47 600 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+48 720 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+49 840 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+50 960 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+51 1080 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+52 1200 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+53 1320 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+54 1440 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+55 1560 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+56 1680 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+57 1680 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+58 1800 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+59 1920 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+60 2040 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+61 2040 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+62 2160 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+63 2280 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+64 2400 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+65 2400 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+66 2520 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+67 2640 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+68 2760 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+69 2880 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+70 3000 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+71 3120 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_5.png 0 0
+
+}
+Objects
+{
+}
+
+72 3120 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+73 3120 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+74 3240 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+75 3240 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+76 3240 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+77 3360 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+78 3480 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+79 3600 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+80 4800 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+82 4680 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+83 4560 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+84 4440 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+85 4320 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+86 3720 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+87 3840 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+88 4200 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+90 4080 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+91 3960 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+92 4920 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_5.png 0 0
+
+}
+Objects
+{
+}
+
+93 4920 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+94 5040 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+95 5160 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_5.png 0 0
+
+}
+Objects
+{
+}
+
+96 5160 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+97 5160 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+98 5160 1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+99 5160 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+100 5160 1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+101 5160 960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+102 5280 960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+103 5400 960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+104 5400 1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+105 5400 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+106 5520 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+107 5640 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+108 5640 1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+109 5640 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+110 5760 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+111 5880 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+112 5880 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+113 5880 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+115 6000 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+116 6120 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+117 6120 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+119 6240 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+120 8040 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+121 7920 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+122 7800 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+123 7680 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+124 6360 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+125 6480 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+126 6600 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+127 7560 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+128 7440 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+129 6720 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+130 7320 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+131 6840 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+132 7200 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+133 7080 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+134 6960 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+135 8160 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_5.png 0 0
+
+}
+Objects
+{
+}
+
+136 8160 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+137 8280 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+138 8400 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+139 8520 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_5.png 0 0
+
+}
+Objects
+{
+}
+
+140 8520 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+141 8520 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+143 8520 1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+144 8520 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+145 8520 1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+146 8520 960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+147 8640 960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+148 8760 960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+149 8760 1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+150 8760 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+151 8880 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+152 9000 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+153 9000 1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+154 9000 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+155 9120 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+156 9240 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+157 9240 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+158 9240 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+159 9360 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+160 9480 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+161 9480 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+162 9600 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+163 11400 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+164 11280 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+165 9720 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+166 11160 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+167 11040 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+168 9840 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+169 9960 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+170 10920 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+171 10800 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+172 10080 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+173 10200 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+174 10680 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+175 10320 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+176 10560 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+177 10440 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+178 11520 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_5.png 0 0
+
+}
+Objects
+{
+}
+
+179 11520 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+180 11520 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+181 11520 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+182 11520 1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_11.png 0 0
+
+}
+Objects
+{
+}
+
+184 11400 1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_9.png 0 0
+
+}
+Objects
+{
+}
+
+185 11400 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+186 11400 1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_11.png 0 0
+
+}
+Objects
+{
+}
+
+188 11280 1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_9.png 0 0
+
+}
+Objects
+{
+}
+
+189 11280 960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+190 11280 840 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+191 11280 720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+193 11400 720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+194 11640 720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+195 11520 720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+196 11760 720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+197 12360 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+198 12240 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+199 12120 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+200 12000 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+201 12000 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+202 11880 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+203 11760 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+205 11760 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+206 11760 1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+207 11760 840 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+208 11760 960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+209 11760 1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+210 11760 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+211 12360 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+212 12480 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+213 17280 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+214 17400 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_5.png 0 0
+
+}
+Objects
+{
+}
+
+215 17400 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+216 18000 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+217 17880 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+218 17760 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+219 17520 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+220 17640 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+221 18240 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_5.png 0 0
+
+}
+Objects
+{
+}
+
+222 18240 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+223 18360 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+224 18480 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+225 18600 1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_5.png 0 0
+
+}
+Objects
+{
+}
+
+226 18600 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+227 18720 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+228 18840 1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_5.png 0 0
+
+}
+Objects
+{
+}
+
+229 18840 1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+232 18840 -720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+233 18840 -600 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+234 18840 -480 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+235 18840 -360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+236 18840 -240 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+237 18840 120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+238 18840 -120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+239 18840 0 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+240 18840 240 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+241. 18840 360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+242 18840 480 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+243 18840 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+244 18840 1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+245 18840 960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+246 18840 840 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+247 18840 720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+248 18840 600 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+249 18720 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\21.png 0 0
+
+}
+Objects
+{
+}
+
+250 18600 -1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\24.png 0 0
+
+}
+Objects
+{
+}
+
+251 18480 -1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\24.png 0 0
+
+}
+Objects
+{
+}
+
+252 18240 -1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\26.png 0 0
+
+}
+Objects
+{
+}
+
+253 18360 -1800 1 1 120 185 0 0 0 4
+Components
+{
+0 Texture 0 0 120 185 ../ASSETS\Tileset\25.png 0 0
+
+}
+Objects
+{
+}
+
+255 18120 -1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\22.png 0 0
+
+}
+Objects
+{
+}
+
+256 18000 -1920 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\28.png 0 0
+
+}
+Objects
+{
+}
+
+257 17880 -1920 1 1 120 207 0 0 0 4
+Components
+{
+0 Texture 0 0 120 207 ../ASSETS\Tileset\27.png 0 0
+
+}
+Objects
+{
+}
+
+258 17760 -1920 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\22.png 0 0
+
+}
+Objects
+{
+}
+
+259 17640 -2040 1 1 120 199 0 0 0 4
+Components
+{
+0 Texture 0 0 120 199 ../ASSETS\Tileset\29.png 0 0
+
+}
+Objects
+{
+}
+
+260 17520 -2040 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\23.png 0 0
+
+}
+Objects
+{
+}
+
+261 17400 -2160 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\21.png 0 0
+
+}
+Objects
+{
+}
+
+262 18840 -840 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+263 18840 -960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+264 18840 -1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+265 12600 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+266 12720 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+267 12840 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+268 12960 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+269 13080 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+270 13200 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+272 17160 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+273 17040 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+274 16920 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+275 16800 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+276 16680 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+277 16560 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+278 16320 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+279 16200 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+280 15960 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+281 13320 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+282 13440 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+283 13560 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+284 13680 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+285 13800 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+286 13920 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+287 14040 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+288 14160 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+289 14280 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+290 14400 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+291 16080 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+292 15600 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+293 15720 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+294 16440 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+295 15480 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+296 15840 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+297 15360 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+298 18120 1680 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+301 14520 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+302 14640 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+303 14760 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+304 14880 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+305 15000 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+306 15120 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+307 15240 1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+338 11520 240 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\30.png 0 0
+
+}
+Objects
+{
+}
+
+339 11640 240 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\18.png 0 0
+
+}
+Objects
+{
+}
+
+340 11400 240 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\23.png 0 0
+
+}
+Objects
+{
+}
+
+341 11280 120 1 1 120 199 0 0 0 4
+Components
+{
+0 Texture 0 0 120 199 ../ASSETS\Tileset\29.png 0 0
+
+}
+Objects
+{
+}
+
+342 11160 120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\28.png 0 0
+
+}
+Objects
+{
+}
+
+343 11040 120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\21.png 0 0
+
+}
+Objects
+{
+}
+
+344 10920 0 1 1 120 185 0 0 0 4
+Components
+{
+0 Texture 0 0 120 185 ../ASSETS\Tileset\25.png 0 0
+
+}
+Objects
+{
+}
+
+345 10800 0 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\22.png 0 0
+
+}
+Objects
+{
+}
+
+346 11760 120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\19.png 0 0
+
+}
+Objects
+{
+}
+
+347 11880 -120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\18.png 0 0
+
+}
+Objects
+{
+}
+
+348 12000 -240 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\20.png 0 0
+
+}
+Objects
+{
+}
+
+349 12120 -480 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\17.png 0 0
+
+}
+Objects
+{
+}
+
+350 12240 -600 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\28.png 0 0
+
+}
+Objects
+{
+}
+
+351 12360 -600 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\17.png 0 0
+
+}
+Objects
+{
+}
+
+352 12480 -720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+353 12360 -720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+354 12240 -720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+355 12120 -720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+356 11880 -1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+357 11880 -1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+358 11880 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+359 12120 -840 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+360 12000 -1560 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\19.png 0 0
+
+}
+Objects
+{
+}
+
+361 12120 -1800 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\17.png 0 0
+
+}
+Objects
+{
+}
+
+362 12240 -1920 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\20.png 0 0
+
+}
+Objects
+{
+}
+
+363 12360 -2040 1 1 120 207 0 0 0 4
+Components
+{
+0 Texture 0 0 120 207 ../ASSETS\Tileset\27.png 0 0
+
+}
+Objects
+{
+}
+
+364 12480 -2040 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\19.png 0 0
+
+}
+Objects
+{
+}
+
+365 12120 -960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+366 11880 -960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+367 12000 -960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+368 12600 -2160 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\20.png 0 0
+
+}
+Objects
+{
+}
+
+369 11880 -1440 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+370 15360 1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\21.png 0 0
+
+}
+Objects
+{
+}
+
+371 15480 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\22.png 0 0
+
+}
+Objects
+{
+}
+
+372 15240 840 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\24.png 0 0
+
+}
+Objects
+{
+}
+
+373 15120 360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\22.png 0 0
+
+}
+Objects
+{
+}
+
+374 15000 120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\26.png 0 0
+
+}
+Objects
+{
+}
+
+375 14880 120 1 1 120 185 0 0 0 4
+Components
+{
+0 Texture 0 0 120 185 ../ASSETS\Tileset\25.png 0 0
+
+}
+Objects
+{
+}
+
+376 14760 120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\23.png 0 0
+
+}
+Objects
+{
+}
+
+377 14640 0 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+378 14760 0 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+379 14880 0 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+380 15240 -120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_5.png 0 0
+
+}
+Objects
+{
+}
+
+381 15000 -120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+382 15000 0 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_5.png 0 0
+
+}
+Objects
+{
+}
+
+383 15120 -120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+384 15240 -240 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+385 15240 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+386 15240 -1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+387 15240 -360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+388 15240 -480 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+389 15240 -1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+390 15240 -960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+391 15240 -840 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+392 15240 -720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+393 15240 -600 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_3.png 0 0
+
+}
+Objects
+{
+}
+
+394 15360 -1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+395 15960 -1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+396 15840 -1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+397 15480 -1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+398 15720 -1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+399 15600 -1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+400 16080 -1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+401 16080 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+402 16920 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+403 16200 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+404 16800 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+405 16680 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+406 16320 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+407 16440 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+408 16560 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+409 17040 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+410 17040 -1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+411 17160 -1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+412 17280 -1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+414 17400 -1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+416 17400 480 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+417 17400 360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+418 17400 240 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+419 17400 120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+420 17400 -120 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+421 17400 0 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+422 17400 -960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+423 17400 -840 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+424 17400 -720 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+425 17400 -600 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+426 17400 -480 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+427 17400 -360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+428 17400 -240 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+429 17400 600 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\19.png 0 0
+
+}
+Objects
+{
+}
+
+430 17280 960 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\18.png 0 0
+
+}
+Objects
+{
+}
+
+431 17160 1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\17.png 0 0
+
+}
+Objects
+{
+}
+
+432 17040 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\20.png 0 0
+
+}
+Objects
+{
+}
+
+433 16920 1200 1 1 120 185 0 0 0 4
+Components
+{
+0 Texture 0 0 120 185 ../ASSETS\Tileset\25.png 0 0
+
+}
+Objects
+{
+}
+
+434 15720 1200 1 1 120 185 0 0 0 4
+Components
+{
+0 Texture 0 0 120 185 ../ASSETS\Tileset\25.png 0 0
+
+}
+Objects
+{
+}
+
+435 16800 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\26.png 0 0
+
+}
+Objects
+{
+}
+
+436 16680 1200 1 1 120 207 0 0 0 4
+Components
+{
+0 Texture 0 0 120 207 ../ASSETS\Tileset\27.png 0 0
+
+}
+Objects
+{
+}
+
+437 16560 1200 1 1 120 199 0 0 0 4
+Components
+{
+0 Texture 0 0 120 199 ../ASSETS\Tileset\29.png 0 0
+
+}
+Objects
+{
+}
+
+438 16440 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\28.png 0 0
+
+}
+Objects
+{
+}
+
+439 16320 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\26.png 0 0
+
+}
+Objects
+{
+}
+
+440 16200 1200 1 1 120 185 0 0 0 4
+Components
+{
+0 Texture 0 0 120 185 ../ASSETS\Tileset\25.png 0 0
+
+}
+Objects
+{
+}
+
+441 15600 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\28.png 0 0
+
+}
+Objects
+{
+}
+
+442 15840 1200 1 1 120 199 0 0 0 4
+Components
+{
+0 Texture 0 0 120 199 ../ASSETS\Tileset\29.png 0 0
+
+}
+Objects
+{
+}
+
+443 15960 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\26.png 0 0
+
+}
+Objects
+{
+}
+
+444 16080 1200 1 1 120 199 0 0 0 4
+Components
+{
+0 Texture 0 0 120 199 ../ASSETS\Tileset\29.png 0 0
+
+}
+Objects
+{
+}
+
+445 14640 -1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+446 14640 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_6.png 0 0
+
+}
+Objects
+{
+}
+
+447 14640 -1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\20.png 0 0
+
+}
+Objects
+{
+}
+
+448 14520 -1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+449 14400 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+450 14520 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_5.png 0 0
+
+}
+Objects
+{
+}
+
+451 14280 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+452 14160 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+453 14160 -1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\21.png 0 0
+
+}
+Objects
+{
+}
+
+454 14520 -1080 1 1 120 185 0 0 0 4
+Components
+{
+0 Texture 0 0 120 185 ../ASSETS\Tileset\25.png 0 0
+
+}
+Objects
+{
+}
+
+457 14400 -1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\30.png 0 0
+
+}
+Objects
+{
+}
+
+458 14280 -1080 1 1 120 199 0 0 0 4
+Components
+{
+0 Texture 0 0 120 199 ../ASSETS\Tileset\29.png 0 0
+
+}
+Objects
+{
+}
+
+459 13440 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+460 13320 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+461 13200 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_7.png 0 0
+
+}
+Objects
+{
+}
+
+462 13200 -1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+463 13080 -1320 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+464 13080 -1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\22.png 0 0
+
+}
+Objects
+{
+}
+
+466 14160 360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+467 14040 360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+468 13920 360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+469 13800 360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+470 13680 360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+471 13560 360 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+473 14160 480 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\18.png 0 0
+
+}
+Objects
+{
+}
+
+474 13560 480 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\21.png 0 0
+
+}
+Objects
+{
+}
+
+475 14040 480 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\26.png 0 0
+
+}
+Objects
+{
+}
+
+476 13680 480 1 1 120 199 0 0 0 4
+Components
+{
+0 Texture 0 0 120 199 ../ASSETS\Tileset\29.png 0 0
+
+}
+Objects
+{
+}
+
+477 13920 480 1 1 120 207 0 0 0 4
+Components
+{
+0 Texture 0 0 120 207 ../ASSETS\Tileset\27.png 0 0
+
+}
+Objects
+{
+}
+
+478 13800 480 1 1 120 199 0 0 0 4
+Components
+{
+0 Texture 0 0 120 199 ../ASSETS\Tileset\29.png 0 0
+
+}
+Objects
+{
+}
+
+479 7320 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\18.png 0 0
+
+}
+Objects
+{
+}
+
+480 7200 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\26.png 0 0
+
+}
+Objects
+{
+}
+
+481 7080 1200 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\21.png 0 0
+
+}
+Objects
+{
+}
+
+482 7080 1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie.png 0 0
+
+}
+Objects
+{
+}
+
+483 7320 1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1_copie_4.png 0 0
+
+}
+Objects
+{
+}
+
+484 7200 1080 1 1 120 120 0 0 0 4
+Components
+{
+0 Texture 0 0 120 120 ../ASSETS\Tileset\Calque_1.png 0 0
+
+}
+Objects
+{
+}
+
+}
