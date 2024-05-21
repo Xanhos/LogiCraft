@@ -558,6 +558,7 @@ namespace lc
 			<< " " << m_base_shape_point_count_
 			<< " " << m_spawn_count_
 			<< " " << m_has_gravity_
+			<< " " << m_relativePosition
 			<< " " << (!m_particles_ressource_.expired() ? m_particles_ressource_.lock()->getName() : std::string("No_Ressource"));
 	}
 
@@ -585,6 +586,7 @@ namespace lc
 			 >> m_base_shape_point_count_
 			 >> m_spawn_count_
 			 >> m_has_gravity_
+			 >> m_relativePosition
 			 >> tmp_textureName;
 
 		if (tmp_textureName != "No_Ressource")
@@ -780,7 +782,7 @@ namespace lc
 					//so we obtain 15, 15, and we subtract this by the origin,
 					//and we obtain 5, 5 then the center of the shape will 5 from the origin and then 10 + 5 obtain the center of the shape (30, 30 / 2).
 					const sf::Vector2f tmp_spawn_center = (tmp_texture ?
-						(tmp_texture->getShape().getSize() / 2.f) - m_particles_origin_ :
+						(tmp_texture->getShape().getSize() * tmp_texture->getParent()->getTransform().getScale() / 2.f) - m_particles_origin_ :
 						sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_) - m_particles_origin_);
 
 					//tmp_spawn_position is the spawn position of the particle.
@@ -795,7 +797,7 @@ namespace lc
 					const sf::Vector2f tmp_spawn_position_in_renderer =
 						sf::Vector2f(m_renderer_.get_render_texture()->getSize()) / 2.f +
 						get_extend_spawn_point(sf::Vector2f(Tools::Rand(-m_spawn_point_extend_size_ / 2.f, m_spawn_point_extend_size_ / 2.f), 0.f));
-
+					
 					rand_spread = Tools::Rand(-m_spawn_spread_ / 2.f, m_spawn_spread_ / 2.f);
 					const float rand_spread2 = Tools::Rand(-m_spawn_spread_ / 2.f, m_spawn_spread_ / 2.f);
 
@@ -806,6 +808,7 @@ namespace lc
 						m_has_gravity_,
 						tmp_spawn_position, tmp_spawn_position_in_renderer, m_particles_origin_);
 
+					tmp_particle->get_transform().getScale() = tmp_texture ? tmp_texture->getParent()->getTransform().getScale() : sf::Vector2f{1.f,.1};
 					m_particles_.push_back(tmp_particle);
 				}
 
@@ -879,8 +882,8 @@ namespace lc
 					window.getView().getSize()
 				},
 				{
-					particle->get_transform().getPosition() - particle->get_transform().getOrigin(),
-					tmp_ressource ? m_texture_size_ : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_)
+					tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getPosition() : particle->get_transform().getPosition() - (particle->get_transform().getOrigin() * particle->get_transform().getScale()),
+					(tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getSize() : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_))
 				}))
 			{
 				tmp_ressource ? window.draw(tmp_ressource->getShape()) : window.draw(m_base_shape_);
@@ -892,7 +895,7 @@ namespace lc
 			tmp_ressource ? 
 				tmp_ressource->getShape().setPosition(particle->get_renderer_transform().getPosition()) : 
 				m_base_shape_.setPosition(particle->get_renderer_transform().getPosition());
-
+			
 			tmp_ressource ? 
 				tmp_ressource->getShape().setRotation(particle->get_renderer_transform().getRotation()) : 
 				m_base_shape_.setRotation(particle->get_renderer_transform().getRotation());
@@ -904,7 +907,7 @@ namespace lc
 				},
 				{
 					particle->get_renderer_transform().getPosition() - particle->get_transform().getOrigin(),
-					tmp_ressource ? m_texture_size_ : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_)
+					tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getSize() : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_)
 				}))
 			{
 				tmp_ressource ? m_renderer_.Draw(tmp_ressource->getShape()) : m_renderer_.Draw(m_base_shape_);

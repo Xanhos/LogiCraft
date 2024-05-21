@@ -36,7 +36,7 @@ SOFTWARE.
 
 #include "ToolsBar.h"
 
-Layers ToolsBar::s_layers = { {11, "BackGround 7"},{10,"BackGround 6"},{ 9, "BackGround 5"},{8, "BackGround 4"},{7, "BackGround 3"},{ 6, "BackGround 2"},{5, "BackGround 1"},{4, "Player Plan"},{3, "Front Plan 4"}, {2, "Front Plan 3"}, {1, "Front Plan 2"}, {0, "Front Plan 1"} };
+Layers ToolsBar::s_layers = { {13, "BackGround 9"},{12, "BackGround 8"},{11, "BackGround 7"},{10,"BackGround 6"},{ 9, "BackGround 5"},{8, "BackGround 4"},{7, "BackGround 3"},{ 6, "BackGround 2"},{5, "BackGround 1"},{4, "Player Plan"},{3, "Front Plan 4"}, {2, "Front Plan 3"}, {1, "Front Plan 2"}, {0, "Front Plan 1"} };
 Layer ToolsBar::s_actualLayer = *ToolsBar::s_layers.begin();
 
 ToolsBar::ToolsBar()
@@ -89,6 +89,7 @@ void ToolsBar::Update(std::shared_ptr <lc::GameObject> object, WindowManager& _w
 				}
 
 				if(ImGui::Button("Any Help ?")) { m_showingHelp = true; }
+				if(ImGui::Button("Change Parallax Speed")) { m_isChangingParallaxSpeed = true; }
 				if (m_showingHelp)
 					ShowHelp();
 				if (ImGui::BeginMenu(std::to_string(Tools::getDeltaTime()).c_str()))
@@ -116,6 +117,8 @@ void ToolsBar::Update(std::shared_ptr <lc::GameObject> object, WindowManager& _w
 			}
 			});
 	}
+	if(m_isChangingParallaxSpeed)
+		ChangeParallaxFactor();
 	if (m_isExporting)
 	{
 		Tools::IG::CreateWindow("Export", m_isExporting, ImGuiWindowFlags_AlwaysAutoResize, [&] {
@@ -162,20 +165,22 @@ void ToolsBar::SetupParallaxSpeed()
 {
 	/*{11, "BackGround 7"},{10,"BackGround 6"},{ 9, "BackGround 5"},{8, "BackGround 4"},{7, "BackGround 3"},{ 6, "BackGround 2"},{5, "BackGround 1"},
 	 *{4, "Player Plan"},{3, "Front Plan 4"}, {2, "Front Plan 3"}, {1, "Front Plan 2"}, {0, "Front Plan 1"}*/
-
-	s_parallax_speed_factor_map_[11] = 1.f;	
-	s_parallax_speed_factor_map_[10] = 0.9f;	
-	s_parallax_speed_factor_map_[9] = 0.8f;	
-	s_parallax_speed_factor_map_[8] = 0.7f;	
-	s_parallax_speed_factor_map_[7] = 0.6f;	
-	s_parallax_speed_factor_map_[6] = 0.5f;	
-	s_parallax_speed_factor_map_[5] = 0.4f;	
-	s_parallax_speed_factor_map_[4] = 0.f;
-	s_parallax_speed_factor_map_[3] = -0.7f;
-	s_parallax_speed_factor_map_[2] = -0.8f;
-	s_parallax_speed_factor_map_[1] = -0.9f;
-	s_parallax_speed_factor_map_[0] = -1.f;	
-
+	std::ifstream file("../Ressources/parallax.txt");
+	file >> s_parallax_speed_factor_map_[13];
+	file >>s_parallax_speed_factor_map_[12];
+	file >>s_parallax_speed_factor_map_[11];
+	file >>s_parallax_speed_factor_map_[10];
+	file >>s_parallax_speed_factor_map_[9];
+	file >>s_parallax_speed_factor_map_[8];
+	file >>s_parallax_speed_factor_map_[7];
+	file >>s_parallax_speed_factor_map_[6];
+	file >>s_parallax_speed_factor_map_[5];
+	file >>s_parallax_speed_factor_map_[4] ;
+	file >>s_parallax_speed_factor_map_[3] ;
+	file >>s_parallax_speed_factor_map_[2] ;
+	file >>s_parallax_speed_factor_map_[1] ;
+	file >>s_parallax_speed_factor_map_[0]	;
+	file.close();
 }
 
 float ToolsBar::GetParallaxSpeedFactor(const int& index)
@@ -338,4 +343,15 @@ void ToolsBar::Exit( WindowManager& _window)
 void ToolsBar::ChangeLayer(Layer _newLayer)
 {
 	s_actualLayer = _newLayer;
+}
+
+void ToolsBar::ChangeParallaxFactor()
+{
+	ImGui::Begin("Parallax Factor",&m_isChangingParallaxSpeed,ImGuiWindowFlags_AlwaysAutoResize);
+	for(auto& it : s_parallax_speed_factor_map_)
+	{
+		if(s_layers[it.first] != "Player Plan")
+			ImGui::SliderFloat(s_layers[it.first].c_str(),&it.second,-1.f,1.f,"%.3f");		
+	}
+	ImGui::End();
 }

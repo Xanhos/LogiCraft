@@ -50,7 +50,12 @@ class ToolsBar
 {
 public:
 	ToolsBar();
-	~ToolsBar() {};
+	~ToolsBar()
+	{
+		std::ofstream file("../Ressources/parallax.txt");
+		for(auto& it : s_parallax_speed_factor_map_)
+			file << it.second << "\n" ;
+	}
 
 	void Update(std::shared_ptr <lc::GameObject> _game_object, WindowManager& _window, Viewports& _viewport);
 
@@ -74,11 +79,14 @@ private:
 	void Exit(WindowManager& _window);
 	void ChangeLayer(Layer _newLayer);
 
+	void ChangeParallaxFactor();
+
 	bool m_isExporting = false;
 	bool m_isSaving = false;
 	bool m_isLoading = false;
 	bool m_showingHelp = false;
-
+	bool m_isChangingParallaxSpeed = false;
+	
 	inline static std::map<int,float> s_parallax_speed_factor_map_ = {};
 	
 	std::string m_path {'\0'};
@@ -86,6 +94,7 @@ private:
 	static Layer s_actualLayer;
 
 	static Layers s_layers;
+
 	
 };
 
