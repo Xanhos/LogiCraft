@@ -66,8 +66,11 @@ namespace lc
         		m_render_texture_->clear(sf::Color::Black);   
         	}
 
-        	for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
-        		this->draw_in_shader(obj_element, window);
+	        for (int i = 12 - 1; i >= 0; --i)
+	        {
+	        	for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
+	        		this->draw_in_shader(obj_element, window, i);   
+	        }
         	
         	if (m_is_in_view_)
         	{
@@ -112,8 +115,11 @@ namespace lc
         	}
 
         	//Display of the object in the shader.
-        	for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
-        		this->draw_in_shader(obj_element, window);
+	        for (int i = 12 - 1; i >= 0; --i)
+	        {
+	        	for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
+	        		this->draw_in_shader(obj_element, window, i);   
+	        }
 
         	//Then set the texture of the render texture on the renderer and draw it with the shader.
         	if (m_is_in_view_)
@@ -236,10 +242,10 @@ void main()
 )";
         }
 
-        void HeatShader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, WindowManager& window)
+        void HeatShader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, WindowManager& window, const unsigned char& depth)
         {
         	//The shader will affect only the objects who are under or on the same depth.
-        	if (game_object->getDepth() <= getParent()->getDepth() && !game_object->hasComponent("Heat_Shader"))
+        	if (game_object->getDepth() >= getParent()->getDepth() && game_object->getDepth() == depth && !game_object->hasComponent("Heat_Shader"))
         	{
         		//If the object is totally in the zone of the shader, then one draw is done.
         		if (this->is_totally_in(game_object) && m_is_in_view_)
@@ -269,13 +275,13 @@ void main()
 
         	//We do the same if the object has children.
         	for (const auto& obj_element : game_object->getObjects())
-        		this->draw_in_shader(obj_element, window);
+        		this->draw_in_shader(obj_element, window, depth);
         }
 
-        void HeatShader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, sf::RenderTexture& window)
+        void HeatShader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, sf::RenderTexture& window, const unsigned char& depth)
         {
         	//The shader will affect only the objects who are under or on the same depth.
-        	if (game_object->getDepth() <= getParent()->getDepth() && !game_object->hasComponent("Heat_Shader"))
+        	if (game_object->getDepth() >= getParent()->getDepth() && game_object->getDepth() == depth && !game_object->hasComponent("Heat_Shader"))
         	{
         		//If the object is totally in the zone of the shader, then one draw is done.
         		if (this->is_totally_in(game_object) && m_is_in_view_)
@@ -305,7 +311,7 @@ void main()
 
         	//We do the same if the object has children.
         	for (const auto& obj_element : game_object->getObjects())
-        		this->draw_in_shader(obj_element, window);
+        		this->draw_in_shader(obj_element, window, depth);
         }
     }
 }

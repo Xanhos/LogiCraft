@@ -24,8 +24,8 @@ namespace lc
         private:
             virtual void setup_shader_script_string() override;
 
-            void draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, WindowManager& window);
-            void draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, sf::RenderTexture& window);
+            void draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, WindowManager& window, const unsigned char& depth);
+            void draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, sf::RenderTexture& window, const unsigned char& depth);
         private:
             float m_distortion_factor_;
             float m_rise_factor_;
