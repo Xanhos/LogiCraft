@@ -243,7 +243,7 @@ void main()
         						}
         					}
                 
-        				game_object->isDrawByAShader(false);
+        				game_object->isDrawByAShader(true);
         			}
         			else
         			{
@@ -291,7 +291,7 @@ void main()
         						}
         					}
                 
-        				game_object->isDrawByAShader(false);
+        				game_object->isDrawByAShader(true);
         			}
         			else
         			{
