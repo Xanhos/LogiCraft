@@ -534,6 +534,7 @@ namespace lc
 			 << " " << m_base_shape_point_count_
 			 << " " << m_spawn_count_
 			 << " " << m_has_gravity_
+			 << " " << m_relativePosition
 			 << " " << (!m_particles_ressource_.expired() ? m_particles_ressource_.lock()->getName() : std::string("No_Ressource"));
 	}
 
@@ -899,7 +900,7 @@ namespace lc
 				},
 				{
 					tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getPosition() : particle->get_transform().getPosition() - (particle->get_transform().getOrigin() * particle->get_transform().getScale()),
-					(tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getSize() : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_))
+					(tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getSize() : sf::Vector2f(m_base_shape_.getRadius(), m_base_shape_.getRadius()))
 				}))
 			{
 				tmp_ressource ? window.draw(tmp_ressource->getShape()) : window.draw(m_base_shape_);
@@ -923,7 +924,7 @@ namespace lc
 				},
 				{
 					particle->get_renderer_transform().getPosition() - particle->get_transform().getOrigin(),
-					tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getSize() : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_)
+					(tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getSize() : sf::Vector2f(m_base_shape_.getRadius(), m_base_shape_.getRadius()))
 				}))
 			{
 				tmp_ressource ? m_renderer_.Draw(tmp_ressource->getShape()) : m_renderer_.Draw(m_base_shape_);
@@ -971,7 +972,7 @@ namespace lc
 				},
 				{
 					tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getPosition() : particle->get_transform().getPosition() - (particle->get_transform().getOrigin() * particle->get_transform().getScale()),
-					(tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getSize() : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_))
+					(tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getSize() : sf::Vector2f(m_base_shape_.getRadius(), m_base_shape_.getRadius()))
 				}))
 			{
 				tmp_ressource ? window.draw(tmp_ressource->getShape()) : window.draw(m_base_shape_);
@@ -995,7 +996,7 @@ namespace lc
 				},
 				{
 					particle->get_renderer_transform().getPosition() - particle->get_transform().getOrigin(),
-					tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getSize() : sf::Vector2f(m_base_shape_radius_, m_base_shape_radius_)
+					(tmp_ressource ? tmp_ressource->getShape().getGlobalBounds().getSize() : sf::Vector2f(m_base_shape_.getRadius(), m_base_shape_.getRadius()))
 				}))
 			{
 				tmp_ressource ? m_renderer_.Draw(tmp_ressource->getShape()) : m_renderer_.Draw(m_base_shape_);
