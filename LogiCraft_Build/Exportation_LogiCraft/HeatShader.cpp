@@ -218,8 +218,12 @@ void main()
         		//If the object is totally in the zone of the shader, then one draw is done.
         		if (this->is_totally_in(game_object) && m_is_in_view_)
         		{
-        			game_object->Draw(*m_render_texture_);
-        			game_object->isVisible(false); //The object is made invisible so is not drawn two times.
+        			if (game_object->isVisible())
+        				for (const auto& component : game_object->getComponents())
+        					if (component->isVisible())
+        						component->Draw(*m_render_texture_);
+
+        			game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
         		}
         		else
         		{
@@ -228,15 +232,23 @@ void main()
         			if (Tools::Collisions::rect_rect({getParent()->getTransform().getPosition(), getParent()->getTransform().getSize()},
 					{game_object->getTransform().getPosition(), game_object->getTransform().getSize()}))
         			{
-        				game_object->Draw(window);
-        				if (m_is_in_view_)
-        					game_object->Draw(*m_render_texture_);
-        				game_object->isVisible(false);
+        				if (game_object->isVisible())
+        					for (const auto& component : game_object->getComponents())
+        					{
+        						if (component->isVisible())
+        						{
+        							component->Draw(window);
+        							if (m_is_in_view_)
+        								component->Draw(*m_render_texture_);	
+        						}
+        					}
+                
+        				game_object->isDrawByAShader(true);
         			}
         			else
         			{
-        				game_object->isVisible(true); //And if the object is totally out of the bound of the zone,
-        											  //he just will be drawn as normal.
+        				game_object->isDrawByAShader(false); //And if the object is totally out of the bound of the zone,
+        				//he just will be drawn as normal.
         			}
         		}
         	}
@@ -254,8 +266,12 @@ void main()
         		//If the object is totally in the zone of the shader, then one draw is done.
         		if (this->is_totally_in(game_object) && m_is_in_view_)
         		{
-        			game_object->Draw(*m_render_texture_);
-        			game_object->isVisible(false); //The object is made invisible so is not drawn two times.
+        			if (game_object->isVisible())
+        				for (const auto& component : game_object->getComponents())
+        					if (component->isVisible())
+        						component->Draw(*m_render_texture_);
+
+        			game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
         		}
         		else
         		{
@@ -264,15 +280,23 @@ void main()
         			if (Tools::Collisions::rect_rect({getParent()->getTransform().getPosition(), getParent()->getTransform().getSize()},
 					{game_object->getTransform().getPosition(), game_object->getTransform().getSize()}))
         			{
-        				game_object->Draw(window);
-        				if (m_is_in_view_)
-        					game_object->Draw(*m_render_texture_);
-        				game_object->isVisible(false);
+        				if (game_object->isVisible())
+        					for (const auto& component : game_object->getComponents())
+        					{
+        						if (component->isVisible())
+        						{
+        							component->Draw(window);
+        							if (m_is_in_view_)
+        								component->Draw(*m_render_texture_);	
+        						}
+        					}
+                
+        				game_object->isDrawByAShader(true);
         			}
         			else
         			{
-        				game_object->isVisible(true); //And if the object is totally out of the bound of the zone,
-        												 //he just will be drawn as normal.
+        				game_object->isDrawByAShader(false); //And if the object is totally out of the bound of the zone,
+        				//he just will be drawn as normal.
         			}
         		}
         	}

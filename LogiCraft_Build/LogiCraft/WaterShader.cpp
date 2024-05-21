@@ -225,14 +225,18 @@ void main()
 
 void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, sf::RenderTexture& window, const unsigned char& depth)
 {
-    //The shader will affect only the objects who are under or on the same depth.
+ //The shader will affect only the objects who are under or on the same depth.
     if (game_object->getDepth() >= getParent()->getDepth() && game_object->getDepth() == depth && !game_object->hasComponent("Water_Shader"))
     {
         //If the object is totally in the zone of the shader, then one draw is done.
         if (this->is_totally_in(game_object) && m_is_in_view_)
         {
-            game_object->Draw(*m_render_texture_);
-            game_object->isVisible(false); //The object is made invisible so is not drawn two times.
+            if (game_object->isVisible())
+                for (const auto& component : game_object->getComponents())
+                    if (component->isVisible())
+                        component->Draw(*m_render_texture_);
+
+            game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
         }
         else
         {
@@ -241,14 +245,22 @@ void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObjec
             if (Tools::Collisions::rect_rect({getParent()->getTransform().getPosition(), getParent()->getTransform().getSize()},
             {game_object->getTransform().getPosition(), game_object->getTransform().getSize()}))
             {
-                game_object->Draw(window);
-                if (m_is_in_view_)
-                    game_object->Draw(*m_render_texture_);
-                game_object->isVisible(false);
+                if (game_object->isVisible())
+                    for (const auto& component : game_object->getComponents())
+                    {
+                        if (component->isVisible())
+                        {
+                            component->Draw(window);
+                            if (m_is_in_view_)
+                                component->Draw(*m_render_texture_);	
+                        }
+                    }
+                
+                game_object->isDrawByAShader(true);
             }
             else
             {
-                game_object->isVisible(true); //And if the object is totally out of the bound of the zone,
+                game_object->isDrawByAShader(false); //And if the object is totally out of the bound of the zone,
                 //he just will be drawn as normal.
             }
         }
@@ -261,14 +273,18 @@ void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObjec
 
 void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, WindowManager& window, const unsigned char& depth)
 {
-    //The shader will affect only the objects who are under or on the same depth.
+ //The shader will affect only the objects who are under or on the same depth.
     if (game_object->getDepth() >= getParent()->getDepth() && game_object->getDepth() == depth && !game_object->hasComponent("Water_Shader"))
     {
         //If the object is totally in the zone of the shader, then one draw is done.
         if (this->is_totally_in(game_object) && m_is_in_view_)
         {
-            game_object->Draw(*m_render_texture_);
-            game_object->isVisible(false); //The object is made invisible so is not drawn two times.
+            if (game_object->isVisible())
+                for (const auto& component : game_object->getComponents())
+                    if (component->isVisible())
+                        component->Draw(*m_render_texture_);
+
+            game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
         }
         else
         {
@@ -277,14 +293,22 @@ void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObjec
             if (Tools::Collisions::rect_rect({getParent()->getTransform().getPosition(), getParent()->getTransform().getSize()},
             {game_object->getTransform().getPosition(), game_object->getTransform().getSize()}))
             {
-                game_object->Draw(window);
-                if (m_is_in_view_)
-                    game_object->Draw(*m_render_texture_);
-                game_object->isVisible(false);
+                if (game_object->isVisible())
+                    for (const auto& component : game_object->getComponents())
+                    {
+                        if (component->isVisible())
+                        {
+                            component->Draw(window);
+                            if (m_is_in_view_)
+                                component->Draw(*m_render_texture_);	
+                        }
+                    }
+                
+                game_object->isDrawByAShader(true);
             }
             else
             {
-                game_object->isVisible(true); //And if the object is totally out of the bound of the zone,
+                game_object->isDrawByAShader(false); //And if the object is totally out of the bound of the zone,
                 //he just will be drawn as normal.
             }
         }

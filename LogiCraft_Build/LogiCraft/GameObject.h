@@ -295,6 +295,9 @@ namespace lc
 		void needToBeRemoved(const bool& needToBeRemoved) { m_needToBeRemove = needToBeRemoved; }
 		bool hasToBeRemoved() const { return m_needToBeRemove; }
 
+		void isDrawByAShader(const bool& isDrawByAShader) { m_isDrawByAShader = isDrawByAShader; } 
+		bool isDrawByAShader() const { return m_isDrawByAShader; }
+
 		void isVisible(const bool& isVisible) { m_isVisible = isVisible; }
 		bool isVisible() const { return m_isVisible; }
 
@@ -317,6 +320,7 @@ namespace lc
 		unsigned char m_depth;
 		
 		bool m_isLock;
+		bool m_isDrawByAShader;
 		bool m_isVisible;
 		bool m_isUpdated;
 		bool m_needToBeRemove;
