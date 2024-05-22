@@ -391,7 +391,7 @@ bool lc::GameObject::is_in_window_view(WindowManager& window)
 bool lc::GameObject::is_in_window_view(const sf::RenderTexture& window)
 {
 	auto& tmp_window_view = window.getView();
-	return Tools::Collisions::rect_rect({getTransform().getPosition(), getTransform().getSize()},
+	return Tools::Collisions::rect_rect({getTransform().getPosition(), getTransform().getSize() * getTransform().getScale()},
 		{tmp_window_view.getCenter() - (tmp_window_view.getSize() / 2.f), tmp_window_view.getSize()});
 }
 
