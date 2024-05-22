@@ -1249,7 +1249,6 @@ void bt::ActionNode::Shoot::setup(NodePtr node)
 		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
 			{
 
-
 				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::Shoot>(node);
 
 				if (node_cast->m_bool_shoot_)
@@ -1263,13 +1262,32 @@ void bt::ActionNode::Shoot::setup(NodePtr node)
 							std::shared_ptr<lc::GameObject> tmpBalle = std::make_shared<lc::GameObject>();
 							tmpBalle->getTransform().getPosition() = node_cast->m_agent_.lock()->getTransform().getPosition();
 							tmpBalle->getTransform().getOrigin() = sf::Vector2f(100, 100);
-							tmpBalle->getTransform().getRotation() = Tools::Vector::getAngle(node_cast->m_agent_.lock()->getTransform().getPosition(), node_cast->m_target_.lock()->getTransform().getPosition()) * RAD2DEG;
+							//tmpBalle->getTransform().getRotation() = Tools::Vector::getAngle(node_cast->m_agent_.lock()->getTransform().getPosition(), node_cast->m_target_.lock()->getTransform().getPosition()) * RAD2DEG;
 							tmpBalle->addComponent<lc::Texture>(lc::Texture("test", "../ASSETS/200x200D.png", sf::IntRect(0,0,200,200)));
 							std::shared_ptr<lc::RigidBody> tmpRB = std::make_shared<lc::RigidBody>(lc::RigidBody(sf::FloatRect(0, 0, 200, 200), sf::Vector2f(), sf::Vector2f(), true));
 							tmpRB->getIsFlying() = true;
+							sf::Vector2f tmpPos = node_cast->m_target_.lock()->getTransform().getPosition();
+							sf::Vector2f tmpCenter = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() / 2.f;
+							sf::Vector2f tmpVelocity = Tools::Vector::normalize((node_cast->m_target_.lock()->getTransform().getPosition() + node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() / 2.f)
+								- (node_cast->m_agent_.lock()->getTransform().getPosition() + rigid_body->getCollider().getSize() / 2.f)) * 500.f;
+							
 
+							tmpRB->AddInputFunction([tmpVelocity, node_cast](lc::RigidBody* rigid_body) {
+								//TODO : Degat Balle
+								rigid_body->getVelocity() = tmpVelocity;
+								/*auto rbt = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody");
+								if (Tools::Collisions::rect_rect(sf::FloatRect(rigid_body->getCollider().getPosition().x - rigid_body->getVelocity().x * Tools::getDeltaTime(),
+									rigid_body->getCollider().getPosition().y - rigid_body->getVelocity().y * Tools::getDeltaTime(),
+									rigid_body->getCollider().getSize().x + rigid_body->getVelocity().x * Tools::getDeltaTime(),
+									rigid_body->getCollider().getSize().y + rigid_body->getVelocity().y * Tools::getDeltaTime()),
+									rbt->getCollider()))
+								{
+									std::cout << "col damage" << std::endl;
+									node_cast->m_target_.lock()->needToBeRemoved(true);
+								}*/
+								});
 
-							tmpBalle->addComponent<lc::RigidBody>();
+							tmpBalle->addComponent<lc::RigidBody>(tmpRB);
 							
 							
 							lc::GameObject::GetRoot(node_cast->m_agent_.lock())->addObject(tmpBalle);
