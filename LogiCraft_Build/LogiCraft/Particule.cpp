@@ -809,7 +809,7 @@ namespace lc
 						m_has_gravity_,
 						tmp_spawn_position, tmp_spawn_position_in_renderer, m_particles_origin_);
 
-					tmp_particle->get_transform().getScale() = tmp_texture ? tmp_texture->getParent()->getTransform().getScale() : sf::Vector2f{1.f,.1};
+					tmp_particle->get_transform().getScale() = tmp_texture ? tmp_texture->getParent()->getTransform().getScale() : sf::Vector2f{1.f, 1.f};
 					m_particles_.push_back(tmp_particle);
 				}
 
