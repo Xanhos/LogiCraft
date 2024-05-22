@@ -100,7 +100,8 @@ void lc::RigidBody::Update(WindowManager& _window)
 		}
 		if(!m_is_flying)
 			m_velocity.y += (g)*Tools::getDeltaTime();
-		CheckAllObject(scene);
+		if (m_canCollide)
+			CheckAllObject(scene);
 	} 
 
 	
@@ -168,35 +169,38 @@ bool lc::RigidBody::CheckAllObject(std::shared_ptr<lc::GameObject> _object)
 	for (auto& i : _object->getComponents())
 	{
 		if(&*i != this)
-			if (auto rb = dynamic_cast<lc::RigidBody*>(&*i))
+			if (auto rb = dynamic_cast<lc::RigidBody*>(&*i) )
 			{
-				if(m_velocity.y > 0.f)
+				if (rb->m_canCollide)
 				{
-					if (Tools::Collisions::lineRect({  m_collider.getPosition() + sf::Vector2f{0.f,m_collider.getSize().y} + sf::Vector2f{0.f,m_velocity.y} *Tools::getDeltaTime(), {{m_collider.getPosition() + m_collider.getSize() + sf::Vector2f{0.f,m_velocity.y}*Tools::getDeltaTime() }} }, { rb->m_collider.getPosition(), rb->m_collider.getSize()}))
+					if (m_velocity.y > 0.f)
 					{
-						m_velocity.y = 0.f;
-						getParent()->getTransform().getPosition().y = rb->getCollider().getPosition().y - m_collider.getSize().y;
+						if (Tools::Collisions::lineRect({ m_collider.getPosition() + sf::Vector2f{0.f,m_collider.getSize().y} + sf::Vector2f{0.f,m_velocity.y} *Tools::getDeltaTime(), {{m_collider.getPosition() + m_collider.getSize() + sf::Vector2f{0.f,m_velocity.y}*Tools::getDeltaTime() }} }, { rb->m_collider.getPosition(), rb->m_collider.getSize() }))
+						{
+							m_velocity.y = 0.f;
+							getParent()->getTransform().getPosition().y = rb->getCollider().getPosition().y - m_collider.getSize().y;
+						}
 					}
-				}
-				else if (m_velocity.y < 0.f)
-				{
-					if (Tools::Collisions::lineRect({  m_collider.getPosition() + sf::Vector2f{0.f,m_velocity.y} *Tools::getDeltaTime(), {{m_collider.getPosition() + sf::Vector2f{m_collider.getSize().x,0.f} + sf::Vector2f{0.f,m_velocity.y}*Tools::getDeltaTime()}} }, { rb->m_collider.getPosition() , rb->m_collider.getSize() }))
+					else if (m_velocity.y < 0.f)
 					{
-						m_velocity.y = 0.f;
+						if (Tools::Collisions::lineRect({ m_collider.getPosition() + sf::Vector2f{0.f,m_velocity.y} *Tools::getDeltaTime(), {{m_collider.getPosition() + sf::Vector2f{m_collider.getSize().x,0.f} + sf::Vector2f{0.f,m_velocity.y}*Tools::getDeltaTime()}} }, { rb->m_collider.getPosition() , rb->m_collider.getSize() }))
+						{
+							m_velocity.y = 0.f;
+						}
 					}
-				}
-				if (m_velocity.x < 0.f)
-				{
-					if (Tools::Collisions::lineRect({  m_collider.getPosition() + sf::Vector2f{m_velocity.x,0.f} *Tools::getDeltaTime(), {{m_collider.getPosition() + sf::Vector2f{0.f,m_collider.getSize().y + gravity_offset} + sf::Vector2f{m_velocity.x,0.f}*Tools::getDeltaTime()}} }, { rb->m_collider.getPosition(), rb->m_collider.getSize() }))
+					if (m_velocity.x < 0.f)
 					{
-						m_velocity.x = 0.f;
+						if (Tools::Collisions::lineRect({ m_collider.getPosition() + sf::Vector2f{m_velocity.x,0.f} *Tools::getDeltaTime(), {{m_collider.getPosition() + sf::Vector2f{0.f,m_collider.getSize().y + gravity_offset} + sf::Vector2f{m_velocity.x,0.f}*Tools::getDeltaTime()}} }, { rb->m_collider.getPosition(), rb->m_collider.getSize() }))
+						{
+							m_velocity.x = 0.f;
+						}
 					}
-				}
-				else if (m_velocity.x > 0.f)
-				{
-					if (Tools::Collisions::lineRect({ m_collider.getPosition() + sf::Vector2f{m_collider.getSize().x,0.f} + sf::Vector2f{m_velocity.x,0.f} *Tools::getDeltaTime(), {{ m_collider.getPosition() + m_collider.getSize() + sf::Vector2f{m_velocity.x,gravity_offset}*Tools::getDeltaTime() }} }, { rb->m_collider.getPosition(), rb->m_collider.getSize() }))
+					else if (m_velocity.x > 0.f)
 					{
-						m_velocity.x = 0.f;
+						if (Tools::Collisions::lineRect({ m_collider.getPosition() + sf::Vector2f{m_collider.getSize().x,0.f} + sf::Vector2f{m_velocity.x,0.f} *Tools::getDeltaTime(), {{ m_collider.getPosition() + m_collider.getSize() + sf::Vector2f{m_velocity.x,gravity_offset}*Tools::getDeltaTime() }} }, { rb->m_collider.getPosition(), rb->m_collider.getSize() }))
+						{
+							m_velocity.x = 0.f;
+						}
 					}
 				}
 			}

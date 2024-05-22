@@ -59,12 +59,14 @@ namespace lc
 		sf::Vector2f& getVelocity() { return m_velocity; }
 		const sf::FloatRect getCollider() const { return m_collider; }
 		bool& getIsFlying() {return m_is_flying;}
+		bool& getCanCollide() { return m_canCollide; }
 	private:
 		bool CheckAllObject(std::shared_ptr<lc::GameObject> _object);
 
 		sf::FloatRect m_collider;
 		sf::Vector2f m_reposition;
 		sf::Vector2f m_velocity;
+		bool m_canCollide = true;
 		bool m_isKinetic = false;
 		bool m_is_flying = false;
 		std::list<std::function<void(lc::RigidBody*)>> m_inputFunc;

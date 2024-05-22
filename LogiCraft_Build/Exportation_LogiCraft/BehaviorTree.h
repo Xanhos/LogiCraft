@@ -435,6 +435,18 @@ namespace bt
 			bool tick() override;
 		};
 
+		class SentryShoot : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			std::weak_ptr<lc::GameObject> m_target_;
+			bool m_bool_shoot_;
+		public:
+			SentryShoot() : m_agent_(), m_target_(), m_bool_shoot_(false) {}
+			SentryShoot(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
+
 		class lanceSpawn : public Node
 		{
 			std::weak_ptr<lc::GameObject> m_agent_;
@@ -537,6 +549,16 @@ namespace bt
 		public:
 			In_Range_Of_Player() : m_range_(0.f) {}
 			In_Range_Of_Player(std::weak_ptr<lc::GameObject> owner,float range);
+			bool tick() override;
+			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
+		};
+
+		class Is_Player_In_Sight : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_owner_, m_player_;
+		public:
+			Is_Player_In_Sight() {}
+			Is_Player_In_Sight(std::weak_ptr<lc::GameObject> owner);
 			bool tick() override;
 			void load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner) override;
 		};

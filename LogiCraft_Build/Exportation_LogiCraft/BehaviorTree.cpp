@@ -135,7 +135,7 @@ void bt::ActionNode::Wander::setup(NodePtr node)
 							side_collision.width += rigid_body->getVelocity().x * Tools::getDeltaTime();
 
 							side_collision.height += -0.1f;
-							if (Tools::Collisions::lineRect(side_collision, rect))
+							if (Tools::Collisions::lineRect(side_collision, rect) && rb->getCanCollide())
 							{
 								has_hit_a_wall = true;
 								return true;
@@ -1001,6 +1001,11 @@ void bt::ActionNode::Shot::load(std::ifstream& file, std::shared_ptr<lc::GameObj
 		m_attack_node_ = bt::Node::New(bt::ActionNode::Shoot(owner, scene->getObject("PLAYER")));
 		std::cout << "shoot loaded" << std::endl;
 	}
+	else if (m_attack_name == "SentryShoot")
+	{
+		m_attack_node_ = bt::Node::New(bt::ActionNode::SentryShoot(owner, scene->getObject("PLAYER")));
+		std::cout << "shoot loaded" << std::endl;
+	}
 	else
 	{
 		m_attack_node_ = bt::Node::New(bt::ActionNode::NodeFunc([] {return true; }));
@@ -1092,7 +1097,7 @@ bt::NodePtr bt::Condition_Factory(const condition_type& type, std::ifstream& fil
 	case condition_type::IN_RANGE_OF_PLAYER:
 		return Node::New(ActionNode::In_Range_Of_Player());
 	case condition_type::IS_PLAYER_IN_SIGHT:
-		return Node::New(ActionNode::NodeFunc([]{return true;}));
+		return Node::New(ActionNode::Is_Player_In_Sight());
 	case condition_type::CUSTOM:
 		file >> custom_condition;
 		return Node::get_unordered_map_custom_condition()[custom_condition]->clone();
@@ -1224,7 +1229,6 @@ bool bt::ActionNode::FarEnough::tick()
 void bt::ActionNode::FarEnough::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
 {
 	m_owner_ = owner;
-
 	m_player_ = lc::GameObject::GetRoot(owner)->getObject("PLAYER");
 }
 
@@ -1262,29 +1266,34 @@ void bt::ActionNode::Shoot::setup(NodePtr node)
 							std::shared_ptr<lc::GameObject> tmpBalle = std::make_shared<lc::GameObject>();
 							tmpBalle->getTransform().getPosition() = node_cast->m_agent_.lock()->getTransform().getPosition();
 							tmpBalle->getTransform().getOrigin() = sf::Vector2f(100, 100);
-							//tmpBalle->getTransform().getRotation() = Tools::Vector::getAngle(node_cast->m_agent_.lock()->getTransform().getPosition(), node_cast->m_target_.lock()->getTransform().getPosition()) * RAD2DEG;
 							tmpBalle->addComponent<lc::Texture>(lc::Texture("test", "../ASSETS/200x200D.png", sf::IntRect(0,0,200,200)));
 							std::shared_ptr<lc::RigidBody> tmpRB = std::make_shared<lc::RigidBody>(lc::RigidBody(sf::FloatRect(0, 0, 200, 200), sf::Vector2f(), sf::Vector2f(), true));
 							tmpRB->getIsFlying() = true;
+							tmpRB->getCanCollide() = false;
 							sf::Vector2f tmpPos = node_cast->m_target_.lock()->getTransform().getPosition();
 							sf::Vector2f tmpCenter = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() / 2.f;
 							sf::Vector2f tmpVelocity = Tools::Vector::normalize((node_cast->m_target_.lock()->getTransform().getPosition() + node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() / 2.f)
 								- (node_cast->m_agent_.lock()->getTransform().getPosition() + rigid_body->getCollider().getSize() / 2.f)) * 500.f;
-							
+							float aliveTimer = 0.f;
 
-							tmpRB->AddInputFunction([tmpVelocity, node_cast](lc::RigidBody* rigid_body) {
+							tmpRB->AddInputFunction([tmpVelocity, &node_cast](lc::RigidBody* rigid_body) {
 								//TODO : Degat Balle
-								rigid_body->getVelocity() = tmpVelocity;
-								/*auto rbt = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody");
-								if (Tools::Collisions::rect_rect(sf::FloatRect(rigid_body->getCollider().getPosition().x - rigid_body->getVelocity().x * Tools::getDeltaTime(),
-									rigid_body->getCollider().getPosition().y - rigid_body->getVelocity().y * Tools::getDeltaTime(),
-									rigid_body->getCollider().getSize().x + rigid_body->getVelocity().x * Tools::getDeltaTime(),
-									rigid_body->getCollider().getSize().y + rigid_body->getVelocity().y * Tools::getDeltaTime()),
-									rbt->getCollider()))
+								rigid_body->getVelocity() = tmpVelocity; 
+								if (!node_cast->m_target_.expired())
 								{
-									std::cout << "col damage" << std::endl;
-									node_cast->m_target_.lock()->needToBeRemoved(true);
-								}*/
+									auto rbt = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody");
+
+									if (Tools::Collisions::rect_rect(sf::FloatRect(rigid_body->getCollider().getPosition().x - rigid_body->getVelocity().x * Tools::getDeltaTime(),
+										rigid_body->getCollider().getPosition().y - rigid_body->getVelocity().y * Tools::getDeltaTime(),
+										rigid_body->getCollider().getSize().x + rigid_body->getVelocity().x * Tools::getDeltaTime(),
+										rigid_body->getCollider().getSize().y + rigid_body->getVelocity().y * Tools::getDeltaTime()),
+										rbt->getCollider()))
+									{
+										std::cout << "col damage" << std::endl;
+										node_cast->m_target_.lock()->needToBeRemoved(true);
+									}
+								}
+								
 								});
 
 							tmpBalle->addComponent<lc::RigidBody>(tmpRB);
@@ -1305,6 +1314,122 @@ void bt::ActionNode::Shoot::setup(NodePtr node)
 }
 
 bool bt::ActionNode::Shoot::tick()
+{
+	if (!m_agent_.expired())
+	{
+		m_bool_shoot_ = true;
+	}
+	return m_bool_shoot_;
+}
+
+bt::ActionNode::Is_Player_In_Sight::Is_Player_In_Sight(std::weak_ptr<lc::GameObject> owner) : m_owner_(owner)
+{
+}
+
+bool bt::ActionNode::Is_Player_In_Sight::tick()
+{
+	if (!m_player_.expired())
+	{
+		if (m_owner_.lock()->getTransform().getScale().x == 1 && m_player_.lock()->getTransform().getPosition().x < m_owner_.lock()->getTransform().getPosition().x)
+			return true;
+		else if (m_owner_.lock()->getTransform().getScale().x == -1 && m_player_.lock()->getTransform().getPosition().x > m_owner_.lock()->getTransform().getPosition().x)
+			return true;
+	}
+
+	return false;
+}
+
+void bt::ActionNode::Is_Player_In_Sight::load(std::ifstream& file, std::shared_ptr<lc::GameObject> owner)
+{
+	m_owner_ = owner;
+	m_player_ = lc::GameObject::GetRoot(owner)->getObject("PLAYER");
+}
+
+bt::ActionNode::SentryShoot::SentryShoot(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_) : m_agent_(agent_), m_target_(target_), m_bool_shoot_(false)
+{
+
+}
+
+void bt::ActionNode::SentryShoot::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
+	{
+		auto rba = agent->getComponent<lc::RigidBody>("RigidBody");
+		auto rbt = agent->getComponent<lc::RigidBody>("RigidBody");
+		//auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::Shoot>(node);
+
+		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+
+				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::SentryShoot>(node);
+
+				if (node_cast->m_bool_shoot_)
+				{
+					if (!node_cast->m_target_.expired())
+					{
+						auto rbt = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody");
+						if (node_cast->m_bool_shoot_)
+						{
+
+							std::shared_ptr<lc::GameObject> tmpBalle = std::make_shared<lc::GameObject>();
+							tmpBalle->getTransform().getPosition() = node_cast->m_agent_.lock()->getTransform().getPosition();
+							tmpBalle->getTransform().getOrigin() = sf::Vector2f(100, 100);
+							tmpBalle->addComponent<lc::Texture>(lc::Texture("test", "../ASSETS/200x200D.png", sf::IntRect(0, 0, 200, 200)));
+							std::shared_ptr<lc::RigidBody> tmpRB = std::make_shared<lc::RigidBody>(lc::RigidBody(sf::FloatRect(0, 0, 200, 200), sf::Vector2f(), sf::Vector2f(), true));
+							tmpRB->getIsFlying() = true;
+							tmpRB->getCanCollide() = false;
+							sf::Vector2f tmpPos = node_cast->m_target_.lock()->getTransform().getPosition();
+							sf::Vector2f tmpCenter = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() / 2.f;
+							sf::Vector2f tmpVelocity = Tools::Vector::normalize((node_cast->m_target_.lock()->getTransform().getPosition() + node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() / 2.f)
+								- (node_cast->m_agent_.lock()->getTransform().getPosition() + rigid_body->getCollider().getSize() / 2.f)) * 500.f;
+
+
+							tmpRB->AddInputFunction([tmpVelocity, &node_cast](lc::RigidBody* rigid_body) {
+								//TODO : Degat Balle
+								rigid_body->getVelocity().x = tmpVelocity.x;
+								if (!node_cast->m_target_.expired())
+								{
+									auto rbt = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody");
+									if (Tools::Collisions::rect_rect(sf::FloatRect(rigid_body->getCollider().getPosition().x - rigid_body->getVelocity().x * Tools::getDeltaTime(),
+										rigid_body->getCollider().getPosition().y - rigid_body->getVelocity().y * Tools::getDeltaTime(),
+										rigid_body->getCollider().getSize().x + rigid_body->getVelocity().x * Tools::getDeltaTime(),
+										rigid_body->getCollider().getSize().y + rigid_body->getVelocity().y * Tools::getDeltaTime()),
+										sf::FloatRect(rbt->getCollider().getPosition().x - rbt->getVelocity().x * Tools::getDeltaTime(),
+											rbt->getCollider().getPosition().y - rbt->getVelocity().y * Tools::getDeltaTime(),
+											rbt->getCollider().getSize().x + rbt->getVelocity().x * Tools::getDeltaTime(),
+											rbt->getCollider().getSize().y + rbt->getVelocity().y * Tools::getDeltaTime())
+
+									))
+									{
+
+										std::cout << "col damage" << std::endl;
+										node_cast->m_target_.lock()->needToBeRemoved(true);
+									}
+								}
+								});
+
+							
+								
+
+							tmpBalle->addComponent<lc::RigidBody>(tmpRB);
+
+
+							lc::GameObject::GetRoot(node_cast->m_agent_.lock())->addObject(tmpBalle);
+
+							node_cast->m_bool_shoot_ = false;
+						}
+					}
+				}
+
+
+
+
+			});
+	}
+}
+
+bool bt::ActionNode::SentryShoot::tick()
 {
 	if (!m_agent_.expired())
 	{
