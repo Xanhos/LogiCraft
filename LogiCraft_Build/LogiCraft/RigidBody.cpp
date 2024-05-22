@@ -165,7 +165,7 @@ void lc::RigidBody::Draw(WindowManager& _window)
 		m_shape.setSize(m_collider.getSize());
 		m_shape.setPosition(getParent()->getTransform().getPosition() + m_collider.getPosition());
 		m_shape.setFillColor(sf::Color::Transparent);
-		m_shape.setOutlineColor(sf::Color::White);
+		m_shape.setOutlineColor(sf::Color::Blue);
 		m_shape.setOutlineThickness(5.f);
 		_window.draw(m_shape);
 	}
@@ -178,7 +178,7 @@ void lc::RigidBody::Draw(sf::RenderTexture& _window)
 		m_shape.setSize(m_collider.getSize());
 		m_shape.setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
 		m_shape.setFillColor(sf::Color::Transparent);
-		m_shape.setOutlineColor(sf::Color::White);
+		m_shape.setOutlineColor(sf::Color::Blue);
 		m_shape.setOutlineThickness(- 3.f);
 		_window.draw(m_shape);
 	}
@@ -210,13 +210,45 @@ void lc::RigidBody::setHierarchieFunc()
 		}
 		else m_simulate = false;
 
-
-
 		if(m_collider.width <= 0.f)
 			m_collider.width = 1.f;
 		if(m_collider.height <= 0.f)
 			m_collider.height = 1.f;
 		ImGui::Checkbox("Show Collider", &m_showCollider);
+
+		if (ImGui::Button("Show All Colliders"))
+		{
+			const std::function<void(const std::shared_ptr<lc::GameObject>&)> show_all_colliders = [&](const std::shared_ptr<lc::GameObject>& game_object)
+			{
+				for (const auto& component : game_object->getComponents())
+					if (component->getTypeName() == "RigidBody")
+					{
+						const auto rigidBody = std::dynamic_pointer_cast<lc::RigidBody>(component);
+						rigidBody->m_showCollider = true;
+					}
+				
+				for (const auto& tmp_game_object : game_object->getObjects())
+					show_all_colliders(tmp_game_object);
+			};
+		}
+
+		
+		if (ImGui::Button("UnShow All Colliders"))
+		{
+			const std::function<void(const std::shared_ptr<lc::GameObject>&)> show_all_colliders = [&](const std::shared_ptr<lc::GameObject>& game_object)
+			{
+				for (const auto& component : game_object->getComponents())
+					if (component->getTypeName() == "RigidBody")
+					{
+						const auto rigidBody = std::dynamic_pointer_cast<lc::RigidBody>(component);
+						rigidBody->m_showCollider = false;
+					}
+				
+				for (const auto& tmp_game_object : game_object->getObjects())
+					show_all_colliders(tmp_game_object);
+			};
+		}
+		
 		};
 }
 

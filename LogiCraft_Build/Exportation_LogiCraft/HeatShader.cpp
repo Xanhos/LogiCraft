@@ -42,6 +42,19 @@ namespace lc
 
         void HeatShader::Update(WindowManager& window)
         {
+        	if (getParent() && (!getParent()->isVisible() || !m_isVisible))
+        	{
+        		const std::function<void(const std::shared_ptr<lc::GameObject>&)> show_all_colliders = [&](const std::shared_ptr<lc::GameObject>& game_object)
+        		{
+        			if (game_object->getDepth() >= getParent()->getDepth() && game_object->isDrawByAShader())
+        				game_object->isDrawByAShader(false);
+				
+        			for (const auto& tmp_game_object : game_object->getObjects())
+        				show_all_colliders(tmp_game_object);
+        		};
+
+        		show_all_colliders(lc::GameObject::GetRoot(getParent()));
+        	}
         }
 
         void HeatShader::Draw(WindowManager& window)

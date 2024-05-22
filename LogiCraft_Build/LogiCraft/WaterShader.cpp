@@ -38,6 +38,19 @@ void lc::Shader::WaterShader::UpdateEvent(sf::Event& event)
 
 void lc::Shader::WaterShader::Update(WindowManager& window)
 {
+    if (getParent() && (!getParent()->isVisible() || !m_isVisible))
+    {
+        const std::function<void(const std::shared_ptr<lc::GameObject>&)> show_all_colliders = [&](const std::shared_ptr<lc::GameObject>& game_object)
+        {
+            if (game_object->getDepth() >= getParent()->getDepth() && game_object->isDrawByAShader())
+                game_object->isDrawByAShader(false);
+				
+            for (const auto& tmp_game_object : game_object->getObjects())
+                show_all_colliders(tmp_game_object);
+        };
+
+        show_all_colliders(lc::GameObject::GetRoot(getParent()));
+    }
 }
 
 void lc::Shader::WaterShader::Draw(WindowManager& window)
@@ -113,7 +126,7 @@ void lc::Shader::WaterShader::Draw(sf::RenderTexture& window)
     if (m_is_in_view_)
     {
         m_render_texture_->setView(m_render_view_);
-        m_render_texture_->clear(sf::Color::Black);   
+        m_render_texture_->clear(sf::Color::Black);
     }
 
     //Display of the object in the shader.
