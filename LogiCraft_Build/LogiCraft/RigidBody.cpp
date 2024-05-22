@@ -230,12 +230,13 @@ void lc::RigidBody::setHierarchieFunc()
 				for (const auto& tmp_game_object : game_object->getObjects())
 					show_all_colliders(tmp_game_object);
 			};
-		}
 
+			show_all_colliders(lc::GameObject::GetRoot(getParent()));
+		}
 		
 		if (ImGui::Button("UnShow All Colliders"))
 		{
-			const std::function<void(const std::shared_ptr<lc::GameObject>&)> show_all_colliders = [&](const std::shared_ptr<lc::GameObject>& game_object)
+			const std::function<void(const std::shared_ptr<lc::GameObject>&)> unShow_all_colliders = [&](const std::shared_ptr<lc::GameObject>& game_object)
 			{
 				for (const auto& component : game_object->getComponents())
 					if (component->getTypeName() == "RigidBody")
@@ -245,10 +246,11 @@ void lc::RigidBody::setHierarchieFunc()
 					}
 				
 				for (const auto& tmp_game_object : game_object->getObjects())
-					show_all_colliders(tmp_game_object);
+					unShow_all_colliders(tmp_game_object);
 			};
+
+			unShow_all_colliders(lc::GameObject::GetRoot(getParent()));
 		}
-		
 		};
 }
 
