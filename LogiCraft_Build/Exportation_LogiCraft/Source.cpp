@@ -29,7 +29,7 @@ int main()
 	auto world = load(window);
 	auto player = lc::GameObject::CreateGameObject("Player", 8);
 	const sf::Vector2f viewSize(1920 * 2, 1080 * 2);
-	sf::View view(viewSize / 2.f, viewSize);
+	sf::View view(sf::Vector2f(0.f, 1560.f), viewSize);
 	window.getWindow().setView(view);
 	sf::Vector2f Viewposition = viewSize/ 2.f;
 	
@@ -40,7 +40,7 @@ int main()
 		window.EventUpdate();
 
 		world->Update(window);
-		window.getWindow().setTitle(std::to_string(Tools::frameRate()));
+		//window.getWindow().setTitle(std::to_string(Tools::frameRate()));
 		if (KEY(Add))
 		{
 			view.zoom(0.999f);
