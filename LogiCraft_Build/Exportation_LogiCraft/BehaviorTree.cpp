@@ -922,12 +922,12 @@ void bt::ActionNode::Attack::load(std::ifstream& file, std::shared_ptr<lc::GameO
 
     if (attack_name == "damageBox")
     {
-        m_attack_node_ = bt::Node::New(bt::ActionNode::DamageBox(owner, scene->getObject("PLAYER")));
+        m_attack_node_ = bt::Node::New(bt::ActionNode::DamageBox(owner, scene->getObject("Player")));
         std::cout << "damageBox loaded" << std::endl;
     }
     else if (attack_name == "lanceHit")
     {
-        m_attack_node_ = bt::Node::New(bt::ActionNode::LanceHit(owner, scene->getObject("PLAYER")));
+        m_attack_node_ = bt::Node::New(bt::ActionNode::LanceHit(owner, scene->getObject("Player")));
         std::cout << "lanceHit loaded" << std::endl;
     }
     else if (attack_name == "CrazyHit")
@@ -1592,4 +1592,147 @@ bool bt::ActionNode::Retract::tick()
 		m_one_pass = false;
 
 	return m_bool_retract_end;
+}
+
+bt::ActionNode::Exploding::Exploding(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_) : m_agent_(agent_), m_target_(target_), m_bool_explode_(false)
+{
+}
+
+void bt::ActionNode::Exploding::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
+	{
+		auto rba = agent->getComponent<lc::RigidBody>("RigidBody");
+
+
+
+		//auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::Shoot>(node);
+
+
+
+		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+
+
+				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::Exploding>(node);
+
+
+				if (node_cast->m_bool_explode_)
+				{
+
+					
+					
+
+					node_cast->m_bool_explode_ = false;
+
+				}
+
+
+
+
+
+			});
+	}
+}
+
+bool bt::ActionNode::Exploding::tick()
+{
+	if (!m_agent_.expired())
+	{
+		m_bool_explode_ = true;
+	}
+
+	return m_bool_explode_;
+}
+
+bt::ActionNode::LavaShooting::LavaShooting(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_) : m_agent_(agent_), m_target_(target_),m_bool_shoot_(false)
+{
+}
+
+void bt::ActionNode::LavaShooting::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
+	{
+		auto rba = agent->getComponent<lc::RigidBody>("RigidBody");
+
+		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+
+
+				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::LavaShooting>(node);
+
+
+				if (node_cast->m_bool_shoot_)
+				{
+
+
+
+					 
+					node_cast->m_bool_shoot_ = false;
+				}
+
+
+
+
+
+			});
+	}
+}
+
+bool bt::ActionNode::LavaShooting::tick()
+{
+	if (!m_agent_.expired())
+	{
+		m_bool_shoot_ = true;
+	}
+
+	return m_bool_shoot_;
+}
+
+bt::ActionNode::ResetRigidBody::ResetRigidBody(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_): m_agent_(agent_), m_bool_reset_(false)
+{
+}
+
+void bt::ActionNode::ResetRigidBody::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody"))
+	{
+		auto rba = agent->getComponent<lc::RigidBody>("RigidBody");
+
+		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+
+
+				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::ResetRigidBody>(node);
+
+
+				if (node_cast->m_bool_reset_)
+				{
+
+					node_cast->m_agent_.lock()->getTransform().getOrigin() = sf::Vector2f();
+					rigid_body->getCollider().width = node_cast->m_agent_.lock()->getTransform().getSize().x;
+					rigid_body->getCollider().height = node_cast->m_agent_.lock()->getTransform().getSize().y;
+
+					node_cast->m_bool_reset_ = false;
+				}
+
+
+
+
+
+			});
+	}
+}
+
+bool bt::ActionNode::ResetRigidBody::tick()
+{
+	if (!m_agent_.expired())
+	{
+		m_bool_reset_ = true;
+	}
+
+	return m_bool_reset_;
 }

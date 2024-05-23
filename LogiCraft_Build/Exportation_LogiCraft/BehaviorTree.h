@@ -478,6 +478,18 @@ namespace bt
 			bool tick() override;
 		};
 
+		class ResetRigidBody : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			bool m_bool_reset_;
+
+		public:
+			ResetRigidBody() : m_agent_(), m_bool_reset_(false) {}
+			ResetRigidBody(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
+
 		class Shoot : public Node
 		{
 			std::weak_ptr<lc::GameObject> m_agent_;

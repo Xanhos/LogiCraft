@@ -57,7 +57,7 @@ namespace lc
 
 
 		sf::Vector2f& getVelocity() { return m_velocity; }
-		const sf::FloatRect getCollider() const { return m_collider; }
+		sf::FloatRect& getCollider() { return m_collider; }
 		bool& getIsFlying() {return m_is_flying;}
 		bool& getCanCollide() { return m_canCollide; }
 	private:
