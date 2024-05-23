@@ -238,8 +238,37 @@ void main()
 
 void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, sf::RenderTexture& window, const unsigned char& depth)
 {
+    bool object_is_upper(true);
+    const std::function<void(const std::shared_ptr<lc::GameObject>&)> gameobject_is_upper = [&](const std::shared_ptr<lc::GameObject>& parent_object)
+    {
+        if (game_object->getDepth() != getParent()->getDepth())
+        {
+            object_is_upper = true;
+        }
+        else if (game_object->getDepth() == getParent()->getDepth())
+        {
+            for (const auto& tmp_game_object : parent_object->getObjects())
+            {
+                gameobject_is_upper(tmp_game_object);
+            }
+            
+            if (parent_object == getParent())
+            {
+                object_is_upper = false;
+                return;
+            }
+            else if (parent_object == game_object)
+            {
+                object_is_upper = true;
+                return;
+            }
+        }
+    };
+
+    gameobject_is_upper(lc::GameObject::GetRoot(getParent()));
+    
  //The shader will affect only the objects who are under or on the same depth.
-    if (game_object->getDepth() >= getParent()->getDepth() && game_object->getDepth() == depth && !game_object->hasComponent("Water_Shader"))
+    if (game_object->getDepth() >= getParent()->getDepth() && game_object->getDepth() == depth && object_is_upper && !game_object->hasComponent("Water_Shader"))
     {
         //If the object is totally in the zone of the shader, then one draw is done.
         if (this->is_totally_in(game_object) && m_is_in_view_)
@@ -248,8 +277,8 @@ void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObjec
                 for (const auto& component : game_object->getComponents())
                     if (component->isVisible())
                         component->Draw(*m_render_texture_);
-
-            game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
+    
+            //game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
         }
         else
         {
@@ -263,13 +292,13 @@ void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObjec
                     {
                         if (component->isVisible())
                         {
-                            component->Draw(window);
+                            //component->Draw(window);
                             if (m_is_in_view_)
                                 component->Draw(*m_render_texture_);	
                         }
                     }
                 
-                game_object->isDrawByAShader(true);
+                //game_object->isDrawByAShader(true);
             }
             else
             {
