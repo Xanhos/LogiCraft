@@ -861,13 +861,13 @@ bool bt::Decorator::Do_On_Anim_Frame::tick()
 		if(const auto anim_key = anim->get_actual_animation_key().lock())		
 			if(anim_key->get_name() == m_key_anim_name_)
 			{
-				if(anim_key->get_actual_frame() == m_action_frame_ and m_new_frame_)
+				if(anim_key->get_actual_frame() == m_action_frame_ /*and m_new_frame_*/)
 				{
 					m_new_frame_ = false;
 					return SECURE_TASK(m_task);
 				}
-				if (anim_key->get_actual_frame() != m_action_frame_ )
-					m_new_frame_ = true;
+				/*if (anim_key->get_actual_frame() != m_action_frame_ )
+					m_new_frame_ = true;*/
 			}
 	return false;
 }
@@ -970,6 +970,16 @@ void bt::ActionNode::Attack::load(std::ifstream& file, std::shared_ptr<lc::GameO
 		m_attack_node_ = bt::Node::New(bt::ActionNode::ResetDirection(owner, scene->getObject("PLAYER")));
 		std::cout << "ResetDirection loaded" << std::endl;
 	}
+	else if (attack_name == "Dash")
+	{
+		m_attack_node_ = bt::Node::New(bt::ActionNode::Dash(owner, scene->getObject("PLAYER")));
+		std::cout << "Dash loaded" << std::endl;
+	}
+	else if (attack_name == "Retract")
+	{
+		m_attack_node_ = bt::Node::New(bt::ActionNode::Retract(owner, scene->getObject("PLAYER")));
+		std::cout << "Retract loaded" << std::endl;
+	}
     else
     {
     	m_attack_node_ = bt::Node::New(bt::ActionNode::NodeFunc([]{return true;}));
@@ -1034,7 +1044,7 @@ void bt::ActionNode::ChangeState::load(std::ifstream& file, std::shared_ptr<lc::
 bool bt::Decorator::IfStateIs::tick()
 {
 	if(m_state_needed_ == GetRoot().lock()->getState())
-		return SECURE_TASK(m_task);
+		return m_task->tick();
 	return false;
 }
 
@@ -1436,4 +1446,150 @@ bool bt::ActionNode::SentryShoot::tick()
 		m_bool_shoot_ = true;
 	}
 	return m_bool_shoot_;
+}
+
+bt::ActionNode::Dash::Dash(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_) : m_agent_(agent_), m_target_(target_), m_bool_dash_(false), m_bool_dash_end(false), m_one_pass(false)
+{
+}
+
+void bt::ActionNode::Dash::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
+	{
+		auto rba = agent->getComponent<lc::RigidBody>("RigidBody");
+
+		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+
+
+				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::Dash>(node);
+
+				if (node_cast->m_bool_dash_)
+				{
+					
+					rigid_body->getVelocity() = node_cast->m_velocity_;
+
+
+					if (Tools::Vector::getDistance(node_cast->m_agent_.lock()->getTransform().getPosition() + rigid_body->getCollider().getSize() / 2.f, node_cast->m_t_previous_pos_) < 200)
+					{
+							node_cast->m_bool_dash_end = true;
+							
+					}
+
+
+					
+
+					node_cast->m_bool_dash_ = false;
+				}
+
+				
+
+
+			});
+	}
+
+}
+
+bool bt::ActionNode::Dash::tick()
+{
+
+	if (!m_agent_.expired())
+	{
+		if (!m_one_pass)
+		{
+			if (!m_target_.expired())
+			{
+				m_velocity_ = Tools::Vector::normalize((m_target_.lock()->getTransform().getPosition() + m_target_.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() / 2.f)
+					- (m_agent_.lock()->getTransform().getPosition() + m_agent_.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() / 2.f)) * 700.f;
+			}
+			
+
+			m_t_previous_pos_ = m_target_.lock()->getTransform().getPosition() + m_target_.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() / 2.f;
+
+			m_bool_dash_end = false;
+
+			m_one_pass = true;
+		}
+		
+
+		m_bool_dash_ = true;
+	}
+		
+	if (m_bool_dash_end)
+		m_one_pass = false;
+
+	return m_bool_dash_end;
+}
+
+bt::ActionNode::Retract::Retract(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_) : m_agent_(agent_), m_target_(target_), m_bool_retract_(false), m_bool_retract_end(false), m_one_pass(false)
+{
+}
+
+void bt::ActionNode::Retract::setup(NodePtr node)
+{
+	auto agent = m_agent_.lock();
+	if (agent->hasComponent("RigidBody") && m_target_.lock()->hasComponent("RigidBody"))
+	{
+		auto rba = agent->getComponent<lc::RigidBody>("RigidBody");
+
+
+		
+		//auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::Shoot>(node);
+
+	
+
+		rba->AddInputFunction([node](lc::RigidBody* rigid_body)
+			{
+				
+
+				auto node_cast = std::dynamic_pointer_cast<bt::ActionNode::Retract>(node);
+
+
+				if (node_cast->m_bool_retract_)
+				{
+					
+					rigid_body->getVelocity().y = -150;
+
+					auto rbt = node_cast->m_target_.lock()->getComponent<lc::RigidBody>("RigidBody");
+
+
+					if (Tools::Vector::getDistance(node_cast->m_agent_.lock()->getTransform().getPosition() + rigid_body->getCollider().getSize() / 2.f, node_cast->m_a_last_pos_) > 500)
+					{
+						node_cast->m_bool_retract_end = true;
+					}
+
+
+					
+
+					node_cast->m_bool_retract_ = false;
+
+				}
+
+				
+
+
+
+			});
+	}
+}
+
+bool bt::ActionNode::Retract::tick()
+{
+	if (!m_agent_.expired())
+	{
+		if (!m_one_pass)
+		{
+			m_bool_retract_end = false;
+			m_a_last_pos_ = m_agent_.lock()->getTransform().getPosition() + m_agent_.lock()->getComponent<lc::RigidBody>("RigidBody")->getCollider().getSize() / 2.f;
+			m_one_pass = true;
+		}
+		
+		m_bool_retract_ = true;
+	}
+		
+	if (m_bool_retract_end)
+		m_one_pass = false;
+
+	return m_bool_retract_end;
 }

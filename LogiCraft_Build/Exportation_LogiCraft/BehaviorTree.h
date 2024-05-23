@@ -423,6 +423,61 @@ namespace bt
 			bool tick() override;
 		};
 
+		class Dash : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			std::weak_ptr<lc::GameObject> m_target_;
+			bool m_bool_dash_;
+			bool m_bool_dash_end;
+			sf::Vector2f m_velocity_;
+			sf::Vector2f m_t_previous_pos_;
+			bool m_one_pass;
+		public:
+			Dash() : m_agent_(), m_target_(), m_bool_dash_(false), m_bool_dash_end(false), m_one_pass(false) {}
+			Dash(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
+
+		class Retract : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			std::weak_ptr<lc::GameObject> m_target_;
+			bool m_bool_retract_;
+			bool m_bool_retract_end;
+			sf::Vector2f m_a_last_pos_;
+			bool m_one_pass;
+		public:
+			Retract() : m_agent_(), m_target_(), m_bool_retract_(false), m_bool_retract_end(false), m_one_pass(false) {}
+			Retract(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
+
+		class Exploding : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			std::weak_ptr<lc::GameObject> m_target_;
+			bool m_bool_explode_;
+		public:
+			Exploding() : m_agent_(), m_target_(), m_bool_explode_(false) {}
+			Exploding(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
+
+		class LavaShooting : public Node
+		{
+			std::weak_ptr<lc::GameObject> m_agent_;
+			std::weak_ptr<lc::GameObject> m_target_;
+			bool m_bool_shoot_;
+		public:
+			LavaShooting() : m_agent_(), m_target_(), m_bool_shoot_(false) {}
+			LavaShooting(const std::shared_ptr<lc::GameObject>& agent_, const std::shared_ptr<lc::GameObject>& target_);
+			void setup(NodePtr node) override;
+			bool tick() override;
+		};
+
 		class Shoot : public Node
 		{
 			std::weak_ptr<lc::GameObject> m_agent_;

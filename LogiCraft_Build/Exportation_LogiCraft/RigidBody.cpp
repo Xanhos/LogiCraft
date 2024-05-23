@@ -141,6 +141,8 @@ void lc::RigidBody::Update(WindowManager& _window)
 	}
 
 	m_velocity.x =0;
+	if (m_is_flying)
+		m_velocity.y = 0;
 }
 
 void lc::RigidBody::Draw(WindowManager& _window)
