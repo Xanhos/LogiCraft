@@ -160,6 +160,7 @@ void Viewports::Draw(ObjWeakPtrList& _object, std::shared_ptr<lc::GameObject> _s
 
 		viewport->getRenderTexture().clear(s_background_color);
 		viewport->getRenderTexture().setView(viewport->getView());
+		viewport->getBackgroundShape().setFillColor(s_background_color);
 		viewport->getRenderTexture().draw(viewport->getBackgroundShape());
 		this->DisplayScreenZones(viewport->getRenderTexture());
 		for (int depth = static_cast<int>(ToolsBar::GetLayers().size()); depth >= 0; depth--)
