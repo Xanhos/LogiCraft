@@ -158,7 +158,7 @@ void Viewports::Draw(ObjWeakPtrList& _object, std::shared_ptr<lc::GameObject> _s
 		//I rescale the viewport to a normal point so the rendertexture dont do wierd thing.
 		viewport->getView().setViewport({ 0.f, 0.f, 1.f, 1.f });
 
-		viewport->getRenderTexture().clear();
+		viewport->getRenderTexture().clear(s_background_color);
 		viewport->getRenderTexture().setView(viewport->getView());
 		viewport->getRenderTexture().draw(viewport->getBackgroundShape());
 		this->DisplayScreenZones(viewport->getRenderTexture());

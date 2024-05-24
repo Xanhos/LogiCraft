@@ -80,12 +80,14 @@ private:
 	void ChangeLayer(Layer _newLayer);
 
 	void ChangeParallaxFactor();
+	void ChangeBGColor();
 
 	bool m_isExporting = false;
 	bool m_isSaving = false;
 	bool m_isLoading = false;
 	bool m_showingHelp = false;
 	bool m_isChangingParallaxSpeed = false;
+	bool m_isChangingBGColor = false;
 	
 	inline static std::map<int,float> s_parallax_speed_factor_map_ = {};
 	

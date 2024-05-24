@@ -90,6 +90,7 @@ void ToolsBar::Update(std::shared_ptr <lc::GameObject> object, WindowManager& _w
 
 				if(ImGui::Button("Any Help ?")) { m_showingHelp = true; }
 				if(ImGui::Button("Change Parallax Speed")) { m_isChangingParallaxSpeed = true; }
+				if(ImGui::Button("Change Background Color")) { m_isChangingBGColor = true; }
 				if (m_showingHelp)
 					ShowHelp();
 				if (ImGui::BeginMenu(std::to_string(Tools::getDeltaTime()).c_str()))
@@ -119,6 +120,8 @@ void ToolsBar::Update(std::shared_ptr <lc::GameObject> object, WindowManager& _w
 	}
 	if(m_isChangingParallaxSpeed)
 		ChangeParallaxFactor();
+	if(m_isChangingBGColor)
+		ChangeBGColor();
 	if (m_isExporting)
 	{
 		Tools::IG::CreateWindow("Export", m_isExporting, ImGuiWindowFlags_AlwaysAutoResize, [&] {
@@ -354,4 +357,11 @@ void ToolsBar::ChangeParallaxFactor()
 			ImGui::SliderFloat(s_layers[it.first].c_str(),&it.second,-1.f,1.f,"%.3f");		
 	}
 	ImGui::End();
+}
+
+void ToolsBar::ChangeBGColor()
+{
+	ImGui::Begin("Background Color##lc", &m_isChangingBGColor,  ImGuiWindowFlags_AlwaysAutoResize);
+	ColorEdit4("Color", Viewports::getBackGroundColor(),ImGuiColorEditFlags_Uint8 | ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_InputRGB);
+	End();
 }
