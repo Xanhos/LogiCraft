@@ -40,6 +40,9 @@ namespace lc
             sf::Sprite m_render_sprite_;
             sf::Vector2u m_render_size_;
 
+            std::list<std::shared_ptr<lc::GameObject>>::iterator m_parent_iterator_;
+            float m_update_parent_iterator_timer_;
+
             bool m_is_in_view_;
         };
     }
