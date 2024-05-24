@@ -367,7 +367,7 @@ void Viewports::UpdateScreenZones(std::shared_ptr<Viewport>& _viewport, WindowMa
 {
 	for (auto& screen : m_screenZones)
 	{
-		if (KEY(LControl) && MOUSE(Left) && !screen.isUsed() && m_screenZoneUnused > 0 && !m_wantToPlaceAnObject)
+		if (KEY(LControl) && MOUSE(Left) && !screen.isUsed() && m_screenZoneUnused >= 0 && !m_wantToPlaceAnObject)
 		{
 			if (_viewport->isInWindow(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow()))))
 				if (Tools::Collisions::point_rect(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow()), _viewport->getView()), sf::FloatRect(screen.getScreenShape().getPosition() + sf::Vector2f(1386.f, 548.f), sf::Vector2f(1080.f, 1080.f))))
@@ -388,7 +388,7 @@ void Viewports::UpdateScreenZones(std::shared_ptr<Viewport>& _viewport, WindowMa
 void Viewports::DisplayScreenZones(sf::RenderTexture& _renderer)
 {
 	for (auto& screen : m_screenZones)
-		if (screen.isUsed() || (!screen.isUsed() && m_screenZoneUnused > 0))
+		if (screen.isUsed() || (!screen.isUsed() && m_screenZoneUnused >= 0))
 			_renderer.draw(screen.getScreenShape());
 }
 

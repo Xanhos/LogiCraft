@@ -224,7 +224,7 @@ void lc::GameObject::Draw(WindowManager& _window)
 			object->Draw(_window);
 	
 	for (auto& component : m_components)
-		if (component->isVisible() && m_isDrawByAShader)
+		if (component->isVisible() && !m_isDrawByAShader)
 			component->Draw(_window);
 }
 
@@ -235,7 +235,7 @@ void lc::GameObject::Draw(sf::RenderTexture& _renderer)
 			object->Draw(_renderer);
 
 	for (auto& component : m_components)
-		if (component->isVisible() && m_isDrawByAShader)
+		if (component->isVisible() && !m_isDrawByAShader)
 			component->Draw(_renderer);
 }
 
@@ -246,7 +246,7 @@ void lc::GameObject::Draw(sf::RenderTexture& _renderer, unsigned char _depth)
 		object->Draw(_renderer, _depth);
 
 	for (auto& component : m_components)
-		if (component->isVisible() && m_isDrawByAShader)
+		if (component->isVisible() && !m_isDrawByAShader)
 			if (m_depth == _depth)
 				component->Draw(_renderer);
 }

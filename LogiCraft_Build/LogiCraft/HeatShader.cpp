@@ -265,7 +265,7 @@ void main()
         		{
         			if (game_object->isVisible())
         				for (const auto& component : game_object->getComponents())
-        					if (component->isVisible())
+        					if (component->isVisible() && component->getTypeName() != "RigidBody")
         						component->Draw(*m_render_texture_);
 
         			game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
@@ -280,7 +280,7 @@ void main()
         				if (game_object->isVisible())
         					for (const auto& component : game_object->getComponents())
         					{
-        						if (component->isVisible())
+        						if (component->isVisible() && component->getTypeName() != "RigidBody")
         						{
         							component->Draw(window);
         							if (m_is_in_view_)
@@ -313,7 +313,7 @@ void main()
         		{
         			if (game_object->isVisible())
         				for (const auto& component : game_object->getComponents())
-        					if (component->isVisible())
+        					if (component->isVisible() && component->getTypeName() != "RigidBody")
         						component->Draw(*m_render_texture_);
 
         			game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
@@ -328,7 +328,7 @@ void main()
         				if (game_object->isVisible())
         					for (const auto& component : game_object->getComponents())
         					{
-        						if (component->isVisible())
+        						if (component->isVisible() && component->getTypeName() != "RigidBody")
         						{
         							component->Draw(window);
         							if (m_is_in_view_)
