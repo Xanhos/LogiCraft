@@ -904,6 +904,7 @@ void bt::ActionNode::In_Range_Of_Player::load(std::ifstream& file, std::shared_p
 void bt::Node::init_custom_condition()
 {
 	m_custom_condition_map_["isHiding"] = New(ActionNode::IsHiding());
+	m_custom_condition_map_["RevertAnimEnd"] = New(ActionNode::IsHiding());
 	m_custom_condition_map_["FarEnough"] = New(ActionNode::FarEnough());
 }
 
@@ -922,12 +923,12 @@ void bt::ActionNode::Attack::load(std::ifstream& file, std::shared_ptr<lc::GameO
 
     if (attack_name == "damageBox")
     {
-        m_attack_node_ = bt::Node::New(bt::ActionNode::DamageBox(owner, scene->getObject("Player")));
+        m_attack_node_ = bt::Node::New(bt::ActionNode::DamageBox(owner, scene->getObject("PLAYER")));
         std::cout << "damageBox loaded" << std::endl;
     }
     else if (attack_name == "lanceHit")
     {
-        m_attack_node_ = bt::Node::New(bt::ActionNode::LanceHit(owner, scene->getObject("Player")));
+        m_attack_node_ = bt::Node::New(bt::ActionNode::LanceHit(owner, scene->getObject("PLAYER")));
         std::cout << "lanceHit loaded" << std::endl;
     }
     else if (attack_name == "CrazyHit")
