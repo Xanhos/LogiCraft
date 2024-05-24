@@ -671,7 +671,7 @@ void Viewports::CreateConvex(std::shared_ptr<lc::GameObject> _scene, sf::Vector2
 		points_convex.push_back(tmp);
 		timer = 0.f;
 	}
-	if (KEY(Space) && timer > 0.5f)
+	if (KEY(Space) && timer > 0.5f and !points_convex.empty())
 	{
 		points_convex.clear();
 		auto convex = lc::Convex(container);
