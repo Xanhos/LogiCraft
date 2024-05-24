@@ -1,4 +1,4 @@
-set "DirName=LogiCraft_V2.0"
+set "DirName=LogiCraft_V2.2"
 
 md ..\%DirName%\bin
 md ..\%DirName%\Ressources
