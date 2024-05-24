@@ -144,7 +144,17 @@ namespace lc
 		/*
 		* @brief Function to draw particles.
 		*/
+		void particles_draw(WindowManager& window);
+
+		/*
+		* @brief Function to draw particles.
+		*/
 		void particles_draw(sf::RenderTexture& window);
+
+		/*
+		* @brief Function to draw Particle.
+		*/
+		void particle_draw(const std::shared_ptr<Particle>& particle, WindowManager& window);
 
 		/*
 		* @brief Function to draw Particle.

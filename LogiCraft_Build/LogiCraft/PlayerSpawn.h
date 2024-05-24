@@ -18,5 +18,7 @@ namespace lc
         std::shared_ptr<lc::GameComponent> Clone() override;
 
         const sf::Vector2f& GetSpawnPosition() const {return m_relativePosition;}
+    private:
+        sf::RectangleShape m_player_screen_zone_;
     };
 }

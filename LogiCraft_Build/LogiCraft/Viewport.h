@@ -156,7 +156,8 @@ public:
 	auto& getAllScreenzone() { return m_screenZones; }
 	auto& getActualSelectedObjectNumber() { return m_actualSelectedObjectNumber; }
 	bool& wantToPlaceAnObject() { return m_wantToPlaceAnObject; }
-
+	static sf::Color& getBackGroundColor() {return  s_background_color;}
+	
 	auto getActualFocusViewport() { return m_actualFocusViewport; }
 	auto getActualUpdatedViewport() 
 	{ 
@@ -290,4 +291,6 @@ private:
 	bool m_isMovementsLocked;
 	bool m_isZoomsLocked;
 	bool m_isViewportsLocked;
+
+	inline static sf::Color s_background_color = sf::Color(0.f,0.f,0.f,255.f);
 };

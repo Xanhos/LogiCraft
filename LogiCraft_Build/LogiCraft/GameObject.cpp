@@ -340,22 +340,22 @@ void lc::GameObject::Update(WindowManager& _window)
 void lc::GameObject::Draw(WindowManager& _window)
 {
 	for (auto& object : m_objects)
-		if (object->isVisible() && !object->isDrawByAShader())
+		if (object->isVisible())
 			object->Draw(_window);
 
 	for (auto& component : m_components)
-		if (component->isVisible())
+		if (component->isVisible() && !m_isDrawByAShader)
 			component->Draw(_window);
 }
 
 void lc::GameObject::Draw(sf::RenderTexture& _renderer)
 {
 	for (auto& object : m_objects)
-		if (object->isVisible() && !object->isDrawByAShader())
+		if (object->isVisible())
 			object->Draw(_renderer);
 
 	for (auto& component : m_components)
-		if (component->isVisible())
+		if (component->isVisible() && !m_isDrawByAShader)
 			component->Draw(_renderer);
 
 }
@@ -369,11 +369,11 @@ void lc::GameObject::Draw(sf::RenderTexture& _renderer, unsigned char _depth)
 	}
 	
 	for (auto& object : m_objects)
-		if (object->isVisible() && !object->isDrawByAShader())
+		if (object->isVisible())
 			object->Draw(_renderer, _depth);
 
 	for (auto& component : m_components)
-		if (component->isVisible())
+		if (component->isVisible() && !m_isDrawByAShader)
 			if (m_depth == _depth)
 				component->Draw(_renderer);
 	
@@ -384,14 +384,14 @@ void lc::GameObject::Draw(sf::RenderTexture& _renderer, unsigned char _depth)
 bool lc::GameObject::is_in_window_view(WindowManager& window)
 {
 	auto& tmp_window_view = window.getWindow().getView();
-	return Tools::Collisions::rect_rect({getTransform().getPosition(), getTransform().getSize()},
+	return Tools::Collisions::rect_rect({getTransform().getPosition(), getTransform().getSize() * getTransform().getScale()},
 		{tmp_window_view.getCenter() - (tmp_window_view.getSize() / 2.f), tmp_window_view.getSize()});
 }
 
 bool lc::GameObject::is_in_window_view(const sf::RenderTexture& window)
 {
 	auto& tmp_window_view = window.getView();
-	return Tools::Collisions::rect_rect({getTransform().getPosition(), getTransform().getSize()},
+	return Tools::Collisions::rect_rect({getTransform().getPosition(), getTransform().getSize() * getTransform().getScale()},
 		{tmp_window_view.getCenter() - (tmp_window_view.getSize() / 2.f), tmp_window_view.getSize()});
 }
 

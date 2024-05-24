@@ -1,7 +1,7 @@
 #include "WaterShader.h"
 
 lc::Shader::WaterShader::WaterShader()
-    : m_level_(0.5f), m_distortion_level_(50), m_is_in_view_(true)
+    : m_level_(0.5f), m_distortion_level_(50), m_update_parent_iterator_timer_(0.f), m_is_in_view_(true)
 {
     m_name = "Water_Shader";
     m_typeName = "Water_Shader";
@@ -38,12 +38,63 @@ void lc::Shader::WaterShader::UpdateEvent(sf::Event& event)
 
 void lc::Shader::WaterShader::Update(WindowManager& window)
 {
+    if (getParent() && (!getParent()->isVisible() || !m_isVisible))
+    {
+        const std::function<void(const std::shared_ptr<lc::GameObject>&)> show_all_colliders = [&](const std::shared_ptr<lc::GameObject>& game_object)
+        {
+            if (game_object->getDepth() >= getParent()->getDepth() && game_object->isDrawByAShader())
+                game_object->isDrawByAShader(false);
+				
+            for (const auto& tmp_game_object : game_object->getObjects())
+                show_all_colliders(tmp_game_object);
+        };
+
+        show_all_colliders(lc::GameObject::GetRoot(getParent()));
+    }
+
+    m_update_parent_iterator_timer_ += Tools::getDeltaTime();
+    if (m_update_parent_iterator_timer_ >= 1.f)
+    {
+        bool tmp_is_done(false);
+        const auto tmp_world = lc::GameObject::GetRoot(getParent());
+        const std::function<void(const std::list<std::shared_ptr<lc::GameObject>>::iterator&)> update_parent_iterator =
+            [&](const std::list<std::shared_ptr<lc::GameObject>>::iterator& parent)
+            {
+                if (getParent() == (*parent))
+                {
+                    tmp_is_done = true;
+                    if((*parent)->getParent() == tmp_world)
+                        m_parent_iterator_ = parent;
+                    return;  
+                }
+                else
+                {
+                    for (auto game_object = (*parent)->getObjects().begin(); game_object != (*parent)->getObjects().end(); ++game_object)
+                    {
+                        update_parent_iterator(game_object);
+                        if (tmp_is_done)
+                        {
+                            if((*parent)->getParent() == tmp_world)
+                                m_parent_iterator_ = parent;
+                            return;   
+                        }
+                    }   
+                }
+            };
+        
+        for (auto game_object = tmp_world->getObjects().begin(); game_object != tmp_world->getObjects().end(); ++game_object)
+        {
+            update_parent_iterator(game_object);
+            if (tmp_is_done)
+                break;
+        }
+
+        m_update_parent_iterator_timer_ = 0.f;
+    }
 }
 
 void lc::Shader::WaterShader::Draw(WindowManager& window)
 {
-    m_is_in_view_ = getParent()->is_in_window_view(window);
-    
     m_time_ += Tools::getDeltaTime();
 
     //Set the shader uniform values.
@@ -88,12 +139,12 @@ void lc::Shader::WaterShader::Draw(WindowManager& window)
 
         window.draw(m_renderer, m_shader_states_);
     }
+
+    m_is_in_view_ = getParent()->is_in_window_view(window);
 }
     
 void lc::Shader::WaterShader::Draw(sf::RenderTexture& window)
 {
-    m_is_in_view_ = getParent()->is_in_window_view(window);
-    
     m_time_ += Tools::getDeltaTime();
 
     //Set the shader uniform values.
@@ -138,6 +189,8 @@ void lc::Shader::WaterShader::Draw(sf::RenderTexture& window)
 
         window.draw(m_renderer, m_shader_states_);
     }
+
+    m_is_in_view_ = getParent()->is_in_window_view(window);
 }
 
 void lc::Shader::WaterShader::Load(std::ifstream& load)
@@ -194,6 +247,41 @@ void main()
 
 void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, sf::RenderTexture& window, const unsigned char& depth)
 {
+    bool m_can_be_drawn(true);
+    if (game_object->getDepth() == getParent()->getDepth())
+    {
+        const auto tmp_world = lc::GameObject::GetRoot(getParent());
+
+        auto tmp_higher_parent = getParent();
+        while (tmp_higher_parent->getParent() != tmp_world)
+        {
+            tmp_higher_parent = tmp_higher_parent->getParent();
+            if (game_object == tmp_higher_parent)
+            {
+                m_can_be_drawn = false;
+                break;
+            }
+        }
+        
+        if (m_parent_iterator_._Ptr && !m_can_be_drawn)
+        {
+            if (m_parent_iterator_._Ptr->_Myval == tmp_higher_parent)
+            {
+                if (std::next(m_parent_iterator_) != tmp_world->getObjects().end())
+                {
+                    for (auto it_game_object = std::next(m_parent_iterator_); it_game_object != tmp_world->getObjects().end(); ++it_game_object)
+                        if ((*it_game_object) == game_object)
+                        {
+                            m_can_be_drawn = false;
+                            break;
+                        }      
+                }
+            }
+        }
+    }
+    else if (game_object->getDepth() < getParent()->getDepth())
+        m_can_be_drawn = false;
+    
  //The shader will affect only the objects who are under or on the same depth.
     if (game_object->getDepth() >= getParent()->getDepth() && game_object->getDepth() == depth && !game_object->hasComponent("Water_Shader"))
     {
@@ -242,6 +330,41 @@ void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObjec
 
 void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, WindowManager& window, const unsigned char& depth)
 {
+    bool m_can_be_drawn(true);
+    if (game_object->getDepth() == getParent()->getDepth())
+    {
+        const auto tmp_world = lc::GameObject::GetRoot(getParent());
+
+        auto tmp_higher_parent = getParent();
+        while (tmp_higher_parent->getParent() != tmp_world)
+        {
+            tmp_higher_parent = tmp_higher_parent->getParent();
+            if (game_object == tmp_higher_parent)
+            {
+                m_can_be_drawn = false;
+                break;
+            }
+        }
+        
+        if (m_parent_iterator_._Ptr && !m_can_be_drawn)
+        {
+            if (m_parent_iterator_._Ptr->_Myval == tmp_higher_parent)
+            {
+                if (std::next(m_parent_iterator_) != tmp_world->getObjects().end())
+                {
+                    for (auto it_game_object = std::next(m_parent_iterator_); it_game_object != tmp_world->getObjects().end(); ++it_game_object)
+                        if ((*it_game_object) == game_object)
+                        {
+                            m_can_be_drawn = false;
+                            break;
+                        }      
+                }
+            }
+        }
+    }
+    else if (game_object->getDepth() < getParent()->getDepth())
+        m_can_be_drawn = false;
+    
  //The shader will affect only the objects who are under or on the same depth.
     if (game_object->getDepth() >= getParent()->getDepth() && game_object->getDepth() == depth && !game_object->hasComponent("Water_Shader"))
     {

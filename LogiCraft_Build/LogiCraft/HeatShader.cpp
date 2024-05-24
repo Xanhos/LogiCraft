@@ -5,7 +5,7 @@ namespace lc
     namespace Shader
     {
         HeatShader::HeatShader()
-            : m_distortion_factor_(0.01f), m_rise_factor_(0.5f)
+            : m_distortion_factor_(0.01f), m_rise_factor_(0.5f), m_update_parent_iterator_timer_(0.f), m_is_in_view_(true)
         {
 			m_name = "Heat_Shader";
         	m_typeName = "Heat_Shader";
@@ -42,12 +42,63 @@ namespace lc
 
         void HeatShader::Update(WindowManager& window)
         {
+        	if (getParent() && (!getParent()->isVisible() || !m_isVisible))
+        	{
+        		const std::function<void(const std::shared_ptr<lc::GameObject>&)> show_all_colliders = [&](const std::shared_ptr<lc::GameObject>& game_object)
+        		{
+        			if (game_object->getDepth() >= getParent()->getDepth() && game_object->isDrawByAShader())
+        				game_object->isDrawByAShader(false);
+				
+        			for (const auto& tmp_game_object : game_object->getObjects())
+        				show_all_colliders(tmp_game_object);
+        		};
+
+        		show_all_colliders(lc::GameObject::GetRoot(getParent()));
+        	}
+
+        	m_update_parent_iterator_timer_ += Tools::getDeltaTime();
+        	if (m_update_parent_iterator_timer_ >= 1.f)
+        	{
+        		bool tmp_is_done(false);
+        		const auto tmp_world = lc::GameObject::GetRoot(getParent());
+        		const std::function<void(const std::list<std::shared_ptr<lc::GameObject>>::iterator&)> update_parent_iterator =
+					[&](const std::list<std::shared_ptr<lc::GameObject>>::iterator& parent)
+					{
+						if (getParent() == (*parent))
+						{
+							tmp_is_done = true;
+							if((*parent)->getParent() == tmp_world)
+								m_parent_iterator_ = parent;
+							return;  
+						}
+						else
+						{
+							for (auto game_object = (*parent)->getObjects().begin(); game_object != (*parent)->getObjects().end(); ++game_object)
+							{
+								update_parent_iterator(game_object);
+								if (tmp_is_done)
+								{
+									if((*parent)->getParent() == tmp_world)
+										m_parent_iterator_ = parent;
+									return;   
+								}
+							}   
+						}
+					};
+        
+        		for (auto game_object = tmp_world->getObjects().begin(); game_object != tmp_world->getObjects().end(); ++game_object)
+        		{
+        			update_parent_iterator(game_object);
+        			if (tmp_is_done)
+        				break;
+        		}
+
+        		m_update_parent_iterator_timer_ = 0.f;
+        	}
         }
 
         void HeatShader::Draw(WindowManager& window)
         {
-        	m_is_in_view_ = getParent()->is_in_window_view(window);
-        	
             m_time_ += Tools::getDeltaTime();
 
             m_shader_->setUniform("u_distortion_factor", m_distortion_factor_);
@@ -86,12 +137,12 @@ namespace lc
 
         		window.draw(m_renderer, m_shader_states_);
         	}
+
+        	m_is_in_view_ = getParent()->is_in_window_view(window);
         }
 
         void HeatShader::Draw(sf::RenderTexture& window)
         {
-        	m_is_in_view_ = getParent()->is_in_window_view(window);
-        	
             m_time_ += Tools::getDeltaTime();
 
         	//Set the shader uniform values.
@@ -136,6 +187,8 @@ namespace lc
 
         		window.draw(m_renderer, m_shader_states_);
         	}
+
+        	m_is_in_view_ = getParent()->is_in_window_view(window);
         }
 
         void HeatShader::Save(std::ofstream& save, sf::RenderTexture& texture, int depth)
@@ -244,15 +297,50 @@ void main()
 
         void HeatShader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, WindowManager& window, const unsigned char& depth)
         {
+        	bool m_can_be_drawn(true);
+        	if (game_object->getDepth() == getParent()->getDepth())
+        	{
+        		const auto tmp_world = lc::GameObject::GetRoot(getParent());
+
+        		auto tmp_higher_parent = getParent();
+        		while (tmp_higher_parent->getParent() != tmp_world)
+        		{
+        			tmp_higher_parent = tmp_higher_parent->getParent();
+        			if (game_object == tmp_higher_parent)
+        			{
+        				m_can_be_drawn = false;
+        				break;
+        			}
+        		}
+        
+        		if (m_parent_iterator_._Ptr && !m_can_be_drawn)
+        		{
+        			if (m_parent_iterator_._Ptr->_Myval == tmp_higher_parent)
+        			{
+        				if (std::next(m_parent_iterator_) != tmp_world->getObjects().end())
+        				{
+        					for (auto it_game_object = std::next(m_parent_iterator_); it_game_object != tmp_world->getObjects().end(); ++it_game_object)
+        						if ((*it_game_object) == game_object)
+        						{
+        							m_can_be_drawn = false;
+        							break;
+        						}      
+        				}
+        			}
+        		}
+        	}
+        	else if (game_object->getDepth() < getParent()->getDepth())
+        		m_can_be_drawn = false;
+        	
         	//The shader will affect only the objects who are under or on the same depth.
-        	if (game_object->getDepth() >= getParent()->getDepth() && game_object->getDepth() == depth && !game_object->hasComponent("Heat_Shader"))
+        	if (m_can_be_drawn && game_object->getDepth() == depth && !game_object->hasComponent("Heat_Shader"))
         	{
         		//If the object is totally in the zone of the shader, then one draw is done.
         		if (this->is_totally_in(game_object) && m_is_in_view_)
         		{
         			if (game_object->isVisible())
         				for (const auto& component : game_object->getComponents())
-        					if (component->isVisible())
+        					if (component->isVisible() && component->getTypeName() != "RigidBody")
         						component->Draw(*m_render_texture_);
 
         			game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
@@ -267,7 +355,7 @@ void main()
         				if (game_object->isVisible())
         					for (const auto& component : game_object->getComponents())
         					{
-        						if (component->isVisible())
+        						if (component->isVisible() && component->getTypeName() != "RigidBody")
         						{
         							component->Draw(window);
         							if (m_is_in_view_)
@@ -292,15 +380,50 @@ void main()
 
         void HeatShader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, sf::RenderTexture& window, const unsigned char& depth)
         {
+        	bool m_can_be_drawn(true);
+        	if (game_object->getDepth() == getParent()->getDepth())
+        	{
+        		const auto tmp_world = lc::GameObject::GetRoot(getParent());
+
+        		auto tmp_higher_parent = getParent();
+        		while (tmp_higher_parent->getParent() != tmp_world)
+        		{
+        			tmp_higher_parent = tmp_higher_parent->getParent();
+        			if (game_object == tmp_higher_parent)
+        			{
+        				m_can_be_drawn = false;
+        				break;
+        			}
+        		}
+        
+        		if (m_parent_iterator_._Ptr && !m_can_be_drawn)
+        		{
+        			if (m_parent_iterator_._Ptr->_Myval == tmp_higher_parent)
+        			{
+        				if (std::next(m_parent_iterator_) != tmp_world->getObjects().end())
+        				{
+        					for (auto it_game_object = std::next(m_parent_iterator_); it_game_object != tmp_world->getObjects().end(); ++it_game_object)
+        						if ((*it_game_object) == game_object)
+        						{
+        							m_can_be_drawn = false;
+        							break;
+        						}      
+        				}
+        			}
+        		}
+        	}
+        	else if (game_object->getDepth() < getParent()->getDepth())
+        		m_can_be_drawn = false;
+        	
         	//The shader will affect only the objects who are under or on the same depth.
-        	if (game_object->getDepth() >= getParent()->getDepth() && game_object->getDepth() == depth && !game_object->hasComponent("Heat_Shader"))
+        	if (m_can_be_drawn && game_object->getDepth() == depth && !game_object->hasComponent("Heat_Shader"))
         	{
         		//If the object is totally in the zone of the shader, then one draw is done.
         		if (this->is_totally_in(game_object) && m_is_in_view_)
         		{
         			if (game_object->isVisible())
         				for (const auto& component : game_object->getComponents())
-        					if (component->isVisible())
+        					if (component->isVisible() && component->getTypeName() != "RigidBody")
         						component->Draw(*m_render_texture_);
 
         			game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
@@ -315,7 +438,7 @@ void main()
         				if (game_object->isVisible())
         					for (const auto& component : game_object->getComponents())
         					{
-        						if (component->isVisible())
+        						if (component->isVisible() && component->getTypeName() != "RigidBody")
         						{
         							component->Draw(window);
         							if (m_is_in_view_)

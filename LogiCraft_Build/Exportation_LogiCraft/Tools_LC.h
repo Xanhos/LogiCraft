@@ -3,7 +3,6 @@
 
 namespace fs = std::filesystem;
 
-
 const std::string background_holder_name = "BACKGROUND_HOLDER";
 
 class ThreadManager
