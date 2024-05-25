@@ -19,9 +19,11 @@ lc::Shader::Shader::~Shader()
 bool lc::Shader::Shader::is_totally_in(const std::shared_ptr<lc::GameObject>& game_object)
 {
     if (game_object->getTransform().getPosition().x >= getParent()->getTransform().getPosition().x &&
-    game_object->getTransform().getPosition().y >= getParent()->getTransform().getPosition().y &&
-    game_object->getTransform().getPosition().x + game_object->getTransform().getSize().x <= getParent()->getTransform().getPosition().x + getParent()->getTransform().getSize().x &&
-    game_object->getTransform().getPosition().y + game_object->getTransform().getSize().y <= getParent()->getTransform().getPosition().y + getParent()->getTransform().getSize().y)
+       game_object->getTransform().getPosition().y >= getParent()->getTransform().getPosition().y &&
+       (game_object->getTransform().getPosition().x) + (game_object->getTransform().getSize().x * std::abs(game_object->getTransform().getScale().x)) <=
+       (getParent()->getTransform().getPosition().x) + (getParent()->getTransform().getSize().x * std::abs(getParent()->getTransform().getScale().x)) &&
+       (game_object->getTransform().getPosition().y) + (game_object->getTransform().getSize().y * std::abs(game_object->getTransform().getScale().y)) <=
+       (getParent()->getTransform().getPosition().y) + (getParent()->getTransform().getSize().y * std::abs(getParent()->getTransform().getScale().y)))
     {
         return true;
     }

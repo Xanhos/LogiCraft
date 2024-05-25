@@ -297,168 +297,188 @@ void main()
 
         void HeatShader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, WindowManager& window, const unsigned char& depth)
         {
-        	bool m_can_be_drawn(true);
-        	if (game_object->getDepth() == getParent()->getDepth())
-        	{
-        		const auto tmp_world = lc::GameObject::GetRoot(getParent());
+		    //The shader will affect only the objects who are under or on the same depth.
+		    if (game_object->getDepth() == depth && !game_object->hasComponent("Heat_Shader"))
+		    {
+		        bool m_can_be_drawn(true);
+		        if (game_object->getDepth() == getParent()->getDepth())
+		        {
+		            const auto tmp_world = lc::GameObject::GetRoot(getParent());
 
-        		auto tmp_higher_parent = getParent();
-        		while (tmp_higher_parent->getParent() != tmp_world)
-        		{
-        			tmp_higher_parent = tmp_higher_parent->getParent();
-        			if (game_object == tmp_higher_parent)
-        			{
-        				m_can_be_drawn = false;
-        				break;
-        			}
-        		}
-        
-        		if (m_parent_iterator_._Ptr && !m_can_be_drawn)
-        		{
-        			if (m_parent_iterator_._Ptr->_Myval == tmp_higher_parent)
-        			{
-        				if (std::next(m_parent_iterator_) != tmp_world->getObjects().end())
-        				{
-        					for (auto it_game_object = std::next(m_parent_iterator_); it_game_object != tmp_world->getObjects().end(); ++it_game_object)
-        						if ((*it_game_object) == game_object)
-        						{
-        							m_can_be_drawn = false;
-        							break;
-        						}      
-        				}
-        			}
-        		}
-        	}
-        	else if (game_object->getDepth() < getParent()->getDepth())
-        		m_can_be_drawn = false;
-        	
-        	//The shader will affect only the objects who are under or on the same depth.
-        	if (m_can_be_drawn && game_object->getDepth() == depth && !game_object->hasComponent("Heat_Shader"))
-        	{
-        		//If the object is totally in the zone of the shader, then one draw is done.
-        		if (this->is_totally_in(game_object) && m_is_in_view_)
-        		{
-        			if (game_object->isVisible())
-        				for (const auto& component : game_object->getComponents())
-        					if (component->isVisible() && component->getTypeName() != "RigidBody")
-        						component->Draw(*m_render_texture_);
+		            auto tmp_higher_parent = getParent();
+		            while (tmp_higher_parent->getParent() != tmp_world)
+		            {
+		                tmp_higher_parent = tmp_higher_parent->getParent();
+		                if (game_object == tmp_higher_parent)
+		                {
+		                    m_can_be_drawn = false;
+		                    break;
+		                }
+		            }
+		        
+		            if (m_parent_iterator_._Ptr && !m_can_be_drawn)
+		            {
+		                if (m_parent_iterator_._Ptr->_Myval == tmp_higher_parent)
+		                    if (std::next(m_parent_iterator_) != tmp_world->getObjects().end())
+		                        for (auto it_game_object = std::next(m_parent_iterator_); it_game_object != tmp_world->getObjects().end(); ++it_game_object)
+		                            if ((*it_game_object) == game_object)
+		                            {
+		                                m_can_be_drawn = false;
+		                                break;
+		                            }
+		            }
+		        }
+		        else if (game_object->getDepth() < getParent()->getDepth())
+		            m_can_be_drawn = false;
 
-        			game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
-        		}
-        		else
-        		{
-        			//If the object is not totally in the zone of the shader,
-        			//then he needs to be drawn one time in the window and a second time in the render texture.
-        			if (Tools::Collisions::rect_rect({getParent()->getTransform().getPosition(), getParent()->getTransform().getSize()},
-					{game_object->getTransform().getPosition(), game_object->getTransform().getSize()}))
-        			{
-        				if (game_object->isVisible())
-        					for (const auto& component : game_object->getComponents())
-        					{
-        						if (component->isVisible() && component->getTypeName() != "RigidBody")
-        						{
-        							component->Draw(window);
-        							if (m_is_in_view_)
-        								component->Draw(*m_render_texture_);	
-        						}
-        					}
-                
-        				game_object->isDrawByAShader(true);
-        			}
-        			else
-        			{
-        				game_object->isDrawByAShader(false); //And if the object is totally out of the bound of the zone,
-        				//he just will be drawn as normal.
-        			}
-        		}
-        	}
+		        if (m_can_be_drawn)
+		        {
+		            const auto tmp_position = game_object->getTransform().getPosition();
+		            const auto tmp_size = game_object->getTransform().getSize();
+		            
+		            game_object->getTransform().getPosition() = game_object->getTransform().getPosition() - sf::Vector2f(100.f, 100.f);
+		            game_object->getTransform().getSize() = game_object->getTransform().getSize() + sf::Vector2f(200.f, 200.f);
+		            
+		            //If the object is totally in the zone of the shader, then one draw is done.
+		            if (this->is_totally_in(game_object) && m_is_in_view_)
+		            {
+		                game_object->getTransform().getPosition() = tmp_position;
+		                game_object->getTransform().getSize() = tmp_size;
+		                
+		                if (game_object->isVisible())
+		                    for (const auto& component : game_object->getComponents())
+		                        if (component->isVisible())
+		                            component->Draw(*m_render_texture_);
 
-        	//We do the same if the object has children.
-        	for (const auto& obj_element : game_object->getObjects())
-        		this->draw_in_shader(obj_element, window, depth);
+		                game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
+		            }
+		            //If the object is not totally in the zone of the shader,
+		            //then he needs to be drawn one time in the window and a second time in the render texture.
+		            else if (Tools::Collisions::rect_rect(
+		                {getParent()->getTransform().getPosition(),
+		                    getParent()->getTransform().getSize() *
+		                        sf::Vector2f(std::abs(getParent()->getTransform().getScale().x), std::abs(getParent()->getTransform().getScale().y))},
+		                {game_object->getTransform().getPosition(),
+		                    game_object->getTransform().getSize() *
+		                        sf::Vector2f(std::abs(game_object->getTransform().getScale().x), std::abs(game_object->getTransform().getScale().y))}))
+		            {
+		                game_object->getTransform().getPosition() = tmp_position;
+		                game_object->getTransform().getSize() = tmp_size;
+		                
+		                if (game_object->isVisible())
+		                    for (const auto& component : game_object->getComponents())
+		                        if (component->isVisible())
+		                            if (m_is_in_view_)
+		                                component->Draw(*m_render_texture_);
+
+		                game_object->isDrawByAShader(false);
+		            }
+		            else
+		            {
+		                game_object->getTransform().getPosition() = tmp_position;
+		                game_object->getTransform().getSize() = tmp_size;
+		                
+		                game_object->isDrawByAShader(false);
+		            }
+		        }
+		    }
+
+		    //We do the same if the object has children.
+		    for (const auto& obj_element : game_object->getObjects())
+		        this->draw_in_shader(obj_element, window, depth);
         }
 
         void HeatShader::draw_in_shader(const std::shared_ptr<lc::GameObject>& game_object, sf::RenderTexture& window, const unsigned char& depth)
         {
-        	bool m_can_be_drawn(true);
-        	if (game_object->getDepth() == getParent()->getDepth())
-        	{
-        		const auto tmp_world = lc::GameObject::GetRoot(getParent());
+		    //The shader will affect only the objects who are under or on the same depth.
+		    if (game_object->getDepth() == depth && !game_object->hasComponent("Heat_Shader"))
+		    {
+		        bool m_can_be_drawn(true);
+		        if (game_object->getDepth() == getParent()->getDepth())
+		        {
+		            const auto tmp_world = lc::GameObject::GetRoot(getParent());
 
-        		auto tmp_higher_parent = getParent();
-        		while (tmp_higher_parent->getParent() != tmp_world)
-        		{
-        			tmp_higher_parent = tmp_higher_parent->getParent();
-        			if (game_object == tmp_higher_parent)
-        			{
-        				m_can_be_drawn = false;
-        				break;
-        			}
-        		}
-        
-        		if (m_parent_iterator_._Ptr && !m_can_be_drawn)
-        		{
-        			if (m_parent_iterator_._Ptr->_Myval == tmp_higher_parent)
-        			{
-        				if (std::next(m_parent_iterator_) != tmp_world->getObjects().end())
-        				{
-        					for (auto it_game_object = std::next(m_parent_iterator_); it_game_object != tmp_world->getObjects().end(); ++it_game_object)
-        						if ((*it_game_object) == game_object)
-        						{
-        							m_can_be_drawn = false;
-        							break;
-        						}      
-        				}
-        			}
-        		}
-        	}
-        	else if (game_object->getDepth() < getParent()->getDepth())
-        		m_can_be_drawn = false;
-        	
-        	//The shader will affect only the objects who are under or on the same depth.
-        	if (m_can_be_drawn && game_object->getDepth() == depth && !game_object->hasComponent("Heat_Shader"))
-        	{
-        		//If the object is totally in the zone of the shader, then one draw is done.
-        		if (this->is_totally_in(game_object) && m_is_in_view_)
-        		{
-        			if (game_object->isVisible())
-        				for (const auto& component : game_object->getComponents())
-        					if (component->isVisible() && component->getTypeName() != "RigidBody")
-        						component->Draw(*m_render_texture_);
+		            auto tmp_higher_parent = getParent();
+		            while (tmp_higher_parent->getParent() != tmp_world)
+		            {
+		                tmp_higher_parent = tmp_higher_parent->getParent();
+		                if (game_object == tmp_higher_parent)
+		                {
+		                    m_can_be_drawn = false;
+		                    break;
+		                }
+		            }
+		        
+		            if (m_parent_iterator_._Ptr && !m_can_be_drawn)
+		            {
+		                if (m_parent_iterator_._Ptr->_Myval == tmp_higher_parent)
+		                    if (std::next(m_parent_iterator_) != tmp_world->getObjects().end())
+		                        for (auto it_game_object = std::next(m_parent_iterator_); it_game_object != tmp_world->getObjects().end(); ++it_game_object)
+		                            if ((*it_game_object) == game_object)
+		                            {
+		                                m_can_be_drawn = false;
+		                                break;
+		                            }
+		            }
+		        }
+		        else if (game_object->getDepth() < getParent()->getDepth())
+		            m_can_be_drawn = false;
 
-        			game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
-        		}
-        		else
-        		{
-        			//If the object is not totally in the zone of the shader,
-        			//then he needs to be drawn one time in the window and a second time in the render texture.
-        			if (Tools::Collisions::rect_rect({getParent()->getTransform().getPosition(), getParent()->getTransform().getSize()},
-					{game_object->getTransform().getPosition(), game_object->getTransform().getSize()}))
-        			{
-        				if (game_object->isVisible())
-        					for (const auto& component : game_object->getComponents())
-        					{
-        						if (component->isVisible() && component->getTypeName() != "RigidBody")
-        						{
-        							component->Draw(window);
-        							if (m_is_in_view_)
-        								component->Draw(*m_render_texture_);	
-        						}
-        					}
-                
-        				game_object->isDrawByAShader(true);
-        			}
-        			else
-        			{
-        				game_object->isDrawByAShader(false); //And if the object is totally out of the bound of the zone,
-        				//he just will be drawn as normal.
-        			}
-        		}
-        	}
+		        if (m_can_be_drawn)
+		        {
+		            const auto tmp_position = game_object->getTransform().getPosition();
+		            const auto tmp_size = game_object->getTransform().getSize();
+		            
+		            game_object->getTransform().getPosition() = game_object->getTransform().getPosition() - sf::Vector2f(100.f, 100.f);
+		            game_object->getTransform().getSize() = game_object->getTransform().getSize() + sf::Vector2f(200.f, 200.f);
+		            
+		            //If the object is totally in the zone of the shader, then one draw is done.
+		            if (this->is_totally_in(game_object) && m_is_in_view_)
+		            {
+		                game_object->getTransform().getPosition() = tmp_position;
+		                game_object->getTransform().getSize() = tmp_size;
+		                
+		                if (game_object->isVisible())
+		                    for (const auto& component : game_object->getComponents())
+		                        if (component->isVisible())
+		                            component->Draw(*m_render_texture_);
 
-        	//We do the same if the object has children.
-        	for (const auto& obj_element : game_object->getObjects())
-        		this->draw_in_shader(obj_element, window, depth);
+		                game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
+		            }
+		            //If the object is not totally in the zone of the shader,
+		            //then he needs to be drawn one time in the window and a second time in the render texture.
+		            else if (Tools::Collisions::rect_rect(
+		                {getParent()->getTransform().getPosition(),
+		                    getParent()->getTransform().getSize() *
+		                        sf::Vector2f(std::abs(getParent()->getTransform().getScale().x), std::abs(getParent()->getTransform().getScale().y))},
+		                {game_object->getTransform().getPosition(),
+		                    game_object->getTransform().getSize() *
+		                        sf::Vector2f(std::abs(game_object->getTransform().getScale().x), std::abs(game_object->getTransform().getScale().y))}))
+		            {
+		                game_object->getTransform().getPosition() = tmp_position;
+		                game_object->getTransform().getSize() = tmp_size;
+		                
+		                if (game_object->isVisible())
+		                    for (const auto& component : game_object->getComponents())
+		                        if (component->isVisible())
+		                            if (m_is_in_view_)
+		                                component->Draw(*m_render_texture_);
+
+		                game_object->isDrawByAShader(false);
+		            }
+		            else
+		            {
+		                game_object->getTransform().getPosition() = tmp_position;
+		                game_object->getTransform().getSize() = tmp_size;
+		                
+		                game_object->isDrawByAShader(false);
+		            }
+				}
+			}
+
+		    //We do the same if the object has children.
+		    for (const auto& obj_element : game_object->getObjects())
+		        this->draw_in_shader(obj_element, window, depth);
         }
     }
 }
