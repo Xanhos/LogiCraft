@@ -981,6 +981,16 @@ void bt::ActionNode::Attack::load(std::ifstream& file, std::shared_ptr<lc::GameO
 		m_attack_node_ = bt::Node::New(bt::ActionNode::Retract(owner, scene->getObject("PLAYER")));
 		std::cout << "Retract loaded" << std::endl;
 	}
+	else if (attack_name == "LavaShooting")
+	{
+		m_attack_node_ = bt::Node::New(bt::ActionNode::LavaShooting(owner, scene->getObject("PLAYER")));
+		std::cout << "LavaShooting loaded" << std::endl;
+	}
+	else if (attack_name == "Exploding")
+	{
+		m_attack_node_ = bt::Node::New(bt::ActionNode::Exploding(owner, scene->getObject("PLAYER")));
+		std::cout << "Exploding loaded" << std::endl;
+	}
     else
     {
     	m_attack_node_ = bt::Node::New(bt::ActionNode::NodeFunc([]{return true;}));
@@ -1622,7 +1632,7 @@ void bt::ActionNode::Exploding::setup(NodePtr node)
 				if (node_cast->m_bool_explode_)
 				{
 
-					
+					node_cast->m_agent_.lock()->getTransform().getOrigin() = sf::Vector2f(665, 496);
 					
 
 					node_cast->m_bool_explode_ = false;
@@ -1667,8 +1677,8 @@ void bt::ActionNode::LavaShooting::setup(NodePtr node)
 
 				if (node_cast->m_bool_shoot_)
 				{
-
-
+					
+					node_cast->m_agent_.lock()->getTransform().getOrigin() = sf::Vector2f(601, 0);
 
 					 
 					node_cast->m_bool_shoot_ = false;
