@@ -1,4 +1,5 @@
 #include "HeatShader.h"
+#include "ToolsBar.h"
 
 namespace lc
 {
@@ -117,7 +118,7 @@ namespace lc
         		m_render_texture_->clear(sf::Color::Black);   
         	}
 
-	        for (int i = 12 - 1; i >= 0; --i)
+	        for (int i = static_cast<int>(ToolsBar::GetLayers().size()) - 1; i >= 0; --i)
 	        {
 	        	for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
 	        		this->draw_in_shader(obj_element, window, i);   
@@ -166,7 +167,7 @@ namespace lc
         	}
 
         	//Display of the object in the shader.
-	        for (int i = 12 - 1; i >= 0; --i)
+	        for (int i = static_cast<int>(ToolsBar::GetLayers().size()) - 1; i >= 0; --i)
 	        {
 	        	for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
 	        		this->draw_in_shader(obj_element, window, i);   

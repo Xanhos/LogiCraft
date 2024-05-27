@@ -118,7 +118,7 @@ void lc::Shader::WaterShader::Draw(WindowManager& window)
     }
 
     //Display of the object in the shader.
-    for (int i = 12 - 1; i >= 0; --i)
+    for (int i = static_cast<int>(Tools::s_layers.size()) - 1; i >= 0; --i)
     {
         for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
             this->draw_in_shader(obj_element, window, i);   
@@ -168,7 +168,7 @@ void lc::Shader::WaterShader::Draw(sf::RenderTexture& window)
     }
 
     //Display of the object in the shader.
-    for (int i = 12 - 1; i >= 0; --i)
+    for (int i = static_cast<int>(Tools::s_layers.size()) - 1; i >= 0; --i)
     {
         for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
             this->draw_in_shader(obj_element, window, i);   
