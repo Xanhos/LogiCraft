@@ -135,10 +135,7 @@ void lc::GameObject::SaveRenderer(sf::RenderTexture& texture, int _depth, bool& 
 	}
 	for (auto& objects : m_objects)
 	{
-		if (objects->getDepth() == _depth)
-		{
-			objects->SaveRenderer(texture, _depth, _object_has_been_drew,_view_rect);
-		}
+		objects->SaveRenderer(texture, _depth, _object_has_been_drew,_view_rect);	
 	}
 }
 

@@ -20,7 +20,8 @@ public:
 	
 	template <typename Func>
 	void AddNewThread(const Func& func);
-	void Update();	
+	void Update();
+	size_t GetThreadSize() const {return m_thread_list_.size();}
 };
 
 template <typename Func>

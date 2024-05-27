@@ -47,11 +47,41 @@ SOFTWARE.
 #include <mutex>
 #include <sstream>
 #include <fstream>
+#include "thread"
 
 #undef CreateWindow
 
 using namespace ImGui;
 namespace fs = std::filesystem;
+
+class ThreadManager
+{
+	std::list<std::pair<std::thread,std::shared_ptr<bool>>> m_thread_list_;
+	unsigned char m_thread_limit_;
+public:
+	ThreadManager() : m_thread_limit_(10) {}
+	ThreadManager(const unsigned char& thread_limit) : m_thread_limit_(thread_limit){}
+	~ThreadManager();
+	ThreadManager operator=(const ThreadManager& thread) = delete;
+	
+	template <typename Func>
+	void AddNewThread(const Func& func);
+	void Update();	
+	size_t GetThreadSize() const {return m_thread_list_.size();}
+};
+
+template <typename Func>
+void ThreadManager::AddNewThread(const Func& func)
+{
+	while(m_thread_list_.size() == m_thread_limit_)
+		this->Update();
+	auto is_thread_finish = std::make_shared<bool>(false);
+	m_thread_list_.push_back({std::thread([func, is_thread_finish]
+	{
+		func();
+		*is_thread_finish = true;
+	}),is_thread_finish});
+}
 
 
 class FileWriter : public std::ofstream
