@@ -350,6 +350,12 @@ void lc::GameObject::Draw(WindowManager& _window)
 
 void lc::GameObject::Draw(sf::RenderTexture& _renderer)
 {
+	if(getParent() && getName() != PLAYER_NAME && !m_first_pass_init_[1])
+	{
+		m_before_simulate_parallax_pos_ = getTransform().getPosition();
+		getTransform().getPosition() += GetOffset(GetRoot(getParent()), m_depth);
+	}
+	
 	for (auto& object : m_objects)
 		if (object->isVisible())
 			object->Draw(_renderer);
@@ -358,6 +364,8 @@ void lc::GameObject::Draw(sf::RenderTexture& _renderer)
 		if (component->isVisible() && !m_isDrawByAShader)
 			component->Draw(_renderer);
 
+	if(getParent() && getName() != PLAYER_NAME && !m_first_pass_init_[1])
+		getTransform().getPosition() = m_before_simulate_parallax_pos_;
 }
 
 void lc::GameObject::Draw(sf::RenderTexture& _renderer, unsigned char _depth)
