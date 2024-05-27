@@ -42,7 +42,7 @@ SOFTWARE.
 #include "GameObject.h"
 
 const sf::Vector2f SCREEN_SIZE(3840.f, 2160.f);
-constexpr unsigned short SCREEN_LIMIT = 32;
+constexpr unsigned short SCREEN_LIMIT = 65535;
 
 class Viewport
 {
@@ -281,7 +281,7 @@ private:
 	float m_selectedTimer;
 	float timer = 0.f;
 
-	short m_screenZoneUnused;
+	unsigned short m_screenZoneUnused;
 
 	bool m_optionIsOpen;
 
