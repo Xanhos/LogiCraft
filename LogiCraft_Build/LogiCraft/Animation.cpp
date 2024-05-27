@@ -648,6 +648,12 @@ namespace lc
 			tmp_texture->getShape().setScale(getParent()->getTransform().getScale());
 			tmp_texture->getShape().setRotation(getParent()->getTransform().getRotation());
 
+			m_renderer.setOrigin(getParent()->getTransform().getOrigin());
+			m_renderer.setScale(getParent()->getTransform().getScale());
+			m_renderer.setRotation(getParent()->getTransform().getRotation());
+
+			m_renderer.setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
+
 			tmp_texture->getShape().setPosition(getParent()->getTransform().getPosition() + m_relativePosition);
 			window.draw(tmp_texture->getShape());
 
