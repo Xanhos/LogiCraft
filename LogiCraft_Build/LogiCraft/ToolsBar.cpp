@@ -285,6 +285,7 @@ void ToolsBar::Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _v
 }
 void ToolsBar::Export(std::shared_ptr<lc::GameObject> _game_object, Viewports& _viewports, sf::RenderWindow& _window)
 {
+	_game_object->ResetExport();
 	Tools::s_filePool.clear();
 	std::ofstream save("../Ressources/" + std::string(m_path) + "/save.lcp");
 	FileWriter exportation("../Ressources/" + std::string(m_path) + "/export.lcg");
@@ -303,13 +304,13 @@ void ToolsBar::Export(std::shared_ptr<lc::GameObject> _game_object, Viewports& _
 	_game_object->NeedToBeExported({"AI", "RigidBody", "Particles", "Animation", "Event", "Button", "Player Spawn", "DisplayCollider","Heat_Shader", "Light_Shader", "Water_Shader"});
 	_game_object->Save(save, exportation, render_texture, s_actualLayer.first);
 
+	ThreadManager thread_manager(std::count_if(_viewports.getAllScreenzone().begin(),_viewports.getAllScreenzone().end(), [](ScreenZone& screen){return screen.isUsed();}));
 	
-	std::list<std::thread> thread_list;
 	for (auto& screen : _viewports.getAllScreenzone())
 	{
 		if (screen.isUsed())
 		{
-			thread_list.push_back(std::thread([&]
+			thread_manager.AddNewThread([&]
 			{
 				sf::RenderTexture render_texture_thread;				
 				render_texture_thread.create(static_cast<unsigned int>(SCREEN_SIZE.x), static_cast<unsigned int>(SCREEN_SIZE.y));
@@ -327,11 +328,12 @@ void ToolsBar::Export(std::shared_ptr<lc::GameObject> _game_object, Viewports& _
 					   image.saveToFile("../Ressources/" + std::string(m_path) + "/" + std::string(std::to_string(screen.getScreenIndex().x) + "_" + std::to_string(screen.getScreenIndex().y)) + "_" + std::string(m_path) + "_layer_" + std::to_string(depth) + ".png");
 					}
 				}
-			}));
+			});
 		}
 	}
-	for(auto& i : thread_list)
-		i.join();
+
+	while(thread_manager.GetThreadSize())
+		thread_manager.Update();
 	
 	_game_object->ResetExport();
 	save.close();
