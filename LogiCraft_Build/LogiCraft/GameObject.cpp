@@ -126,8 +126,7 @@ void lc::GameObject::SaveRenderer(sf::RenderTexture& texture, int _depth, bool& 
 {
 	if(!getNeedToBeExported())
 	{
-		
-		if(Tools::Collisions::rect_rect(_view_rect,{getTransform().getPosition(),getTransform().getSize()}) and _depth == getDepth())
+		if( _depth == getDepth())
 			for (auto& components : m_components)
 			{
 				components->SaveRenderer(texture, _depth);
