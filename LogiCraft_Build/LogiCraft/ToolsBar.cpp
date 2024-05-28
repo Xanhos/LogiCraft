@@ -285,7 +285,6 @@ void ToolsBar::Save(std::shared_ptr <lc::GameObject> _game_object, Viewports& _v
 }
 void ToolsBar::Export(std::shared_ptr<lc::GameObject> _game_object, Viewports& _viewports, sf::RenderWindow& _window)
 {
-	_game_object->ResetExport();
 	Tools::s_filePool.clear();
 	std::ofstream save("../Ressources/" + std::string(m_path) + "/save.lcp");
 	FileWriter exportation("../Ressources/" + std::string(m_path) + "/export.lcg");

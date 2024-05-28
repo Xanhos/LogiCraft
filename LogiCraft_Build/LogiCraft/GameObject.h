@@ -310,6 +310,10 @@ namespace lc
 		void CheckMaxSize();
 
 		bool& getNeedToBeExported() { return m_needToBeExported; }
+
+		bool* getFirstPassInit() { return m_first_pass_init_; }
+
+		sf::Vector2f& getBeforeSimulateParallaxPos() { return m_before_simulate_parallax_pos_; }
 #pragma endregion
 	private:
 		inline static unsigned int m_generalID = 0u;

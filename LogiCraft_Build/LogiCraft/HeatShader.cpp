@@ -334,8 +334,14 @@ void main()
 
 		        if (m_can_be_drawn)
 		        {
-		            const auto tmp_position = game_object->getTransform().getPosition();
-		            const auto tmp_size = game_object->getTransform().getSize();
+		        	if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+		        	{
+		        		game_object->getBeforeSimulateParallaxPos() = game_object->getTransform().getPosition();
+		        		game_object->getTransform().getPosition() += game_object->GetOffset(lc::GameObject::GetRoot(game_object->getParent()), game_object->getDepth());
+		        	}
+
+		        	const auto tmp_position = game_object->getTransform().getPosition();
+		        	const auto tmp_size = game_object->getTransform().getSize();
 		            
 		            game_object->getTransform().getPosition() = game_object->getTransform().getPosition() - sf::Vector2f(100.f, 100.f);
 		            game_object->getTransform().getSize() = game_object->getTransform().getSize() + sf::Vector2f(200.f, 200.f);
@@ -351,6 +357,9 @@ void main()
 		                        if (component->isVisible())
 		                            component->Draw(*m_render_texture_);
 
+		            	if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+		            		game_object->getTransform().getPosition() = game_object->getBeforeSimulateParallaxPos();
+
 		                game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
 		            }
 		            //If the object is not totally in the zone of the shader,
@@ -365,19 +374,25 @@ void main()
 		            {
 		                game_object->getTransform().getPosition() = tmp_position;
 		                game_object->getTransform().getSize() = tmp_size;
-		                
+		            	
 		                if (game_object->isVisible())
 		                    for (const auto& component : game_object->getComponents())
 		                        if (component->isVisible())
 		                            if (m_is_in_view_)
 		                                component->Draw(*m_render_texture_);
 
+		            	if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+		            		game_object->getTransform().getPosition() = game_object->getBeforeSimulateParallaxPos();
+		            	
 		                game_object->isDrawByAShader(false);
 		            }
 		            else
 		            {
 		                game_object->getTransform().getPosition() = tmp_position;
 		                game_object->getTransform().getSize() = tmp_size;
+
+		            	if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+		            		game_object->getTransform().getPosition() = game_object->getBeforeSimulateParallaxPos();
 		                
 		                game_object->isDrawByAShader(false);
 		            }
@@ -427,8 +442,14 @@ void main()
 
 		        if (m_can_be_drawn)
 		        {
-		            const auto tmp_position = game_object->getTransform().getPosition();
-		            const auto tmp_size = game_object->getTransform().getSize();
+		        	if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+		        	{
+		        		game_object->getBeforeSimulateParallaxPos() = game_object->getTransform().getPosition();
+		        		game_object->getTransform().getPosition() += game_object->GetOffset(lc::GameObject::GetRoot(game_object->getParent()), game_object->getDepth());
+		        	}
+
+		        	const auto tmp_position = game_object->getTransform().getPosition();
+		        	const auto tmp_size = game_object->getTransform().getSize();
 		            
 		            game_object->getTransform().getPosition() = game_object->getTransform().getPosition() - sf::Vector2f(100.f, 100.f);
 		            game_object->getTransform().getSize() = game_object->getTransform().getSize() + sf::Vector2f(200.f, 200.f);
@@ -443,6 +464,9 @@ void main()
 		                    for (const auto& component : game_object->getComponents())
 		                        if (component->isVisible())
 		                            component->Draw(*m_render_texture_);
+		            	
+		            	if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+		            		game_object->getTransform().getPosition() = game_object->getBeforeSimulateParallaxPos();
 
 		                game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
 		            }
@@ -465,12 +489,18 @@ void main()
 		                            if (m_is_in_view_)
 		                                component->Draw(*m_render_texture_);
 
+		            	if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+		            		game_object->getTransform().getPosition() = game_object->getBeforeSimulateParallaxPos();
+
 		                game_object->isDrawByAShader(false);
 		            }
 		            else
 		            {
 		                game_object->getTransform().getPosition() = tmp_position;
 		                game_object->getTransform().getSize() = tmp_size;
+
+		            	if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+		            		game_object->getTransform().getPosition() = game_object->getBeforeSimulateParallaxPos();
 		                
 		                game_object->isDrawByAShader(false);
 		            }
