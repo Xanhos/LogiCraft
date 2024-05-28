@@ -317,6 +317,12 @@ void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObjec
 
         if (m_can_be_drawn)
         {
+            if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+            {
+                game_object->getBeforeSimulateParallaxPos() = game_object->getTransform().getPosition();
+                game_object->getTransform().getPosition() += game_object->GetOffset(lc::GameObject::GetRoot(game_object->getParent()), game_object->getDepth());
+            }
+
             const auto tmp_position = game_object->getTransform().getPosition();
             const auto tmp_size = game_object->getTransform().getSize();
             
@@ -333,6 +339,9 @@ void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObjec
                     for (const auto& component : game_object->getComponents())
                         if (component->isVisible())
                             component->Draw(*m_render_texture_);
+
+                if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+                    game_object->getTransform().getPosition() = game_object->getBeforeSimulateParallaxPos();
 
                 game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
             }
@@ -355,12 +364,18 @@ void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObjec
                             if (m_is_in_view_)
                                 component->Draw(*m_render_texture_);
 
+                if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+                    game_object->getTransform().getPosition() = game_object->getBeforeSimulateParallaxPos();
+
                 game_object->isDrawByAShader(false);
             }
             else
             {
                 game_object->getTransform().getPosition() = tmp_position;
                 game_object->getTransform().getSize() = tmp_size;
+
+                if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+                    game_object->getTransform().getPosition() = game_object->getBeforeSimulateParallaxPos();
                 
                 game_object->isDrawByAShader(false);
             }
@@ -410,6 +425,12 @@ void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObjec
 
         if (m_can_be_drawn)
         {
+            if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+            {
+                game_object->getBeforeSimulateParallaxPos() = game_object->getTransform().getPosition();
+                game_object->getTransform().getPosition() += game_object->GetOffset(lc::GameObject::GetRoot(game_object->getParent()), game_object->getDepth());
+            }
+            
             const auto tmp_position = game_object->getTransform().getPosition();
             const auto tmp_size = game_object->getTransform().getSize();
             
@@ -426,6 +447,9 @@ void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObjec
                     for (const auto& component : game_object->getComponents())
                         if (component->isVisible())
                             component->Draw(*m_render_texture_);
+
+                if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+                    game_object->getTransform().getPosition() = game_object->getBeforeSimulateParallaxPos();
 
                 game_object->isDrawByAShader(true); //The object is made invisible so is not drawn two times.
             }
@@ -448,12 +472,18 @@ void lc::Shader::WaterShader::draw_in_shader(const std::shared_ptr<lc::GameObjec
                             if (m_is_in_view_)
                                 component->Draw(*m_render_texture_);
 
+                if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+                    game_object->getTransform().getPosition() = game_object->getBeforeSimulateParallaxPos();
+
                 game_object->isDrawByAShader(false);
             }
             else
             {
                 game_object->getTransform().getPosition() = tmp_position;
                 game_object->getTransform().getSize() = tmp_size;
+
+                if(game_object->getParent() && game_object->getName() != PLAYER_NAME && !game_object->getFirstPassInit()[1])
+                    game_object->getTransform().getPosition() = game_object->getBeforeSimulateParallaxPos();
                 
                 game_object->isDrawByAShader(false);
             }
