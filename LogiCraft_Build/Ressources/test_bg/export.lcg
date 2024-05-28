@@ -233,8 +233,8 @@ Components
 0 0 0 3108 2096 drone_sprite_sheet.png 0 0
 
 6 Animation drone_sprite_sheet Idle 5
-Idle 0 1735 225 361 10 0 0.155 10
 Disparition 0 878 258 496 10 0 0.15 10
+Idle 0 1735 225 361 10 0 0.155 10
 Dash 0 496 323 382 4 0 0.15 4
 Apparition 0 0 258 496 10 0 0.15 10
 IdleCible 0 1374 225 361 10 0 0.15 10
@@ -291,7 +291,7 @@ Shooting 0 4444 767 273 8 2 0.05 10
 1 
 0 2
 1 1
-1 3
+1 4
 2007 1 Explosion
 2006 1
 0 3
@@ -312,12 +312,16 @@ Shooting 0 4444 767 273 8 2 0.05 10
 0 4
 5006 0 ResetRigidBody
 5002 0 Animation Idle 0 0
-2003 1 2.5
+2006 1
+2003 1 0.5
 
 5009 0 Shooting
-2003 1 6
+2003 1 2
 
 5009 0 Explosion
+0 2
+5006 0 ResetRigidBody
+5002 0 Animation Idle 0 0
 5006 0 damageBox
 
 }
