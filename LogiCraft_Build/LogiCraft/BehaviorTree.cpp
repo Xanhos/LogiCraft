@@ -39,7 +39,9 @@ SOFTWARE.
 #include <tuple>
 #include <tuple>
 #include <tuple>
+#include <tuple>
 #include "Animation.h"
+#include "Particule.h"
 
 std::unordered_map<std::string, int> PatronNode::s_node_container_ = {};
 std::unordered_map<std::string, int> PatronNode::s_condition_container_ = {};
@@ -81,11 +83,12 @@ void PatronNode::SetupAllNode()
 	pushNode("SHOT");
 	pushNode("JUMP");	
 	pushNode("CHANGE STATE");
+	pushNode("PLAY PARTICLES");
 
 	s_decorator_node_start_ = s_node_container_["INVERSER"];//Were the decorator node start
 	s_action_node_start_ = s_node_container_["WANDER"];//Were the action node start and were the decorator node stop (leaf node)
 	s_decorator_node_end_ = s_node_container_["IF STATE IS"] + 1;
-	s_action_node_end_ = s_node_container_["CHANGE STATE"] + 1;
+	s_action_node_end_ = s_node_container_["PLAY PARTICLES"] + 1;
 	
 
 	
@@ -588,6 +591,69 @@ void PatronNode::SetupAllNode()
 			file >> std::get<0>(tuple) >> std::get<1>(tuple) >> std::get<2>(tuple) >> std::get<3>(tuple);
 			node->m_decorator_data_ = tuple;
 			};
+	}
+	
+	//PLAY_PARTICLES
+	{
+		typedef std::tuple<std::weak_ptr<lc::Particles>,std::string, char> bt_particle;
+		s_decorator_init_method_["PLAY PARTICLES"] = [](PatronNode* node) {
+			node->m_decorator_data_ = bt_particle();
+		};
+		s_decorator_copy_method_["PLAY PARTICLES"] = [](PatronNode* node, PatronNode* node_copied) {
+			node->m_decorator_data_ = std::any_cast<bt_particle>(node_copied->m_decorator_data_);
+		};
+		s_decorator_update_method_["PLAY PARTICLES"] = [](PatronNode* node) {
+			auto tuple = std::any_cast<bt_particle>(node->m_decorator_data_);
+			if(std::get<0>(tuple).expired() and !std::get<1>(tuple).empty())
+			{
+				if(!node->m_game_object_.expired())
+				{
+					auto object = node->m_game_object_.lock();
+					for (const auto& component : object->getComponents())
+					{
+						if(auto particles = std::dynamic_pointer_cast<lc::Particles>(component))
+						{
+							if(particles->getName() == std::get<1>(tuple))
+							{
+								std::get<0>(tuple) = particles;
+								std::get<1>(tuple) = particles->getName();
+							}
+						}					
+					}
+				}
+			}
+			if(!node->m_game_object_.expired())
+			{
+				auto object = node->m_game_object_.lock();
+				if(ImGui::BeginCombo("Choose Particles", std::get<0>(tuple).expired() ? "Select Particles" : std::get<0>(tuple).lock()->getName().c_str()))
+				{
+					bool is_selected = false;
+					for (const auto& component : object->getComponents())
+					{
+						if(auto particles = std::dynamic_pointer_cast<lc::Particles>(component))
+						{
+							if(ImGui::Selectable(particles->getName().c_str(),&is_selected,ImGuiSelectableFlags_SelectOnClick))
+							{
+								std::get<0>(tuple) = particles;
+								std::get<1>(tuple) = particles->getName();
+							}
+						}					
+					}
+					ImGui::EndCombo();
+				}				
+			}		
+			node->m_decorator_data_ = tuple;
+		};
+		s_decorator_save_method_["PLAY PARTICLES"] = [](PatronNode* node, std::ofstream& file) {
+			auto tuple = std::any_cast<bt_particle>(node->m_decorator_data_);
+			file << std::get<1>(tuple) << " ";
+
+		};
+		s_decorator_load_method_["PLAY PARTICLES"] = [](PatronNode* node, std::ifstream& file) {
+			bt_particle tuple;
+			file >> std::get<1>(tuple);
+			node->m_decorator_data_ = tuple;
+		};
 	}
 
 	//ROTATE_TO

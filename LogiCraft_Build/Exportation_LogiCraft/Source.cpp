@@ -90,8 +90,7 @@ int main()
 				image_list.push_back(pair);
 			}
 		}
-
-
+		
 		for(auto& it : image_list)
 		{
 			std::cout << "Checking " << it.first << "\n";
