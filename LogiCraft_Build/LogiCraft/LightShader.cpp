@@ -225,7 +225,7 @@ void lc::Shader::LightShader::Draw(sf::RenderTexture& window)
         		if (tmp_light->m_type_ != light_type::OFF && tmp_light->getParent()->is_in_window_view(window) || light == tmp_depth_light_list.begin())
 	            {
         			//Set the light position with the view
-        			const sf::Vector2i tmp_light_position_view(window.mapCoordsToPixel(tmp_light->getParent()->getTransform().getPosition(), tmp_window_view));
+        			const sf::Vector2i tmp_light_position_view(window.mapCoordsToPixel(tmp_light->getParent()->getTransform().getPosition() + m_relativePosition, tmp_window_view));
         			m_shader_->setUniform("lights_info[" + std::to_string(tmp_light_index) + "].m_position_",
 						sf::Vector3f(static_cast<float>(tmp_light_position_view.x), static_cast<float>(tmp_light_position_view.y), 10.f));
 
@@ -330,7 +330,9 @@ void lc::Shader::LightShader::Save(std::ofstream& save, sf::RenderTexture& textu
 	 " " << m_max_radius_rand_ <<
 	 " " << m_min_radius_rand_ <<
 	 " " << m_max_flicker_timer_ <<
-	 " " << m_min_flicker_timer_;
+	 " " << m_min_flicker_timer_ <<
+	 " " << m_relativePosition <<
+	 " " << m_type_;
 }
 
 void lc::Shader::LightShader::Export(std::ofstream& exportation)
@@ -347,11 +349,14 @@ void lc::Shader::LightShader::Export(std::ofstream& exportation)
 	 " " << m_max_radius_rand_ <<
 	 " " << m_min_radius_rand_ <<
 	 " " << m_max_flicker_timer_ <<
-	 " " << m_min_flicker_timer_;
+	 " " << m_min_flicker_timer_ <<
+	 " " << m_relativePosition <<
+	 " " << m_type_;
 }
 
 void lc::Shader::LightShader::Load(std::ifstream& load)
 {
+	int type(0);
 	load >>
 	  m_color_.x >>
 	  m_color_.y >>
@@ -363,7 +368,10 @@ void lc::Shader::LightShader::Load(std::ifstream& load)
 	  m_max_radius_rand_ >>
 	  m_min_radius_rand_ >>
 	  m_max_flicker_timer_ >>
-	  m_min_flicker_timer_;
+	  m_min_flicker_timer_ >>
+	  m_relativePosition >>
+	  type;
+	m_type_ = static_cast<light_type>(type);
 }
 
 std::shared_ptr<lc::GameComponent> lc::Shader::LightShader::Clone()
@@ -383,7 +391,9 @@ void lc::Shader::LightShader::setHierarchieFunc()
 		ImGui::SliderFloat("General Light Alpha", &LightShader::s_ambient_light_.x, 0.f, 1.f);
 		LightShader::s_ambient_light_ =
 			{ LightShader::s_ambient_light_.x, LightShader::s_ambient_light_.x, LightShader::s_ambient_light_.x };
-		
+
+		ImGui::DragFloat2("Relative Position",m_relativePosition);
+			
 		ImGui::ColorEdit3("Color", m_color_, ImGuiColorEditFlags_InputRGB);
 
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5.f);
@@ -396,10 +406,10 @@ void lc::Shader::LightShader::setHierarchieFunc()
 
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5.f);
 
-		ImGui::DragFloat("Lerp Speed", &m_lerp_speed_);
-		ImGui::DragFloat("Radius Gap", &m_radius_gap_);
+		// ImGui::DragFloat("Lerp Speed", &m_lerp_speed_);
+		// ImGui::DragFloat("Radius Gap", &m_radius_gap_);
 
-		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5.f);
+		//ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 5.f);
 		
 		ImGui::DragFloat("Max Radius Rand", &m_max_radius_rand_);
 		ImGui::DragFloat("Min Radius Rand", &m_min_radius_rand_);
@@ -408,6 +418,19 @@ void lc::Shader::LightShader::setHierarchieFunc()
 		
 		ImGui::DragFloat("Max Flicker Rand", &m_max_flicker_timer_);
 		ImGui::DragFloat("Min Flicker Rand", &m_min_flicker_timer_);
+
+		std::string light_type[] {"OFF","NORMAL","FLICKERING","FLAME"};
+		if(ImGui::BeginCombo("Select light type",light_type[static_cast<int>(m_type_)].c_str()))
+		{
+			for(int i = 0;i < 4; i++)
+			{
+				if(Selectable(light_type[static_cast<int>(i)].c_str()))
+					m_type_ = static_cast<enum light_type>(i);
+			}
+			ImGui::EndCombo();
+		}
+		
+		
 	};
 }
 
