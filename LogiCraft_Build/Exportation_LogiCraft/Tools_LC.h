@@ -1,8 +1,10 @@
 #pragma once
 #include "SFML_ENGINE/Tools.h"
 
-namespace fs = std::filesystem;
+typedef std::map<unsigned char, std::string> Layers;
+typedef std::pair<unsigned char, std::string> Layer;
 
+namespace fs = std::filesystem;
 
 const std::string background_holder_name = "BACKGROUND_HOLDER";
 
@@ -18,7 +20,8 @@ public:
 	
 	template <typename Func>
 	void AddNewThread(const Func& func);
-	void Update();	
+	void Update();
+	size_t GetThreadSize() const {return m_thread_list_.size();}
 };
 
 template <typename Func>
@@ -74,7 +77,8 @@ public:
 
 namespace Tools
 {
-
+	const Layers s_layers = { {13, "BackGround 9"},{12, "BackGround 8"},{11, "BackGround 7"},{10,"BackGround 6"},{ 9, "BackGround 5"},{8, "BackGround 4"},{7, "BackGround 3"},{ 6, "BackGround 2"},{5, "BackGround 1"},{4, "Player Plan"},{3, "Front Plan 4"}, {2, "Front Plan 3"}, {1, "Front Plan 2"}, {0, "Front Plan 1"} };
+	
 	namespace Collisions
 	{
 		bool lineRect(sf::FloatRect line, sf::FloatRect rect);

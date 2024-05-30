@@ -42,7 +42,7 @@ SOFTWARE.
 #include "GameObject.h"
 
 const sf::Vector2f SCREEN_SIZE(3840.f, 2160.f);
-constexpr unsigned short SCREEN_LIMIT = 32;
+constexpr unsigned short SCREEN_LIMIT = 65535;
 
 class Viewport
 {
@@ -156,7 +156,8 @@ public:
 	auto& getAllScreenzone() { return m_screenZones; }
 	auto& getActualSelectedObjectNumber() { return m_actualSelectedObjectNumber; }
 	bool& wantToPlaceAnObject() { return m_wantToPlaceAnObject; }
-
+	static sf::Color& getBackGroundColor() {return  s_background_color;}
+	
 	auto getActualFocusViewport() { return m_actualFocusViewport; }
 	auto getActualUpdatedViewport() 
 	{ 
@@ -280,7 +281,7 @@ private:
 	float m_selectedTimer;
 	float timer = 0.f;
 
-	short m_screenZoneUnused;
+	unsigned short m_screenZoneUnused;
 
 	bool m_optionIsOpen;
 
@@ -290,4 +291,6 @@ private:
 	bool m_isMovementsLocked;
 	bool m_isZoomsLocked;
 	bool m_isViewportsLocked;
+
+	inline static sf::Color s_background_color = sf::Color(0.f,0.f,0.f,255.f);
 };

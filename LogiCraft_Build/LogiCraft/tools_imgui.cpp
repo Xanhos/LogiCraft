@@ -35,6 +35,25 @@ SOFTWARE.
 #include "tools_imgui.h"
 #include "nfd.h"
 
+ThreadManager::~ThreadManager()
+{
+	while(!m_thread_list_.empty())
+		this->Update();
+}
+
+void ThreadManager::Update()
+{
+	for(auto it = m_thread_list_.begin();it != m_thread_list_.end();)
+	{
+		if(*it->second)
+		{
+			it->first.join();
+			it = m_thread_list_.erase(it);
+		}
+	}
+}
+
+
 bool Tools::camera_grabbed = false;
 
 Tools::Renderer::Renderer()

@@ -183,7 +183,10 @@ void lc::Texture::Draw(WindowManager& _window)
 	if (m_displayThumbnail)
 		m_renderer.setSize(m_thumbnailSize);
 
-	_window.draw(m_renderer);
+	if (!getParent())
+		_window.draw(m_renderer);
+	else if (getParent()->is_in_window_view(_window))
+		_window.draw(m_renderer);
 }
 
 void lc::Texture::Draw(sf::RenderTexture& _window)
@@ -198,7 +201,10 @@ void lc::Texture::Draw(sf::RenderTexture& _window)
 
 	m_renderer.setSize((sf::Vector2f)m_textureRect.getSize());
 
-	_window.draw(m_renderer);
+	if (!getParent())
+		_window.draw(m_renderer);
+	else if (getParent()->is_in_window_view(_window))
+		_window.draw(m_renderer);
 }
 
 std::shared_ptr<lc::GameComponent> lc::Texture::Clone()

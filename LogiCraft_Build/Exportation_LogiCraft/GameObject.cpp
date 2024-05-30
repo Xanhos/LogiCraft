@@ -51,17 +51,20 @@ SOFTWARE.
 #include "PlayerSpawn.h"
 
 lc::GameObject::GameObject()
-	: m_ID(m_generalID++), m_depth(0), m_isVisible(true), m_isUpdated(true), m_needToBeRemove(false)
+	: m_ID(m_generalID++), m_depth(0), m_isDrawByAShader(false), m_isVisible(true), m_isUpdated(true),
+	  m_needToBeRemove(false)
 {
 }
 
 lc::GameObject::GameObject(std::string _name)
-	: m_ID(m_generalID++), m_depth(0), m_isVisible(true), m_isUpdated(true), m_needToBeRemove(false)
+	: m_ID(m_generalID++), m_depth(0), m_isDrawByAShader(false), m_isVisible(true), m_isUpdated(true),
+	  m_needToBeRemove(false)
 {
 }
 
 lc::GameObject::GameObject(std::string _name, unsigned char _depth)
-	: m_name(_name), m_ID(m_generalID++), m_depth(_depth), m_isVisible(true), m_isUpdated(true),
+	: m_name(_name), m_ID(m_generalID++), m_depth(_depth), m_isDrawByAShader(false), m_isVisible(true),
+	  m_isUpdated(true),
 	  m_needToBeRemove(false)
 {
 }
@@ -221,7 +224,7 @@ void lc::GameObject::Draw(WindowManager& _window)
 			object->Draw(_window);
 	
 	for (auto& component : m_components)
-		if (component->isVisible())
+		if (component->isVisible() && !m_isDrawByAShader)
 			component->Draw(_window);
 }
 
@@ -232,7 +235,7 @@ void lc::GameObject::Draw(sf::RenderTexture& _renderer)
 			object->Draw(_renderer);
 
 	for (auto& component : m_components)
-		if (component->isVisible())
+		if (component->isVisible() && !m_isDrawByAShader)
 			component->Draw(_renderer);
 }
 
@@ -243,7 +246,7 @@ void lc::GameObject::Draw(sf::RenderTexture& _renderer, unsigned char _depth)
 		object->Draw(_renderer, _depth);
 
 	for (auto& component : m_components)
-		if (component->isVisible())
+		if (component->isVisible() && !m_isDrawByAShader)
 			if (m_depth == _depth)
 				component->Draw(_renderer);
 }

@@ -70,6 +70,7 @@ void EditorState::updateEvent(sf::Event& _event)
 
 	if (m_scene)
 		m_scene->UpdateEvent(_event);
+
 }
 
 void EditorState::update()

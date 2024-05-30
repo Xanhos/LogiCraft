@@ -158,11 +158,12 @@ void Viewports::Draw(ObjWeakPtrList& _object, std::shared_ptr<lc::GameObject> _s
 		//I rescale the viewport to a normal point so the rendertexture dont do wierd thing.
 		viewport->getView().setViewport({ 0.f, 0.f, 1.f, 1.f });
 
-		viewport->getRenderTexture().clear();
+		viewport->getRenderTexture().clear(s_background_color);
 		viewport->getRenderTexture().setView(viewport->getView());
+		viewport->getBackgroundShape().setFillColor(s_background_color);
 		viewport->getRenderTexture().draw(viewport->getBackgroundShape());
 		this->DisplayScreenZones(viewport->getRenderTexture());
-		for (int depth = static_cast<int>(ToolsBar::GetLayers().size()); depth >= 0; depth--)
+		for (int depth = static_cast<int>(ToolsBar::GetLayers().size()) - 1; depth >= 0; depth--)
 		{
 			_scene->Draw(viewport->getRenderTexture(), depth);
 		}
@@ -367,7 +368,7 @@ void Viewports::UpdateScreenZones(std::shared_ptr<Viewport>& _viewport, WindowMa
 {
 	for (auto& screen : m_screenZones)
 	{
-		if (KEY(LControl) && MOUSE(Left) && !screen.isUsed() && m_screenZoneUnused > 0 && !m_wantToPlaceAnObject)
+		if (KEY(LControl) && MOUSE(Left) && !screen.isUsed() && m_screenZoneUnused >= 0 && !m_wantToPlaceAnObject)
 		{
 			if (_viewport->isInWindow(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow()))))
 				if (Tools::Collisions::point_rect(_window.getWindow().mapPixelToCoords(sf::Mouse::getPosition(_window.getWindow()), _viewport->getView()), sf::FloatRect(screen.getScreenShape().getPosition() + sf::Vector2f(1386.f, 548.f), sf::Vector2f(1080.f, 1080.f))))
@@ -388,7 +389,7 @@ void Viewports::UpdateScreenZones(std::shared_ptr<Viewport>& _viewport, WindowMa
 void Viewports::DisplayScreenZones(sf::RenderTexture& _renderer)
 {
 	for (auto& screen : m_screenZones)
-		if (screen.isUsed() || (!screen.isUsed() && m_screenZoneUnused > 0))
+		if (screen.isUsed() || (!screen.isUsed() && m_screenZoneUnused >= 0))
 			_renderer.draw(screen.getScreenShape());
 }
 
@@ -671,7 +672,7 @@ void Viewports::CreateConvex(std::shared_ptr<lc::GameObject> _scene, sf::Vector2
 		points_convex.push_back(tmp);
 		timer = 0.f;
 	}
-	if (KEY(Space) && timer > 0.5f)
+	if (KEY(Space) && timer > 0.5f and !points_convex.empty())
 	{
 		points_convex.clear();
 		auto convex = lc::Convex(container);

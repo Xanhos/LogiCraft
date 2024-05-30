@@ -53,19 +53,22 @@ SOFTWARE.
 #include "WaterShader.h"
 
 lc::GameObject::GameObject()
-	: m_ID(m_generalID++), m_depth(0), m_isLock(false), m_isVisible(true), m_isUpdated(true), m_needToBeRemove(false),
+	: m_ID(m_generalID++), m_depth(0), m_isLock(false), m_isDrawByAShader(false), m_isVisible(true), m_isUpdated(true),
+	  m_needToBeRemove(false),
 	  m_needToBeExported(false)
 {
 }
 
 lc::GameObject::GameObject(std::string _name)
-	: m_name(_name), m_ID(m_generalID++), m_depth(0), m_isLock(false), m_isVisible(true), m_isUpdated(true), m_needToBeRemove(false),
+	: m_name(_name), m_ID(m_generalID++), m_depth(0), m_isLock(false), m_isDrawByAShader(false), m_isVisible(true),
+	  m_isUpdated(true), m_needToBeRemove(false),
 	  m_needToBeExported(false)
 {
 }
 
 lc::GameObject::GameObject(std::string _name, unsigned char _depth)
-	: m_name(_name), m_ID(m_generalID++), m_depth(_depth), m_isLock(false), m_isVisible(true), m_isUpdated(true),
+	: m_name(_name), m_ID(m_generalID++), m_depth(_depth), m_isLock(false), m_isDrawByAShader(false), m_isVisible(true),
+	  m_isUpdated(true),
 	  m_needToBeRemove(false), m_needToBeExported(false)
 {
 }
@@ -87,35 +90,35 @@ void lc::GameObject::Save(std::ofstream& save, std::ofstream& exportation,sf::Re
 		" " << static_cast<int>(getDepth()) << std::endl;
 	oss << "Components" << std::endl << "{";
 	save << oss.str();
-	if(getNeedToBeExported() or !getParent() or getName() != PLAYER_NAME)
+	if((getNeedToBeExported() and getName() != PLAYER_NAME) or !getParent())
 		exportation << oss.str();
 	for (auto& component : getComponents())
 	{
 		save << std::endl;
-		if(getNeedToBeExported() or !getParent() or getName() != PLAYER_NAME)
+		if((getNeedToBeExported() and getName() != PLAYER_NAME) or !getParent())
 			exportation << std::endl;
 		component->Save(save, texture, _depth);
-		if(getNeedToBeExported() or !getParent() or getName() != PLAYER_NAME)
+	if((getNeedToBeExported() and getName() != PLAYER_NAME) or !getParent())
 			component->Export(exportation);
 	}
-	if(getNeedToBeExported() or !getParent() or getName() != PLAYER_NAME)
+	if((getNeedToBeExported() and getName() != PLAYER_NAME) or !getParent())
 	exportation << std::endl << "}" << std::endl;
 	
 	save << std::endl << "}" << std::endl;
 	
-	if(getNeedToBeExported() or !getParent() or getName() != PLAYER_NAME)
+	if((getNeedToBeExported() and getName() != PLAYER_NAME) or !getParent())
 		exportation << "Objects" << std::endl << "{";
 	
 	save << "Objects" << std::endl << "{";
 	for (auto& object : getObjects())
 	{
 		save << std::endl;
-		if(getNeedToBeExported() or getName() != PLAYER_NAME)
+	if((getNeedToBeExported() and getName() != PLAYER_NAME) or !getParent())
 			exportation << std::endl;
 		object->Save(save, exportation, texture, _depth);
 	}
 	save << std::endl << "}" << std::endl;
-	if(getNeedToBeExported() or !getParent() or getName() != PLAYER_NAME)
+	if((getNeedToBeExported() and getName() != PLAYER_NAME) or !getParent())
 		exportation << std::endl << "}" << std::endl;
 }
 
@@ -123,7 +126,7 @@ void lc::GameObject::SaveRenderer(sf::RenderTexture& texture, int _depth, bool& 
 {
 	if(!getNeedToBeExported())
 	{
-		if(Tools::Collisions::rect_rect(_view_rect,{getTransform().getPosition(),getTransform().getSize()}) and _depth == getDepth())
+		if( _depth == getDepth())
 			for (auto& components : m_components)
 			{
 				components->SaveRenderer(texture, _depth);
@@ -132,10 +135,7 @@ void lc::GameObject::SaveRenderer(sf::RenderTexture& texture, int _depth, bool& 
 	}
 	for (auto& objects : m_objects)
 	{
-		if (objects->getDepth() == _depth)
-		{
-			objects->SaveRenderer(texture, _depth, _object_has_been_drew,_view_rect);
-		}
+		objects->SaveRenderer(texture, _depth, _object_has_been_drew,_view_rect);	
 	}
 }
 
@@ -341,20 +341,28 @@ void lc::GameObject::Draw(WindowManager& _window)
 			object->Draw(_window);
 
 	for (auto& component : m_components)
-		if (component->isVisible())
+		if (component->isVisible() && !m_isDrawByAShader)
 			component->Draw(_window);
 }
 
 void lc::GameObject::Draw(sf::RenderTexture& _renderer)
 {
+	if(getParent() && getName() != PLAYER_NAME && !m_first_pass_init_[1])
+	{
+		m_before_simulate_parallax_pos_ = getTransform().getPosition();
+		getTransform().getPosition() += GetOffset(GetRoot(getParent()), m_depth);
+	}
+	
 	for (auto& object : m_objects)
 		if (object->isVisible())
 			object->Draw(_renderer);
 
 	for (auto& component : m_components)
-		if (component->isVisible())
+		if (component->isVisible() && !m_isDrawByAShader)
 			component->Draw(_renderer);
 
+	if(getParent() && getName() != PLAYER_NAME && !m_first_pass_init_[1])
+		getTransform().getPosition() = m_before_simulate_parallax_pos_;
 }
 
 void lc::GameObject::Draw(sf::RenderTexture& _renderer, unsigned char _depth)
@@ -370,9 +378,10 @@ void lc::GameObject::Draw(sf::RenderTexture& _renderer, unsigned char _depth)
 			object->Draw(_renderer, _depth);
 
 	for (auto& component : m_components)
-		if (component->isVisible())
+		if (component->isVisible() && !m_isDrawByAShader)
 			if (m_depth == _depth)
 				component->Draw(_renderer);
+	
 	if(getParent() && getName() != PLAYER_NAME && m_depth ==_depth && !m_first_pass_init_[1])
 		getTransform().getPosition() = m_before_simulate_parallax_pos_;
 }
@@ -380,14 +389,14 @@ void lc::GameObject::Draw(sf::RenderTexture& _renderer, unsigned char _depth)
 bool lc::GameObject::is_in_window_view(WindowManager& window)
 {
 	auto& tmp_window_view = window.getWindow().getView();
-	return Tools::Collisions::rect_rect({getTransform().getPosition(), getTransform().getSize()},
+	return Tools::Collisions::rect_rect({getTransform().getPosition(), getTransform().getSize() * getTransform().getScale()},
 		{tmp_window_view.getCenter() - (tmp_window_view.getSize() / 2.f), tmp_window_view.getSize()});
 }
 
 bool lc::GameObject::is_in_window_view(const sf::RenderTexture& window)
 {
 	auto& tmp_window_view = window.getView();
-	return Tools::Collisions::rect_rect({getTransform().getPosition(), getTransform().getSize()},
+	return Tools::Collisions::rect_rect({getTransform().getPosition(), getTransform().getSize() * getTransform().getScale()},
 		{tmp_window_view.getCenter() - (tmp_window_view.getSize() / 2.f), tmp_window_view.getSize()});
 }
 

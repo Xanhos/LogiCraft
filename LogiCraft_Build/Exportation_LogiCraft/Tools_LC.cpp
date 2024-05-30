@@ -1,6 +1,4 @@
 #include "Tools_LC.h"
-
-
 #include "GameObject.h"
 
 ThreadManager::~ThreadManager()
