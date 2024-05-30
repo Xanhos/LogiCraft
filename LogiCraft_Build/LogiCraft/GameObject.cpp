@@ -49,6 +49,7 @@ SOFTWARE.
 #include "HeatShader.h"
 #include "LightShader.h"
 #include "PlayerSpawn.h"
+#include "StatSystem.h"
 #include "ToolsBar.h"
 #include "WaterShader.h"
 
@@ -206,6 +207,10 @@ void lc::GameObject::Load(std::ifstream& load)
 		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::CONVEX)
 		{			
 			addComponent(std::make_shared<lc::Convex>())->Load(load);
+		}
+		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::STAT_SYSTEM)
+		{			
+			addComponent(std::make_shared<lc::StatSystem>())->Load(load);
 		}
 		else if (static_cast<Ressource::TYPE>(type) == Ressource::TYPE::SHADER)
 		{

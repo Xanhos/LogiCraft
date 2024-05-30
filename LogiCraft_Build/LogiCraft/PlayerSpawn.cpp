@@ -61,7 +61,7 @@ void lc::PlayerSpawn::Draw(WindowManager& _window)
 void lc::PlayerSpawn::Draw(sf::RenderTexture& _window)
 {
     m_renderer.setPosition(m_relativePosition);
-    m_renderer.setSize({50,100});
+    m_renderer.setSize({280,270});
     _window.draw(m_renderer);
     _window.draw(m_player_screen_zone_);
 }
