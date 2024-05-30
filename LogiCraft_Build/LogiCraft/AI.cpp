@@ -42,6 +42,25 @@ lc::AI::AI() : m_root(PatronNode::GetNodeType("SEQUENCE"))
     m_name = "AI";
 }
 
+lc::AI::AI(AI& other) : m_root(0)
+{
+    m_root = other.m_root.Clone();
+    m_aiName = other.m_aiName;
+    m_type = other.m_type;
+    m_typeName = other.m_typeName;
+    m_name = other.m_name;
+    std::function<void(PatronNode*)> reparenting = [&](PatronNode* node)
+    {
+        for (auto& i : node->GetChildren())
+        {
+            i->SetParent(node);
+            reparenting(i);
+        }
+    };
+            
+    reparenting(&m_root);
+}
+
 lc::AI::~AI()
 {
 }
