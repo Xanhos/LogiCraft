@@ -42,6 +42,7 @@ SOFTWARE.
 #include <tuple>
 #include "Animation.h"
 #include "Particule.h"
+#include "StatSystem.h"
 
 std::unordered_map<std::string, int> PatronNode::s_node_container_ = {};
 std::unordered_map<std::string, int> PatronNode::s_condition_container_ = {};
@@ -50,6 +51,9 @@ DecoratorLoadMethod PatronNode::s_decorator_load_method_ = {};
 DecoratorMethod PatronNode::s_decorator_init_method_ = {};
 DecoratorMethod PatronNode::s_decorator_update_method_ = {};
 DecoratorCopyMethod PatronNode::s_decorator_copy_method_ = {};
+
+enum COMPARE_ENUM {COMP_NULL = -1,HIGHER,LOWER,EQUAL_H,EQUAL_L,EQUAL_TO,NOT_EQUAL_TO};
+enum OPERATION_ENUM {OPE_NULL =-1,ADD,SUB,DIVIDE,MULTIPLY};
 
 void PatronNode::SetupAllNode()
 {
@@ -70,6 +74,7 @@ void PatronNode::SetupAllNode()
 	pushNode("DO ON ANIM FRAME");
 	pushNode("FORCE SUCCESS");
 	pushNode("IF STATE IS");
+	pushNode("IF STAT IS");
 	//
 	pushNode("WANDER");
 	s_node_container_["WANDER"] = 5000;
@@ -84,11 +89,12 @@ void PatronNode::SetupAllNode()
 	pushNode("JUMP");	
 	pushNode("CHANGE STATE");
 	pushNode("PLAY PARTICLES");
+	pushNode("CHANGE STAT");
 
 	s_decorator_node_start_ = s_node_container_["INVERSER"];//Were the decorator node start
 	s_action_node_start_ = s_node_container_["WANDER"];//Were the action node start and were the decorator node stop (leaf node)
-	s_decorator_node_end_ = s_node_container_["IF STATE IS"] + 1;
-	s_action_node_end_ = s_node_container_["PLAY PARTICLES"] + 1;
+	s_decorator_node_end_ = s_node_container_["IF STAT IS"] + 1;
+	s_action_node_end_ = s_node_container_["CHANGE STAT"] + 1;
 	
 
 	
@@ -209,6 +215,212 @@ void PatronNode::SetupAllNode()
 			std::string customCondition;
 			file >> customCondition;
 			node->m_decorator_data_ = customCondition;
+		};
+	}
+	//IF STAT IS
+	{
+		typedef std::tuple<std::weak_ptr<lc::StatSystem>,float,std::string,int,COMPARE_ENUM> bt_stat_is;
+		//Init method set the std::any to the default value
+		s_decorator_init_method_["IF STAT IS"] = [](PatronNode* node) {
+			node->m_decorator_data_ = bt_stat_is(std::weak_ptr<lc::StatSystem>(),0.f,"",-1,COMP_NULL);
+		};
+		s_decorator_copy_method_["IF STAT IS"] = [](PatronNode* node, PatronNode* copied_node)		{
+			node->m_decorator_data_ = std::any_cast<bt_stat_is>(copied_node->m_decorator_data_);
+		};
+		//Update method display the data and set the std::any to the new value
+		s_decorator_update_method_["IF STAT IS"] = [](PatronNode* node) {
+			auto tuple = std::any_cast<bt_stat_is>(node->m_decorator_data_);
+			if(std::get<0>(tuple).expired() and !std::get<2>(tuple).empty())
+			{
+				if(!node->m_game_object_.expired())
+				{
+					auto object = node->m_game_object_.lock();
+					for (const auto& component : object->getComponents())
+					{
+						if(auto stat_system = std::dynamic_pointer_cast<lc::StatSystem>(component))
+						{
+							if(stat_system->getName() == std::get<2>(tuple))
+							{
+								std::get<0>(tuple) = stat_system;
+								std::get<2>(tuple) = stat_system->getName();
+							}
+						}					
+					}
+				}
+			}
+
+		
+			auto object = node->m_game_object_.lock();
+			if(ImGui::BeginCombo("Choose Stat System", std::get<0>(tuple).expired() ? "Select Stat System" : std::get<0>(tuple).lock()->getName().c_str()))
+			{
+				bool is_selected = false;
+				for (const auto& component : object->getComponents())
+				{
+					if(auto stat_system = std::dynamic_pointer_cast<lc::StatSystem>(component))
+					{
+						if(ImGui::Selectable(stat_system->getName().c_str(),&is_selected,ImGuiSelectableFlags_SelectOnClick))
+						{
+							std::get<0>(tuple) = stat_system;
+							std::get<2>(tuple) = stat_system->getName();
+						}
+					}					
+				}
+				ImGui::EndCombo();
+			}
+			
+			if(!std::get<0>(tuple).expired())
+			{
+				const std::string type[] = {"Health","Dexterity","Range","Speed"};
+				if(ImGui::BeginCombo("Stat type",std::get<3>(tuple) >= 0 ? type[std::get<3>(tuple)].c_str() : "Select type"))
+				{
+					for(int i = 0; i < 4;i++)
+					{
+						if(ImGui::Selectable(type[i].c_str()))
+							std::get<3>(tuple) = i;					
+					}ImGui::EndCombo();
+				}
+
+				if(std::get<3>(tuple) >= 0)
+				{
+					const std::string comp[] = {"HIGHER","LOWER","EQUAL_OR_HIGHER","EQUAL_OR_LOWER","EQUAL_TO","NOT_EQUAL_TO"};
+				
+					if(ImGui::BeginCombo("Stat Compare type",std::get<4>(tuple) >= 0 ? comp[std::get<4>(tuple)].c_str() : "Select Compare type"))
+					{
+						for(int i = 0; i < 6;i++)
+						{
+							if(ImGui::Selectable(comp[i].c_str()))
+								std::get<4>(tuple) = static_cast<COMPARE_ENUM>(i);					
+						}ImGui::EndCombo();
+					}
+				
+					if(std::get<3>(tuple) == 0)
+					{
+						int life = std::get<1>(tuple);
+						ImGui::InputInt("Value",&life);
+						std::get<1>(tuple) = life;
+					}
+					else
+						ImGui::InputFloat("Value",&std::get<1>(tuple));
+				}
+			}
+			
+			node->m_decorator_data_ = tuple;
+		};
+		//Save method save the data in the file
+		s_decorator_save_method_["IF STAT IS"] = [](PatronNode* node, std::ofstream& file) {
+			auto tuple = std::any_cast<bt_stat_is>(node->m_decorator_data_);
+			file << std::get<1>(tuple)<< " " << std::get<2>(tuple)<< " " << std::get<3>(tuple)<< " " << std::get<4>(tuple);
+		};
+		//Load method load the data from the file
+		s_decorator_load_method_["IF STAT IS"] = [](PatronNode* node, std::ifstream& file) {
+			auto tuple = bt_stat_is();
+			int type = 0;
+			file >> std::get<1>(tuple) >> std::get<2>(tuple) >> std::get<3>(tuple) >> type;
+			std::get<4>(tuple) = static_cast<COMPARE_ENUM>(type); 
+			node->m_decorator_data_ = tuple;
+		};
+	}
+	//CHANGE STAT
+	{
+		typedef std::tuple<std::weak_ptr<lc::StatSystem>,float,std::string,int,OPERATION_ENUM> bt_stat_is;
+		//Init method set the std::any to the default value
+		s_decorator_init_method_["CHANGE STAT"] = [](PatronNode* node) {
+			node->m_decorator_data_ = bt_stat_is(std::weak_ptr<lc::StatSystem>(),0.f,"",-1,OPE_NULL);
+		};
+		s_decorator_copy_method_["CHANGE STAT"] = [](PatronNode* node, PatronNode* copied_node)		{
+			node->m_decorator_data_ = std::any_cast<bt_stat_is>(copied_node->m_decorator_data_);
+		};
+		//Update method display the data and set the std::any to the new value
+		s_decorator_update_method_["CHANGE STAT"] = [](PatronNode* node) {
+			auto tuple = std::any_cast<bt_stat_is>(node->m_decorator_data_);
+			if(std::get<0>(tuple).expired() and !std::get<2>(tuple).empty())
+			{
+				if(!node->m_game_object_.expired())
+				{
+					auto object = node->m_game_object_.lock();
+					for (const auto& component : object->getComponents())
+					{
+						if(auto stat_system = std::dynamic_pointer_cast<lc::StatSystem>(component))
+						{
+							if(stat_system->getName() == std::get<2>(tuple))
+							{
+								std::get<0>(tuple) = stat_system;
+								std::get<2>(tuple) = stat_system->getName();
+							}
+						}					
+					}
+				}
+			}
+
+		
+			auto object = node->m_game_object_.lock();
+			if(ImGui::BeginCombo("Choose Stat System", std::get<0>(tuple).expired() ? "Select Stat System" : std::get<0>(tuple).lock()->getName().c_str()))
+			{
+				bool is_selected = false;
+				for (const auto& component : object->getComponents())
+				{
+					if(auto stat_system = std::dynamic_pointer_cast<lc::StatSystem>(component))
+					{
+						if(ImGui::Selectable(stat_system->getName().c_str(),&is_selected,ImGuiSelectableFlags_SelectOnClick))
+						{
+							std::get<0>(tuple) = stat_system;
+							std::get<2>(tuple) = stat_system->getName();
+						}
+					}					
+				}
+				ImGui::EndCombo();
+			}
+			
+			if(!std::get<0>(tuple).expired())
+			{
+				const std::string type[] = {"Health","Dexterity","Range","Speed"};
+				if(ImGui::BeginCombo("Stat type",std::get<3>(tuple) >= 0 ? type[std::get<3>(tuple)].c_str() : "Select type"))
+				{
+					for(int i = 0; i < 4;i++)
+					{
+						if(ImGui::Selectable(type[i].c_str()))
+							std::get<3>(tuple) = i;					
+					}ImGui::EndCombo();
+				}
+
+				if(std::get<3>(tuple) >= 0)
+				{
+					const std::string op[] = {"ADD","SUBSTRACT","DIVIDE","MULTIPLY"};
+				
+					if(ImGui::BeginCombo("Stat Operation type",std::get<4>(tuple) >= 0 ? op[std::get<4>(tuple)].c_str() : "Select Compare type"))
+					{
+						for(int i = 0; i < 4;i++)
+						{
+							if(ImGui::Selectable(op[i].c_str()))
+								std::get<4>(tuple) = static_cast<OPERATION_ENUM>(i);					
+						}ImGui::EndCombo();
+					}
+				
+					if(std::get<3>(tuple) == 0)
+					{
+						int life = std::get<1>(tuple);
+						ImGui::InputInt("Value",&life);
+						std::get<1>(tuple) = life;
+					}
+					else
+						ImGui::InputFloat("Value",&std::get<1>(tuple));
+				}
+			}
+			
+			node->m_decorator_data_ = tuple;
+		};
+		//Save method save the data in the file
+		s_decorator_save_method_["CHANGE STAT"] = [](PatronNode* node, std::ofstream& file) {
+			auto tuple = std::any_cast<bt_stat_is>(node->m_decorator_data_);
+			file << std::get<1>(tuple)<< " " << std::get<2>(tuple)<< " " << std::get<3>(tuple)<< " " << std::get<4>(tuple);
+		};
+		//Load method load the data from the file
+		s_decorator_load_method_["CHANGE STAT"] = [](PatronNode* node, std::ifstream& file) {
+			auto tuple = bt_stat_is();
+			int type = 0;
+			file >> std::get<1>(tuple) >> std::get<2>(tuple) >> std::get<3>(tuple) >> type;
+			std::get<4>(tuple) = static_cast<OPERATION_ENUM>(type); 
+			node->m_decorator_data_ = tuple;
 		};
 	}
 	//DO ON ANIM FRAME

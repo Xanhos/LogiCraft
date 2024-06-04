@@ -54,9 +54,9 @@ void EditorState::init()
 
 	std::vector<sf::Vector2f> convex_point;
 	convex_point.push_back({0,0});
-	convex_point.push_back({50,0});
-	convex_point.push_back({50,100});
-	convex_point.push_back({0,100});
+	convex_point.push_back({280,0});
+	convex_point.push_back({280,270});
+	convex_point.push_back({0,270});
 	auto player = m_scene->addObject(PLAYER_NAME,4);
 	player->addComponent<lc::Convex>(convex_point)->getConvex().setFillColor(sf::Color::Red);
 

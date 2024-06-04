@@ -53,6 +53,7 @@ void lc::Convex::Save(std::ofstream& save, sf::RenderTexture& texture, int _dept
 
 void lc::Convex::Load(std::ifstream& load)
 {
+	
 	m_type = TYPE::CONVEX;
 	load >> m_typeName;
 	int nb_points(0);
@@ -67,6 +68,15 @@ void lc::Convex::Load(std::ifstream& load)
 	}
 	load >> m_position.x >> m_position.y;
 	m_convex.setOrigin(m_position);
+
+	if(getParent()->getName() == "PLAYER")
+	{
+		m_convex.setPoint(0,{0,0});
+		m_convex.setPoint(1,{280,0});
+		m_convex.setPoint(2,{280,270});
+		m_convex.setPoint(3,{0,270});
+		m_convex.setFillColor(sf::Color::Red);
+	}
 }
 
 void lc::Convex::SaveRenderer(sf::RenderTexture& texture, int _depth)

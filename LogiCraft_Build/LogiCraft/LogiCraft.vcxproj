@@ -172,6 +172,7 @@
     <ClCompile Include="RigidBody.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="State.cpp" />
+    <ClCompile Include="StatSystem.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="ToolsBar.cpp" />
     <ClCompile Include="tools_imgui.cpp" />
@@ -215,6 +216,7 @@
     <ClInclude Include="RigidBody.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="State.h" />
+    <ClInclude Include="StatSystem.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="ToolsBar.h" />
     <ClInclude Include="tools_imgui.h" />

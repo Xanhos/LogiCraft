@@ -41,6 +41,7 @@ SOFTWARE.
 #include "DisplayCollider.h"
 #include "HeatShader.h"
 #include "LightShader.h"
+#include "StatSystem.h"
 #include "WaterShader.h"
 
 Hierarchie::Hierarchie()
@@ -702,19 +703,19 @@ void Hierarchie::setup_components_function()
                                       tmp_object->addComponent<lc::AI>();
                               });
 							  
-							  m_components_map_.emplace("Button",
-                              [&]()
-                              {
-                                  const auto tmp_object = m_want_to_add_a_component_.second.lock();
+    m_components_map_.emplace("Button",
+    [&]()
+    {
+        const auto tmp_object = m_want_to_add_a_component_.second.lock();
 
-                                  if (std::find_if(tmp_object->getComponents().begin(),
-                                                   tmp_object->getComponents().end(),
-                                                   [](const auto& components)
-                                                   {
-                                                       return components->getTypeName() == "Button";
-                                                   }) == tmp_object->getComponents().end())
-                                      tmp_object->addComponent<lc::Button>();
-                              });
+        if (std::find_if(tmp_object->getComponents().begin(),
+                   tmp_object->getComponents().end(),
+                   [](const auto& components)
+                   {
+                       return components->getTypeName() == "Button";
+                   }) == tmp_object->getComponents().end())
+        tmp_object->addComponent<lc::Button>();
+    });
 
     m_components_map_.emplace("Display Collider",
                               [&]()
@@ -735,4 +736,10 @@ void Hierarchie::setup_components_function()
 		if (m_want_to_add_a_component_.second.lock()->getDepth() == 4)
 			m_want_to_add_a_component_.second.lock()->addComponent<lc::Shader::LightShader>();
 	});
+    m_components_map_.emplace("Stat System",
+    [&]()
+    {
+        if (m_want_to_add_a_component_.second.lock()->hasComponent("AI"))
+            m_want_to_add_a_component_.second.lock()->addComponent<lc::StatSystem>();
+    });
 }
