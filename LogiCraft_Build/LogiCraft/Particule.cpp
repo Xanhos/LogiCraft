@@ -128,7 +128,7 @@ namespace lc
 		  m_spawn_spread_(45.f),
 		  m_spawn_angle_(0.f),
 		  m_spawn_speed_(50.f),
-		  m_base_shape_radius_(10.f),
+		  m_base_shape_radius_(1000.f),
 		  m_life_time_timer_(0.f),
 		  m_life_time_time_(5.f),
 		  m_gravity_force_(300.f),
@@ -171,7 +171,7 @@ namespace lc
 		  m_spawn_spread_(45.f),
 		  m_spawn_angle_(0.f),
 		  m_spawn_speed_(50.f),
-		  m_base_shape_radius_(10.f),
+		  m_base_shape_radius_(1000.f),
 		  m_life_time_timer_(0.f),
 		  m_life_time_time_(5.f),
 		  m_gravity_force_(300.f),
@@ -451,8 +451,11 @@ namespace lc
 			}
 			else
 			{
-				if (ImGui::DragFloat2("Texture Size", m_texture_size_))
-					m_particles_ressource_.lock()->getShape().setSize(m_texture_size_);
+				if (const auto texture = std::dynamic_pointer_cast<lc::Texture>(m_particles_ressource_.lock()))
+				{
+					ImGui::DragFloat2("Texture Size", m_texture_size_);
+					texture->getTextureRect() = {texture->getTextureRect().getPosition(), sf::Vector2i(m_texture_size_)};
+				}
 			}
 
 			if (ImGui::TreeNodeEx("Reset Button"))
@@ -953,6 +956,11 @@ namespace lc
 			tmp_ressource ?
 					tmp_ressource->getShape().setScale(getParent()->getTransform().getScale()) :
 					m_base_shape_.setScale(getParent()->getTransform().getScale());
+			
+			if (const auto texture = std::dynamic_pointer_cast<lc::Texture>(m_particles_ressource_.lock()))
+			{
+				tmp_ressource->getShape().setSize(sf::Vector2f(texture->getTextureRect().getSize()));
+			}
 		}
 
 		if (m_is_particles_rendered_on_the_viewport_)
