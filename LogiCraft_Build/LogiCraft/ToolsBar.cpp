@@ -304,30 +304,43 @@ void ToolsBar::Export(std::shared_ptr<lc::GameObject> _game_object, Viewports& _
 	_game_object->Save(save, exportation, render_texture, s_actualLayer.first);
 
 	ThreadManager thread_manager(std::count_if(_viewports.getAllScreenzone().begin(),_viewports.getAllScreenzone().end(), [](ScreenZone& screen){return screen.isUsed();}));
+
+	unsigned int number_of_thread(0u);
+	constexpr unsigned short thread_limit(20u);
 	
 	for (auto& screen : _viewports.getAllScreenzone())
 	{
 		if (screen.isUsed())
 		{
-			thread_manager.AddNewThread([&]
+			while (number_of_thread >= thread_limit) {}
+			
+			if (number_of_thread <= thread_limit)
 			{
-				sf::RenderTexture render_texture_thread;				
-				render_texture_thread.create(static_cast<unsigned int>(SCREEN_SIZE.x), static_cast<unsigned int>(SCREEN_SIZE.y));
-				render_texture_thread.setView(sf::View(sf::Vector2f(SCREEN_SIZE.x / 2.f + (SCREEN_SIZE.x * screen.getScreenIndex().x), SCREEN_SIZE.y / 2.f + (SCREEN_SIZE.y * screen.getScreenIndex().y)), sf::Vector2f(SCREEN_SIZE.x, SCREEN_SIZE.y)));
-				for (int depth = 0; depth <= static_cast<int>(s_layers.size()); depth++)
+				number_of_thread++;
+				std::cout << number_of_thread << '\n';
+				thread_manager.AddNewThread([&] 
 				{
-					render_texture_thread.clear(sf::Color::Transparent);
-					bool need_to_export_png = false;
-					_game_object->SaveRenderer(render_texture_thread, depth,need_to_export_png, sf::FloatRect({SCREEN_SIZE.x * screen.getScreenIndex().x,SCREEN_SIZE.y * screen.getScreenIndex().y},SCREEN_SIZE));
-					if(need_to_export_png)
+					sf::RenderTexture render_texture_thread;				
+					render_texture_thread.create(static_cast<unsigned int>(SCREEN_SIZE.x), static_cast<unsigned int>(SCREEN_SIZE.y));
+					render_texture_thread.setView(sf::View(sf::Vector2f(SCREEN_SIZE.x / 2.f + (SCREEN_SIZE.x * screen.getScreenIndex().x), SCREEN_SIZE.y / 2.f + (SCREEN_SIZE.y * screen.getScreenIndex().y)), sf::Vector2f(SCREEN_SIZE.x, SCREEN_SIZE.y)));
+					for (int depth = 0; depth <= static_cast<int>(s_layers.size()); depth++)
 					{
-						sf::Image image;
-					   image = render_texture_thread.getTexture().copyToImage();
-					   image.flipVertically();
-					   image.saveToFile("../Ressources/" + std::string(m_path) + "/" + std::string(std::to_string(screen.getScreenIndex().x) + "_" + std::to_string(screen.getScreenIndex().y)) + "_" + std::string(m_path) + "_layer_" + std::to_string(depth) + ".png");
+						render_texture_thread.clear(sf::Color::Transparent);
+						bool need_to_export_png = false;
+						_game_object->SaveRenderer(render_texture_thread, depth,need_to_export_png, sf::FloatRect({SCREEN_SIZE.x * screen.getScreenIndex().x,SCREEN_SIZE.y * screen.getScreenIndex().y},SCREEN_SIZE));
+						if(need_to_export_png)
+						{
+							sf::Image image;
+						   image = render_texture_thread.getTexture().copyToImage();
+						   image.flipVertically();
+						   image.saveToFile("../Ressources/" + std::string(m_path) + "/" + std::string(std::to_string(screen.getScreenIndex().x) + "_" + std::to_string(screen.getScreenIndex().y)) + "_" + std::string(m_path) + "_layer_" + std::to_string(depth) + ".png");
+						}
 					}
-				}
-			});
+
+					number_of_thread--;
+				});
+			}
+			
 		}
 	}
 

@@ -63,7 +63,7 @@ namespace lc
 		std::string getTextureName() { return m_textureName; }
 		std::string getTexturePath() { return m_texturePath; }
 		sf::Texture& getTexture() { return m_texture; }
-		sf::IntRect getTextureRect() { return m_textureRect; }
+		sf::IntRect& getTextureRect() { return m_textureRect; }
 	private:
 		sf::Texture m_texture;
 		std::string m_textureName;
