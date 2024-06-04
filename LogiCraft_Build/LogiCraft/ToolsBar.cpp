@@ -36,6 +36,8 @@ SOFTWARE.
 
 #include "ToolsBar.h"
 
+#include "PlayerSpawn.h"
+
 Layers ToolsBar::s_layers = { {13, "BackGround 9"},{12, "BackGround 8"},{11, "BackGround 7"},{10,"BackGround 6"},{ 9, "BackGround 5"},{8, "BackGround 4"},{7, "BackGround 3"},{ 6, "BackGround 2"},{5, "BackGround 1"},{4, "Player Plan"},{3, "Front Plan 4"}, {2, "Front Plan 3"}, {1, "Front Plan 2"}, {0, "Front Plan 1"} };
 Layer ToolsBar::s_actualLayer = *ToolsBar::s_layers.begin();
 
@@ -59,7 +61,12 @@ void ToolsBar::Update(std::shared_ptr <lc::GameObject> object, WindowManager& _w
 							if (ImGui::MenuItem("New", "Ctrl + N") || (KEY(LControl) && KEY(N))) { New(object, _viewport); }
 							if (ImGui::MenuItem("Load", "Ctrl + O") || (KEY(LControl) && KEY(O))) { m_isLoading = true; }
 							if (ImGui::MenuItem("Save As", "Ctrl + S") || (KEY(LControl) && KEY(S))) { m_isSaving = true; }
-							if (ImGui::MenuItem("Export as", "Ctrl + E") || (KEY(LControl) && KEY(E))) { m_isExporting = true; }
+							if (ImGui::MenuItem("Export as", "Ctrl + E") || (KEY(LControl) && KEY(E)))
+							{
+								m_isExporting = true;
+								auto player = object->GetRoot(object)->getObject(PLAYER_NAME);
+								auto spawn = object->GetRoot(object)->getComponent<lc::PlayerSpawn>("Player Spawn");
+								player->getTransform().getPosition() = spawn->GetSpawnPosition();						}
 							if (ImGui::MenuItem("Exit", "Ctrl + W") ||(KEY(LControl) && KEY(W))) { Exit(_window); }
 							ImGui::EndMenu();
 						});
