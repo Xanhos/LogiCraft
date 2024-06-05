@@ -252,11 +252,7 @@ void Hierarchie::SelectedObjectsDisplay(std::shared_ptr<lc::GameObject> _scene, 
                         (*component)->Hierarchie_Draw(tmp_object->getID(), component, tmp_object->getComponents());
                     }
 
-                    if (KEY(Delete))
-                    {
-                        auto tmp_parent = tmp_object->getParent();
-                        tmp_parent->removeObject(tmp_object->getName(), tmp_object->getID());
-                    }
+                    
                 }
             }
         }

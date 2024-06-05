@@ -78,36 +78,69 @@ int main()
 		nfdresult_t result = NFD_PickFolder(nullptr, &outPath);
 		fs::path path_ = std::string(outPath);
 
-		std::list<std::pair<std::string,sf::Image>> image_list;
-		for(auto& it : fs::directory_iterator(path_))
+		std::ifstream exportIn(path_.string() + "/export.lcg");
+		std::string string, actualLine;
+
+		while (!exportIn.eof())
 		{
-			if(it.path().extension() == ".png")
-			{
-				std::pair<std::string,sf::Image> pair;
-				pair.first = it.path().string();
-				std::cout << "Loading " << pair.first << "\n";
-				pair.second.loadFromFile(it.path().string());
-				image_list.push_back(pair);
-			}
+			std::getline(exportIn,actualLine);
+			if(actualLine.find("6 Animation") != std::string::npos)
+				string += actualLine + " 0 0\n";
+			else
+				string += actualLine + "\n";			
 		}
+		exportIn.close();
 		
-		for(auto& it : image_list)
+		std::ofstream exportOut(path_.string() + "/export.lcg");
+		exportOut << string;
+		
+		std::ifstream saveIn(path_.string() + "/save.lcp");
+		string = ""; actualLine = "";
+
+		while (!saveIn.eof())
 		{
-			std::cout << "Checking " << it.first << "\n";
-			bool need_to_delete = true;
-			for(int y = 0;y < it.second.getSize().y;y++)
-			{
-				for(int x = 0; x < it.second.getSize().x; x++)
-				{
-					if(it.second.getPixel(x,y) != sf::Color::Transparent)
-					{
-						need_to_delete = false;
-						break;
-					}
-				}
-			}
-			if(need_to_delete)
-				fs::remove(it.first);
-		}		
+			std::getline(saveIn,actualLine);
+			if(actualLine.find("6 Animation") != std::string::npos)
+				string += actualLine + " 0 0\n";
+			else
+				string += actualLine + "\n";			
+		}
+		saveIn.close();
+		
+		std::ofstream saveOut(path_.string() + "/save.lcp");
+		saveOut << string;
+
+		
+		// std::list<std::pair<std::string,sf::Image>> image_list;
+		// for(auto& it : fs::directory_iterator(path_))
+		// {
+		// 	if(it.path().extension() == ".png")
+		// 	{
+		// 		std::pair<std::string,sf::Image> pair;
+		// 		pair.first = it.path().string();
+		// 		std::cout << "Loading " << pair.first << "\n";
+		// 		pair.second.loadFromFile(it.path().string());
+		// 		image_list.push_back(pair);
+		// 	}
+		// }
+		//
+		// for(auto& it : image_list)
+		// {
+		// 	std::cout << "Checking " << it.first << "\n";
+		// 	bool need_to_delete = true;
+		// 	for(int y = 0;y < it.second.getSize().y;y++)
+		// 	{
+		// 		for(int x = 0; x < it.second.getSize().x; x++)
+		// 		{
+		// 			if(it.second.getPixel(x,y) != sf::Color::Transparent)
+		// 			{
+		// 				need_to_delete = false;
+		// 				break;
+		// 			}
+		// 		}
+		// 	}
+		// 	if(need_to_delete)
+		// 		fs::remove(it.first);
+		// }		
 	}
 }

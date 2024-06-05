@@ -180,7 +180,7 @@ namespace lc
 			 << " " << m_name
 			 << " " << (m_texture_.expired() ? static_cast<std::string>("No_Texture") : m_texture_.lock()->getName())
 			 << " " << (m_actual_animation_key_.expired() ? "No_Actual_Key" : m_actual_animation_key_.lock()->get_name())
-			 << " " << static_cast<int>(m_animation_keys_.size()) << '\n';
+			 << " " << static_cast<int>(m_animation_keys_.size()) << ' ' << m_relativePosition <<"\n";
 
 		for (const auto& animation_key_pair : m_animation_keys_)
 		{
@@ -200,7 +200,7 @@ namespace lc
 			 << " " << m_name
 			 << " " << (m_texture_.expired() ? static_cast<std::string>("No_Texture") : m_texture_.lock()->getName())
 			 << " " << (m_actual_animation_key_.expired() ? "No_Actual_Key" : m_actual_animation_key_.lock()->get_name())
-			 << " " << static_cast<int>(m_animation_keys_.size()) << '\n';
+			 << " " << static_cast<int>(m_animation_keys_.size()) << ' ' << m_relativePosition << "\n";
 
 		for (const auto& animation_key_pair : m_animation_keys_)
 		{
@@ -224,7 +224,9 @@ namespace lc
 			 >> m_name
 			 >> tmp_texture_name
 			 >> tmp_actual_key_name
-			 >> tmp_animation_key_cout;
+			 >> tmp_animation_key_cout 
+			 >> m_relativePosition;
+		;
 
 		std::shared_ptr<AnimationKey> tmp_animation_key;
 		for (int i = 0; i < tmp_animation_key_cout; i++)
@@ -579,7 +581,7 @@ namespace lc
 			{
 				tmp_save_animation << m_name << '\n';
 				tmp_save_animation << (m_texture_.expired() ? "No_texture" : m_texture_.lock()->getName()) << '\n';
-				tmp_save_animation << static_cast<int>(m_animation_keys_.size()) << '\n';
+				tmp_save_animation << static_cast<int>(m_animation_keys_.size()) << '\n' << m_relativePosition << "\n";
 				for (const auto& animation_key_pair : m_animation_keys_)
 				{
 					tmp_save_animation << animation_key_pair.second->get_name() << '\n';
