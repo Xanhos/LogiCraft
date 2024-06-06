@@ -37,10 +37,14 @@ namespace lc
             sf::View m_render_view_;
             sf::Sprite m_render_sprite_;
             sf::Vector2u m_render_size_;
+            sf::Vector2<float*> m_most_extended_point_;
 
             std::list<std::shared_ptr<lc::GameObject>>::iterator m_parent_iterator_;
             float m_update_parent_iterator_timer_;
 
+            std::list<sf::Vector2f> m_convex_point_list_;
+            sf::ConvexShape m_convex_;
+            
             bool m_is_in_view_;
        };
     }

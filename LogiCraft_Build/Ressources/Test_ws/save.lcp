@@ -1,0 +1,109 @@
+1 0 0 
+WORLD 0 0 1 1 280 270 0 0 0 0
+Components
+{
+13 Player_Spawn 0 0
+
+}
+Objects
+{
+L1b -170.745 1130.48 1 1 485 1101 0 0 0 8
+Components
+{
+0 Texture 0 0 485 1101 ../ASSETS\BG_L1\L1b.png 0 0
+
+}
+Objects
+{
+}
+
+L1bu 245.224 1120.52 1 1 485 1101 0 0 0 8
+Components
+{
+0 Texture 0 0 485 1101 ../ASSETS\BG_L1\L1b.png 0 0
+
+}
+Objects
+{
+}
+
+L1c 593.032 1288.94 1 1 912 804 0 0 0 8
+Components
+{
+0 Texture 0 0 912 804 ../ASSETS\BG_L1\L1c.png 0 0
+
+}
+Objects
+{
+}
+
+L1d 1276.72 1335.54 1 1 998 412 0 0 0 8
+Components
+{
+0 Texture 0 0 998 412 ../ASSETS\BG_L1\L1d.png 0 0
+
+}
+Objects
+{
+}
+
+L1e 1995.39 1060.99 1 1 994 1738 0 0 0 8
+Components
+{
+0 Texture 0 0 994 1738 ../ASSETS\BG_L1\L1e.png 0 0
+
+}
+Objects
+{
+}
+
+PLAYER 0 0 1 1 280 270 0 0 0 4
+Components
+{
+10 Convex 4 0 0 280 0 280 270 0 270 140 135
+
+}
+Objects
+{
+}
+
+1 -849.295 987.88 1 1 3840 360 0 0 0 0
+Components
+{
+0 Texture 0 0 3840 360 ../ASSETS\1.png 0 0
+
+7 RigidBody -849.295 987.88 3840 360 0 0 0 0 0 0 RigidBody
+
+}
+Objects
+{
+}
+
+2 -8.96045 1799.79 1 1 3840 360 0 0 0 0
+Components
+{
+0 Texture 0 0 3840 360 ../ASSETS\2.png 0 0
+
+7 RigidBody -8.96045 1799.79 3840 360 0 0 0 0 0 0 RigidBody
+
+}
+Objects
+{
+}
+
+d -45.1047 1314.76 1 1 3053 479 0 0 0 0
+Components
+{
+11 Water_Shader 0 47 3053 479 6
+0 0
+3053 0
+2500 303
+1932 479
+991 353
+252 443
+}
+Objects
+{
+}
+
+}

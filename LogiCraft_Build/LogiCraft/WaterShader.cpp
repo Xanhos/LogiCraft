@@ -23,6 +23,14 @@ lc::Shader::WaterShader::WaterShader()
     
     m_render_texture_ = std::make_shared<sf::RenderTexture>();
     m_render_texture_->create(m_render_size_.x, m_render_size_.y);
+
+    m_convex_point_list_.emplace_back(0,0);
+    m_convex_point_list_.emplace_back(500,0);
+    m_convex_point_list_.emplace_back(500,500);
+    m_convex_point_list_.emplace_back(0,500);
+    m_convex_.setPointCount(4);
+    m_convex_.setFillColor(sf::Color::Transparent);
+    
     
     m_render_view_ = { sf::Vector2f(m_render_texture_->getSize() / 2u), sf::Vector2f(m_render_texture_->getSize()) };
 }
@@ -92,37 +100,89 @@ void lc::Shader::WaterShader::Update(WindowManager& window)
 
         m_update_parent_iterator_timer_ = 0.f;
     }
+
+    int id = 0;
+    for(auto& i : m_convex_point_list_)
+    {
+        if(i.x > m_render_size_.x)
+            m_most_extended_point_.x = &i.x;
+        if(i.y > m_render_size_.y)
+            m_most_extended_point_.y = &i.y;
+        
+        m_convex_.setPoint(id++,i);
+    }
+    if(m_most_extended_point_.x)
+        m_render_size_.x = *m_most_extended_point_.x;
+    if(m_most_extended_point_.y)
+        m_render_size_.y = *m_most_extended_point_.y;
 }
 
 void lc::Shader::WaterShader::Draw(WindowManager& window)
 {
     m_time_ += Tools::getDeltaTime();
 
-    //Set the shader uniform values.
+    
     m_shader_->setUniform("u_time", m_time_);
     m_shader_->setUniform("u_level", m_level_);
     m_shader_->setUniform("u_distortion_level", m_distortion_level_);
-
     //If the zone where the shader is applied changed, the render texture is recreated with the good size.
     if (m_render_size_ != m_render_texture_->getSize())
+    {
         m_render_texture_->create(m_render_size_.x, m_render_size_.y);
+    }
 
+    // //Set the view center and size.
+    // m_render_view_.setCenter(getParent()->getTransform().getPosition() + sf::Vector2f(m_render_texture_->getSize() / 2u));
+    // m_render_view_.setSize(sf::Vector2f(m_render_texture_->getSize()));
+    //
+    // //Set the view and clear the render texture.
+    // if (m_is_in_view_)
+    // {
+    //     m_render_texture_->setView(m_render_view_);
+    //     m_render_texture_->clear(sf::Color(150u, 150u, 150u));   
+    // }
+    //
+    // //Display of the object in the render texture.
+    // for (int i = static_cast<int>(Tools::s_layers.size()) - 1; i >= 0; --i)
+    // {
+    //     for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
+    //         this->draw_in_shader(obj_element, window, i);   
+    // }
+    //
+    // //Then set the texture of the render texture on the renderer and draw it with the shader.
+    // if (m_is_in_view_)
+    // {
+    //     m_render_texture_->display();
+    //
+    //     m_renderer.setTexture(&m_render_texture_->getTexture());
+    //     m_renderer.setTextureRect({{0, 0}, sf::Vector2i(m_render_texture_->getSize())});
+    //     m_renderer.setSize(sf::Vector2f(m_render_texture_->getSize()));
+    //     m_renderer.setPosition(getParent()->getTransform().getPosition());
+    //     m_renderer.setScale(getParent()->getTransform().getScale());
+    //     m_renderer.setOrigin(getParent()->getTransform().getOrigin());
+    //     m_renderer.setRotation(getParent()->getTransform().getRotation());
+    //
+    //     window.draw(m_renderer, m_shader_states_);
+    // }
+    //
+    // m_is_in_view_ = getParent()->is_in_window_view(window);
     //Set the view center and size.
+    
     m_render_view_.setCenter(getParent()->getTransform().getPosition() + sf::Vector2f(m_render_texture_->getSize() / 2u));
     m_render_view_.setSize(sf::Vector2f(m_render_texture_->getSize()));
 
-    //Set the view a clear the render texture.
+    //Set the view and clear the render texture.
     if (m_is_in_view_)
     {
         m_render_texture_->setView(m_render_view_);
-        m_render_texture_->clear(sf::Color::Black);   
+        m_render_texture_->clear(sf::Color::Transparent);    
     }
 
-    //Display of the object in the shader.
+    //Display of the object in the render texture.
     for (int i = static_cast<int>(ToolsBar::GetLayers().size()) - 1; i >= 0; --i)
     {
         for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
-            this->draw_in_shader(obj_element, window, static_cast<unsigned char>(i));   
+            this->draw_in_shader(obj_element, window, i);   
     }
 
     //Then set the texture of the render texture on the renderer and draw it with the shader.
@@ -130,15 +190,15 @@ void lc::Shader::WaterShader::Draw(WindowManager& window)
     {
         m_render_texture_->display();
 
-        m_renderer.setTexture(&m_render_texture_->getTexture());
-        m_renderer.setTextureRect({{0, 0}, sf::Vector2i(m_render_texture_->getSize())});
+        m_convex_.setTexture(&m_render_texture_->getTexture());
         m_renderer.setSize(sf::Vector2f(m_render_texture_->getSize()));
-        m_renderer.setPosition(getParent()->getTransform().getPosition());
-        m_renderer.setScale(getParent()->getTransform().getScale());
-        m_renderer.setOrigin(getParent()->getTransform().getOrigin());
-        m_renderer.setRotation(getParent()->getTransform().getRotation());
+        m_convex_.setTextureRect({{0, 0}, sf::Vector2i(m_render_texture_->getSize())});
+        m_convex_.setPosition(getParent()->getTransform().getPosition());
+        m_convex_.setScale(getParent()->getTransform().getScale());
+        m_convex_.setOrigin(getParent()->getTransform().getOrigin());
+        m_convex_.setRotation(getParent()->getTransform().getRotation());
 
-        window.draw(m_renderer, m_shader_states_);
+        window.draw(m_convex_, m_shader_states_);
     }
 
     m_is_in_view_ = getParent()->is_in_window_view(window);
@@ -153,26 +213,64 @@ void lc::Shader::WaterShader::Draw(sf::RenderTexture& window)
     m_shader_->setUniform("u_level", m_level_);
     m_shader_->setUniform("u_distortion_level", m_distortion_level_);
 
-    //If the zone where the shader is applied changed, the render texture is recreated with the good size.
+   //If the zone where the shader is applied changed, the render texture is recreated with the good size.
     if (m_render_size_ != m_render_texture_->getSize())
+    {
         m_render_texture_->create(m_render_size_.x, m_render_size_.y);
+    }
 
+    // //Set the view center and size.
+    // m_render_view_.setCenter(getParent()->getTransform().getPosition() + sf::Vector2f(m_render_texture_->getSize() / 2u));
+    // m_render_view_.setSize(sf::Vector2f(m_render_texture_->getSize()));
+    //
+    // //Set the view and clear the render texture.
+    // if (m_is_in_view_)
+    // {
+    //     m_render_texture_->setView(m_render_view_);
+    //     m_render_texture_->clear(sf::Color(150u, 150u, 150u));   
+    // }
+    //
+    // //Display of the object in the render texture.
+    // for (int i = static_cast<int>(Tools::s_layers.size()) - 1; i >= 0; --i)
+    // {
+    //     for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
+    //         this->draw_in_shader(obj_element, window, i);   
+    // }
+    //
+    // //Then set the texture of the render texture on the renderer and draw it with the shader.
+    // if (m_is_in_view_)
+    // {
+    //     m_render_texture_->display();
+    //
+    //     m_renderer.setTexture(&m_render_texture_->getTexture());
+    //     m_renderer.setTextureRect({{0, 0}, sf::Vector2i(m_render_texture_->getSize())});
+    //     m_renderer.setSize(sf::Vector2f(m_render_texture_->getSize()));
+    //     m_renderer.setPosition(getParent()->getTransform().getPosition());
+    //     m_renderer.setScale(getParent()->getTransform().getScale());
+    //     m_renderer.setOrigin(getParent()->getTransform().getOrigin());
+    //     m_renderer.setRotation(getParent()->getTransform().getRotation());
+    //
+    //     window.draw(m_renderer, m_shader_states_);
+    // }
+    //
+    // m_is_in_view_ = getParent()->is_in_window_view(window);
     //Set the view center and size.
+    
     m_render_view_.setCenter(getParent()->getTransform().getPosition() + sf::Vector2f(m_render_texture_->getSize() / 2u));
     m_render_view_.setSize(sf::Vector2f(m_render_texture_->getSize()));
 
-    //Set the view a clear the render texture.
+    //Set the view and clear the render texture.
     if (m_is_in_view_)
     {
         m_render_texture_->setView(m_render_view_);
-        m_render_texture_->clear(sf::Color::Black);
+        m_render_texture_->clear(sf::Color::Transparent);   
     }
 
-    //Display of the object in the shader.
+    //Display of the object in the render texture.
     for (int i = static_cast<int>(ToolsBar::GetLayers().size()) - 1; i >= 0; --i)
     {
         for (const auto& obj_element : lc::GameObject::GetRoot(getParent())->getObjects())
-            this->draw_in_shader(obj_element, window, static_cast<unsigned char>(i));   
+            this->draw_in_shader(obj_element, window, i);   
     }
 
     //Then set the texture of the render texture on the renderer and draw it with the shader.
@@ -180,15 +278,15 @@ void lc::Shader::WaterShader::Draw(sf::RenderTexture& window)
     {
         m_render_texture_->display();
 
-        m_renderer.setTexture(&m_render_texture_->getTexture());
-        m_renderer.setTextureRect({{0, 0}, sf::Vector2i(m_render_texture_->getSize())});
+        m_convex_.setTexture(&m_render_texture_->getTexture());
         m_renderer.setSize(sf::Vector2f(m_render_texture_->getSize()));
-        m_renderer.setPosition(getParent()->getTransform().getPosition());
-        m_renderer.setScale(getParent()->getTransform().getScale());
-        m_renderer.setOrigin(getParent()->getTransform().getOrigin());
-        m_renderer.setRotation(getParent()->getTransform().getRotation());
+        m_convex_.setTextureRect({{0, 0}, sf::Vector2i(m_render_texture_->getSize())});
+        m_convex_.setPosition(getParent()->getTransform().getPosition());
+        m_convex_.setScale(getParent()->getTransform().getScale());
+        m_convex_.setOrigin(getParent()->getTransform().getOrigin());
+        m_convex_.setRotation(getParent()->getTransform().getRotation());
 
-        window.draw(m_renderer, m_shader_states_);
+        window.draw(m_convex_, m_shader_states_);
     }
 
     m_is_in_view_ = getParent()->is_in_window_view(window);
@@ -200,7 +298,10 @@ void lc::Shader::WaterShader::Save(std::ofstream& save, sf::RenderTexture& textu
 		<< " " << m_typeName
         << " " << m_level_
         << " " << m_distortion_level_
-        << " " << m_render_size_;
+        << " " << m_render_size_
+        << " " << (int)m_convex_point_list_.size();
+    for(auto& i : m_convex_point_list_)
+        save << "\n" << i;
 }
 
 void lc::Shader::WaterShader::Export(std::ofstream& exportation)
@@ -209,12 +310,23 @@ void lc::Shader::WaterShader::Export(std::ofstream& exportation)
         << " " << m_typeName
         << " " << m_level_
         << " " << m_distortion_level_
-        << " " << m_render_size_;
+        << " " << m_render_size_
+        << " " << (int)m_convex_point_list_.size();
+        for(auto& i : m_convex_point_list_)
+            exportation << "\n" << i;
 }
 
 void lc::Shader::WaterShader::Load(std::ifstream& load)
 {
-    load >> m_level_ >> m_distortion_level_ >> m_render_size_;
+    int conv_size;
+    load >> m_level_ >> m_distortion_level_ >> m_render_size_ >> conv_size;
+    for(int i = 0;i< conv_size;i++)
+    {
+        sf::Vector2f point;
+        load >> point;
+        m_convex_point_list_.emplace_back(point);
+    }
+    
 }
 
 std::shared_ptr<lc::GameComponent> lc::Shader::WaterShader::Clone()
@@ -234,6 +346,30 @@ void lc::Shader::WaterShader::setHierarchieFunc()
 {
     m_hierarchieInformation = [this]()
     {
+        if(ImGui::Button("Add point"))
+        {
+            m_convex_point_list_.emplace_back();
+            sf::ConvexShape conv;
+            conv.setPointCount(m_convex_point_list_.size());
+            for(int i = 0; i < m_convex_point_list_.size();i++)
+                conv.setPoint(i,*std::next(m_convex_point_list_.begin(),i));
+            m_convex_ = conv;
+            m_convex_.setFillColor(sf::Color::Transparent);
+
+        }
+
+        for(int i = 0; i < m_convex_point_list_.size();i++)
+        {
+            ImGui::DragFloat2(std::string{"Point " + std::to_string(i)}.c_str(),*std::next(m_convex_point_list_.begin(),i));
+            if(std::next(m_convex_point_list_.begin(),i)->x < 0)
+                std::next(m_convex_point_list_.begin(),i)->x = 0;
+            if(std::next(m_convex_point_list_.begin(),i)->y < 0)
+                std::next(m_convex_point_list_.begin(),i)->y = 0;
+                
+            m_convex_.setPoint(i,*std::next(m_convex_point_list_.begin(),i));
+        }
+        ImGui::NewLine();
+        ImGui::NewLine();
         ImGui::SliderFloat("Water Level", &m_level_, 0.f, 1.f);
         ImGui::DragInt("Distortion Level", &m_distortion_level_, 1.f);
 
