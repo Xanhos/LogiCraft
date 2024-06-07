@@ -1,5 +1,7 @@
 #include "WaterShader.h"
 #include "ToolsBar.h"
+#include "WaterShader.h"
+#include "ToolsBar.h"
 
 lc::Shader::WaterShader::WaterShader()
     : m_level_(0.5f), m_distortion_level_(50), m_update_parent_iterator_timer_(0.f), m_is_in_view_(true)
@@ -319,6 +321,7 @@ void lc::Shader::WaterShader::Export(std::ofstream& exportation)
 void lc::Shader::WaterShader::Load(std::ifstream& load)
 {
     int conv_size;
+    m_convex_point_list_.clear();
     load >> m_level_ >> m_distortion_level_ >> m_render_size_ >> conv_size;
     for(int i = 0;i< conv_size;i++)
     {
