@@ -1,10 +1,11 @@
-# ⚠️ Disclaimer: Educational Project Context
-
-LogiCraft was developed during our first year of C++ studies. The project was built by three main contributors over a span of just three months.
-
-At the time, we were unfamiliar with game engine architecture and learned the GameObject/GameComponent system "on the fly" while developing. As a result of these strict time constraints and our simultaneous learning process, the codebase is not optimized and would require a complete refactor to meet professional/usable standards. We have chosen to keep the repository in its original state to provide context on our development journey and ability to deliver under pressure.
-
-With this in mind, enjoy the **Logicraft** !
+> [!IMPORTANT]
+> # Disclaimer: Educational Project Context
+>
+> LogiCraft was developed during our first year of C++ studies. The project was built by three main contributors over a span of just three months.
+>
+> At the time, we were unfamiliar with game engine architecture and learned the GameObject/GameComponent system "on the fly" while developing. As a result of these strict time constraints and our simultaneous learning process, the codebase is not optimized and would require a complete refactor to meet professional/usable standards. We have chosen to keep the repository in its original state to provide context on our development journey and ability to deliver under pressure.
+>
+> With this in mind, enjoy the **Logicraft** !
 
 ---
 # Logicraft 🎮
@@ -25,7 +26,7 @@ The editor creates a hierarchy of objects where users can attach components to e
 
 ## ✨ Key Features
 
-### 🎨 Rendering & Visuals
+### Rendering & Visuals
 * **Static Assets:** Drag-and-drop support for PNG textures.
 * **Animations:** Support for 2D sprite sheet animations.
 * **Custom Shaders:** Implementation of specific shaders, including:
@@ -34,11 +35,11 @@ The editor creates a hierarchy of objects where users can attach components to e
 * **Parallax Scrolling:** Native support for multi-layered backgrounds to create depth.
 * **Particle System:** Built-in emitter for dynamic visual effects.
 
-### 🧠 Gameplay & Logic
+### Gameplay & Logic
 * **Behavior Tree AI:** A simplified AI system allowing for the creation of basic NPC behaviors and decision-making.
 * **Player Management:** dedicated systems for Player Spawning and state management.
 
-### 🛠 Architecture & Editor
+### Architecture & Editor
 * **GameObject / Component System:** Inspired by Unity, this allows for a flexible composition of game entities.
 * **Scene Hierarchy:** Objects are organized in a parent-child relationship tree.
 * **ImGui Interface:** The entire editor GUI (inspector, hierarchy, asset browser) is built using **Dear ImGui**.
